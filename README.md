@@ -1,22 +1,26 @@
 # STEAM Academy CyberPatriot Documentation
 
-## Contents
+## :clipboard: Contents
 
 - [Virtual Machines](#virtual-machines)
 	- [Getting Started with the VMs](#getting-started-with-the-vms)
+  - [Windows 10](#windows-10)
+  - [Windows Server](#windows-server)
+  - [Ubuntu 22](#ubuntu-22)
+  - [Debian](#debian)
 - [Packet Tracer](#packet-tracer)
 	- [Getting Started with PT](#getting-started-with-pt)
 - [Net Academy Quiz](#net-academy-quiz)
 	- [How to Complete the Quiz](#how-to-complete-the-quiz)
 
 
-# Virtual Machines
+# :computer: Virtual Machines
 
 ### Getting Started with the VMs
 
 1. Where to download VM images
 2. Loading the images into VMware
->Note:
+>:warning: **DO NOT HAVE TWO INSTANCES OF ONE IMAGE OPEN SIMULTANEOUSLY** :warning:
 4. Entering the UID
 5. Understanding the README, scoring sheet, and forensics questions
 6. Stop scoring
@@ -25,11 +29,15 @@
 
 ## Windows Server
 
-## Ubuntu
+## Ubuntu 22
 
 ## Debian
 
-# Packet Tracer
+Uses the same commands as [ubuntu](#ubuntu-22) but the GUI is much more limited
+
+---
+
+# :satellite: Packet Tracer
 
 ### Getting Started with PT
 
