@@ -2,7 +2,7 @@
 
 ## :clipboard: Contents
 
-- [Virtual Machines](#virtual-machines)
+- [Virtual Machines](#:computer:-virtual-machines)
 	- [Getting Started with the VMs](#getting-started-with-the-vms)
   - [Windows 10](#windows-10)
   - [Windows Server](#windows-server)
