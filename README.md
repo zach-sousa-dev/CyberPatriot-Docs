@@ -13,6 +13,7 @@
 	  - [User Management](#managing-users-in-ubuntu)
 	  - [Firewall](#uncomplicated-firewall-\(ufw\))
     - [Services](#services-in-ubuntu)
+    - [General Maintenance](#general-maintenance-in-ubuntu)
   - [Debian](#debian)
 - [Packet Tracer](#packet-tracer)
 	- [Getting Started with PT](#getting-started-with-pt)
