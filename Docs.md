@@ -45,7 +45,7 @@
 
 # Cisco Networking Academy
 
-### Getting Started with PT
+## Getting Started with PT
 
 ### Networking Academy
 
