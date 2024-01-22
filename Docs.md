@@ -10,7 +10,6 @@
 	  - [Ubuntu 22](Ubuntu.md)
 	  - [Debian](Debian.md)
 - [Cisco Networking Academy](#cisco-networking-academy)
-	- [Getting Started with PT](#getting-started-with-pt)
   - [Networking Academy](#networking-academy)
   - [Useful Modules](#useful-modules)
 - [Net Academy Quiz](#net-academy-quiz)
@@ -44,8 +43,6 @@
 
 
 # Cisco Networking Academy
-
-## Getting Started with PT
 
 ### Networking Academy
 
