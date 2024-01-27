@@ -177,7 +177,7 @@
 
 - #### Disable Root Login From ssh
 
-	1. In the terminal, run: `sudo nano /etc/ssh/shhd_config`
+	1. In the terminal, run: `sudo nano /etc/ssh/sshd_config`
 	2. Look for `PermitRootLogin`
 	3. Change `yes` to `no`
 	4. Press CRTL + X to save and exit
