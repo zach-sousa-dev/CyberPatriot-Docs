@@ -1,5 +1,7 @@
 # STEAM Academy CyberPatriot Documentation
 
+ [Video Reviewing These Docs]([www.netacad.com](https://youtu.be/SiRn0inJGeU))
+
 ## Contents
 
 - [Virtual Machines](#virtual-machines)
