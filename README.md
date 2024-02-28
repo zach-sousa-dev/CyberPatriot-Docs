@@ -1,6 +1,6 @@
 # STEAM Academy CyberPatriot Documentation
 
- [Video Reviewing These Docs]([https://youtu.be/SiRn0inJGeU])
+ [Video Reviewing These Docs](https://youtu.be/SiRn0inJGeU)
 
 ## Contents
 
