@@ -3,7 +3,7 @@
 ## Contents
 
 ### Other Pages
-- [Main Page](Docs.md)
+- [Main Page](README.md)
 - [Windows Server](Server.md)
 - [Ubuntu](Ubuntu.md)
 - [Debian](Debian.md)

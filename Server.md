@@ -1,7 +1,7 @@
 # Windows Server
 
 ### Other Pages
-- [Main Page](Docs.md)
+- [Main Page](README.md)
 - [Windows 10](Windows_10.md)
 - [Ubuntu](Ubuntu.md)
 - [Debian](Debian.md)
