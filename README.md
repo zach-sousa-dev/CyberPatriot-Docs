@@ -12,7 +12,11 @@
 	  - [Ubuntu 22](Ubuntu.md)
 	  - [Debian](Debian.md)
 - [Cisco Networking Academy](#cisco-networking-academy)
+	- [Getting Started with PT](#getting-started-with-pt)
+  - [Networking Academy](#networking-academy)
   - [Useful Modules](#useful-modules)
+- [Net Academy Quiz](#net-academy-quiz)
+	- [How to Complete the Quiz](#how-to-complete-the-quiz)
 
 ---
 
@@ -42,6 +46,10 @@
 
 
 # Cisco Networking Academy
+
+### Getting Started with PT
+
+### Networking Academy
 
 - **Logging In**
 
@@ -88,8 +96,11 @@
 	5. Choose either the Packet Tracer activity or the Networking Challenge Quiz
 
 	![Course Contents](images/pt/course-content.png "Course Contents")
-
-	6. Follow the on-screen instructions
+	
+- Downloading the project
+- Opening the project
+- Brief tour
+- Saving and submitting the project
 
 ### Useful Modules
 
@@ -99,3 +110,11 @@
 - [Module 18 \(Firewalls\)](Packet_Tracer/Module18.md)
 	- Unfinished
 
+# Net Academy Quiz
+
+### How to Complete the Quiz
+
+- Logging into Networking Academy
+- Opening the quiz
+- Answering the questions
+- Submitting the quiz
