@@ -32,6 +32,18 @@
   - [Limit Blank Passwords](#limit-local-use-of-blank-passwords-to-console-only)
   - [Disable Anonymous Enumeration of SAM Accounts](#disable-anonymous-enumeration-of-sam-accounts)
 
+## 1. Account Policies
+### 1.1 Password Policies
+#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
+``` 
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Password Policy\Enforce password history 
+``` 
+Setting : 24  
+Links  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
+[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
+
+
 ## General Security
 
 #### Update Windows
