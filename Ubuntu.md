@@ -9,6 +9,12 @@
 - [Debian](Debian.md)
 
 ### Sub Headings
+- [1. Initial Setup](#1.-initial-setup)
+- [2. Services](#2.-services)
+- [3. Network Configuration](#3.-network-configuration)
+- [4. Logging and Auditing](#4.-logging-and-auditing)
+- [5. Access, Authentication, and Authorization](#5.-access,-authentication,-and-authorization)
+- [6. System Maintenance](#6.-system-maintenance)
 - [User Management](#managing-users-in-ubuntu)
 	- [Adding User](#making-a-user)
   - [Removing User](#removing-a-user)
@@ -45,6 +51,19 @@
   - [Delete Individual Files of Type](#delete-individual-files-of-type)
   - [Delete All Files of Type From a Directory](#delete-all-files-of-type-from-a-directory)
   - [Remove Unwanted Software](#remove-unwanted-software)
+
+
+## 1. Initial Setup
+
+## 2. Services
+
+## 3. Network Configuration
+
+## 4. Logging and Auditing
+
+## 5. Access, Authentication, and Authorization
+
+## 6. System Maintenance
 
 > :page_with_curl: Currently, not *every* action that we need to perform in Ubuntu is documented using terminal commands (GUI is used instead). If you discover a command alternative please take note of it so it can be added to the documentation.
 
