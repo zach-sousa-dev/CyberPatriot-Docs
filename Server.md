@@ -6,4 +6,33 @@
 - [Ubuntu](Ubuntu.md)
 - [Debian](Debian.md)
 
-> :page_with_curl: W.I.P. see [Windows 10](Windows_10.md).
+> :hammer: ~~W.I.P. see [Windows 10](Windows_10.md).~~ This is being worked on now!
+
+>:page_with_curl: This documentation is being swiftly written in preparation for the CyberPatriot Nationals. Basically, it might be a little messy.
+
+- ## 1. Account Policies
+    - ### 1.1 Password Policies
+        - #### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
+
+        - #### 1.1.2 (L1) Ensure 'Maximum password age' is set to '365 or fewer days, but not 0' (Automated)
+
+        - #### 1.1.3 (L1) Ensure 'Minimum password age' is set to '1 or more day(s)' (Automated)
+
+        - #### 1.1.4 (L1) Ensure 'Minimum password length' is set to '14 or more character(s)' (Automated)
+
+        - #### 1.1.5 (L1) Ensure 'Password must meet complexity requirements' is set to 'Enabled' (Automated)
+
+        - #### 1.1.6 (L1) Ensure 'Store passwords using reversible encryption' is set to 'Disabled' (Automated)
+
+    - ### 1.2 Account Lockout Policy
+        - #### 1.2.1 (L1) Ensure 'Account lockout duration' is set to '15 or more minute(s)' (Automated)
+
+        - #### 1.2.2 (L1) Ensure 'Account lockout threshold' is set to '5 or fewer invalid logon attempt(s), but not 0' (Automated)
+
+        - #### 1.2.3 (L1) Ensure 'Allow Administrator account lockout' is set to 'Enabled' (MS only) (Manual)
+
+        - #### 
+
+
+        
+        
