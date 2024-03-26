@@ -39,10 +39,55 @@
 Computer Configuration\Policies\Windows Settings\Security Settings\Account 
 Policies\Password Policy\Enforce password history 
 ``` 
-Setting : 24  
-Links  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
+Setting: 24  
+Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
 [2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
+<br></br>
 
+
+
+#### 1.1.2 (L1) Ensure 'Maximum password age' is set to '365 or fewer days, but not 0' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Password Policy\Maximum password age
+```
+
+Setting: 42  
+Links:  [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide), 
+[2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
+<br></br>
+
+#### 1.1.3 (L1) Ensure 'Minimum password age' is set to '1 or more day(s)' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Password Policy\Minimum password age
+```
+Setting: 1      
+Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide),
+[2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
+<br></br>
+
+
+#### 1.1.4 (L1) Ensure 'Minimum password length' is set to '14 or more character(s)' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Password Policy\Minimum password length
+```
+Setting: 7  
+Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide),
+[2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
+<br></br>
+
+
+#### 1.1.5 (L1) Ensure 'Password must meet complexity requirements' is set to 'Enabled' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Password Policy\Password must meet complexity requirements
+```
+Setting: Not contain the user's account name, have at least six characters in length, contain characters that are uppercase, lowercase, base 10 digits (0 through 9), non-alphabetic characters(i.e. !,$,#,%)  
+Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide),
+[2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
+<br></br>
 
 ## General Security
 
