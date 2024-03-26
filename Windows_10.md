@@ -32,7 +32,7 @@
   - [Limit Blank Passwords](#limit-local-use-of-blank-passwords-to-console-only)
   - [Disable Anonymous Enumeration of SAM Accounts](#disable-anonymous-enumeration-of-sam-accounts)
 
-## 1. Account Policies
+## 1. Account Policies ***EMMANUEL***
 ### 1.1 Password Policies
 #### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
 ``` 
