@@ -89,6 +89,148 @@ Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-
 [2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
 <br></br>
 
+#### 1.1.6 (L1) Ensure 'Relax minimum password length limits' is set to 'Enabled' (Automated)
+```
+Audit: HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\SAM:RelaxMinimumPasswordL
+engthLimits
+
+Remediation: Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Password Policy\Relax minimum password length limits
+```
+Setting: minimum password length can be configured to a max of 14 chars
+
+Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide), 
+[2](https://support.microsoft.com/en-us/topic/minimum-password-length-auditing-and-enforcement-on-certain-versions-of-windows-5ef7fecf-3325-f56b-cc10-4fd565aacc59),  [3](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
+<br></br>
+
+#### 1.1.7 (L1) Ensure 'Store passwords using reversible encryption' is set to 'Disabled' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Password Policy\Store passwords using reversible encryption
+```
+Setting: Disabled     
+Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide), [2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
+<br></br>
+
+## 1.2 Account Lockout Policy
+#### 1.2.1 (L1) Ensure 'Account lockout duration' is set to '15 or more minute(s)' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Account Lockout Policy\Account lockout duration
+```
+Setting: None, because this policy setting only has meaning if the account lockout threshold is specified    
+Link: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide)
+<br></br>
+
+#### 1.2.2 (L1) Ensure 'Account lockout threshold' is set to '5 or fewer invalid logon attempt(s), but not 0' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Account Lockout Policy\Account lockout threshold
+```
+Setting: 0 failed logon attempts    
+Link: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide)
+<br></br>
+
+#### 1.2.3 (L1) Ensure 'Allow Administrator account lockout' is set to 'Enabled' (Manual)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Account Lockout Policies\Allow Administrator account lockout
+```
+Setting: Disabled   
+Link: [1](https://support.microsoft.com/en-us/topic/kb5020282-account-lockout-available-for-built-in-local-administrators-bce45c4d-f28d-43ad-b6fe-70156cb2dc00)
+<br></br>
+
+#### 1.2.4 (L1) Ensure 'Reset account lockout counter after' is set to '15 or more minute(s)' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Account 
+Policies\Account Lockout Policy\Reset account lockout counter after
+```
+Setting: None, because this policy setting only has meaning if the account lockout threshold is specified   
+Link: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide)
+<br></br>
+
+## 2. Local Policies
+### 2.1 Audit Policy (this is left blank and exists to ensure the structure of Windows benchmarks is consistent.)
+#### 2.2.1 (L1) Ensure 'Access Credential Manager as a trusted caller' is set to 'No One' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Access Credential Manager as a trusted caller
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/access-credential-manager-as-a-trusted-caller)
+<br></br>
+
+#### 2.2.2 (L1) Ensure 'Access this computer from the network' is set to 'Administrators, Remote Desktop Users' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Access this computer from the network
+```
+Setting: Administrators, backup operators, everyone, users    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/access-credential-manager-as-a-trusted-caller)
+<br></br>
+
+#### 2.2.3 (L1) Ensure 'Act as part of the operating system' is set to 'No One' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Act as part of the operating system
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/act-as-part-of-the-operating-system)
+<br></br>
+
+#### 2.2.4 (L1) Ensure 'Adjust memory quotas for a process' is set to 'Administrators, LOCAL SERVICE, NETWORK SERVICE' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Adjust memory quotas for a process
+```
+Setting: Administrators, LOCAL SERVICE, NETWORK SERVICE   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/adjust-memory-quotas-for-a-process)
+<br></br>
+
+#### 2.2.5 (L1) Ensure 'Allow log on locally' is set to 'Administrators, Users' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Allow log on locally
+```
+Setting: Administrators, backup operators, guest, users   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/allow-log-on-locally)
+<br></br>
+
+#### 2.2.6 (L1) Ensure 'Allow log on through Remote Desktop Services' is set to 'Administrators, Remote Desktop Users' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Allow log on through Remote Desktop Services
+```
+Setting: Administrators, remote desktop users   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/allow-log-on-through-remote-desktop-services)
+<br></br>
+
+#### 2.2.7 (L1) Ensure 'Back up files and directories' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Back up files and directories
+```
+Setting: Administrators, backup operators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/back-up-files-and-directories)
+<br></br>
+
+#### 2.2.8 (L1) Ensure 'Change the system time' is set to 'Administrators, LOCAL SERVICE' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Change the system time
+```
+Setting: Administrators, LOCAL SERVICE    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/change-the-system-time)
+<br></br>
+
+#### 2.2.9 (L1) Ensure 'Change the time zone' is set to 'Administrators, LOCAL SERVICE, Users' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Change the time zone
+```
+Setting: Administrators, LOCAL SERVICE, users   
+Link: [1](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/change-the-time-zone)
+
 ## General Security
 
 #### Update Windows
