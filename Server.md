@@ -13,8 +13,20 @@
 - ## 1. Account Policies
     - ### 1.1 Password Policies
         - #### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Account Policies\Password Policy\Enforce password history
+        ```
+        Setting: 24 or more password(s)
+    
+        Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide)
 
         - #### 1.1.2 (L1) Ensure 'Maximum password age' is set to '365 or fewer days, but not 0' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Account      Policies\Password Policy\Maximum password age
+        ```
+        Setting: 365 or fewer, but not 0
+
+        Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide)
 
         - #### 1.1.3 (L1) Ensure 'Minimum password age' is set to '1 or more day(s)' (Automated)
 
@@ -31,7 +43,14 @@
 
         - #### 1.2.3 (L1) Ensure 'Allow Administrator account lockout' is set to 'Enabled' (MS only) (Manual)
 
-        - #### 
+        - #### 1.2.4 (L1) Ensure 'Reset account lockout counter after' is set to '15 or more minute(s)' (Automated)
+
+- ## 2. Local Policies
+    - ### 2.2 User Rights Assignment
+        - #### 2.2.1 (L1) Ensure 'Access Credential Manager as a trusted caller' is set to 'No One' (Automated)
+
+
+    
 
 
         
