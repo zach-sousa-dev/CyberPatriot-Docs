@@ -11,6 +11,8 @@
 ### Sub Headings
 - [1 Initial Setup](#1-initial-setup)
   - [Filesystem Configuration](#filesystem-configuration)
+	- [Disable Unused Filesystems](#disable-unused-filesystems)
+	- [Configure tmp](#configure-tmp)
   - [Configure Software Updates](#configure-software-updates)
   - [Filesystem Integrity Checking](#filesystem-integrity-checking)
   - [Secure Boot Settings](#secure-boot-settings)
@@ -32,11 +34,14 @@
 - [5 Access Authentication and Authorization](#5-access-authentication-and-authorization)
 - [6 System Maintenance](#6-system-maintenance)
 
+---
+
+> Commands starting with `#` may require you to start the command with `sudo` instead.
+
 ## 1 Initial Setup
 ### Filesystem Configuration
 #### Disable Unused Filesystems
-1. Ensure mounting of cramfs filesystems is disabled 
-(Automated)
+1. Ensure mounting of cramfs filesystems is disabled (Automated)
 
 Run the following script to check if the filesystem is installed
 ``` bash
@@ -94,8 +99,7 @@ Run the following script to remove the filesystem
 ```
 
 
-2. Ensure mounting of squashfs filesystems is disabled 
-(Automated)
+2. Ensure mounting of squashfs filesystems is disabled (Automated)
 
 > Snap packages use this filesystem
 
@@ -156,8 +160,7 @@ Run the following script to remove the filesystem
 
 ```
 
-3. Ensure mounting of udf filesystems is disabled 
-(Automated)
+3. Ensure mounting of udf filesystems is disabled (Automated)
 
 > Microsoft Azure uses this filesystem
 
@@ -214,6 +217,28 @@ Run the following script to remove the filesystem
 		echo -e "blacklist $l_mname" >> /etc/modprobe.d/"$l_mname".conf
 	fi
 ```
+#### Configure tmp
+1. Ensure /tmp is a separate partition (Automated)
+Run the following command and verify the output shows that `/tmp` is mounted.
+
+`# findmnt --kernel /tmp TARGET SOURCE FSTYPE OPTIONS /tmp tmpfs tmpfs rw,nosuid,nodev,noexec,inode6`
+
+Ensure that systemd will mount the `/tmp` partition at boot time.
+
+`# systemctl is-enabled tmp.mount`
+`enabled`
+
+First ensure that systemd is correctly configured to ensure that `/tmp` will be mounted at 
+boot time.
+
+`# systemctl unmask tmp.mount`
+
+> **More Information**
+> 
+> ![Additional tmp information](images/ubuntu/1-1-2-1.png)
+
+[\[1\]](https://www.freedesktop.org/wiki/Software/systemd/APIFileSystems/)
+[\[2\]](https://www.freedesktop.org/software/systemd/man/latest/systemd-fstab-generator.html)
 
 ### Configure Software Updates
 
