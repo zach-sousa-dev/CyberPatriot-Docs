@@ -95,24 +95,52 @@ Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-
 
 ### Private Profile
 
-#### (L1) Ensure 'Windows Firewall: Private: Firewall state' is set to 'On (recommended)' (Automated)
-
+### (L1) Ensure 'Windows Firewall: Private: Firewall state' is set to 'On (recommended)' (Automated)
+<br></br>
 It's reccomended that Windows Defender Firewall is on. Simply type "Windows defender firewall with advanced security" Then turn it on.
 
 To turn the Windows Defender Firewall With Advanced Security on search up group policy, Computer configuration , then Windows Settings, Security Settings, Windows Defender Firewall, click the drop down arrow go into Windows Defender Firewall With Advanced Security, Windows Firewall Properties, Private Profile, Firewall state.
 
-##### How to turn on firewall in enterprise version of windows
+<br></br>
+
+### How to turn on firewall in enterprise version of windows
 
 
  Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
 Defender Firewall with Advanced Security\Windows Defender Firewall with 
 Advanced Security\Windows Firewall Properties\Private Profile\Firewall state
 
-#### Ensure 'Windows Firewall: Private: Inbound connections' is set to 'Block (default)' (Automated)
+### Ensure 'Windows Firewall: Private: Inbound connections' is set to 'Block (default)' (Automated)
 
-Navigate to registry Edit
-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile
-:DefaultInboundAction
+<br></br>
+
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Private Profile\Inbound 
+connections
+
+
+Set it to ***Block(Default)***
+
+
+### (L1) Ensure 'Windows Firewall: Private: Outbound connections' is set to 'Allow (default)' (Automated)
+<br></br>
+
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Private Profile\Outbound 
+connections
+
+This should be set to ***Allow(Defautlt)***
+
+###  Ensure 'Windows Firewall: Private: Settings: Display a notification' is set to 'No' (Automated)
+
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Private Profile\Settings 
+Customize\Display a notification
+
+This setting should be set to ***No***
 
 
 ## General Security
