@@ -87,7 +87,16 @@ Policies\Password Policy\Password must meet complexity requirements
 Setting: Not contain the user's account name, have at least six characters in length, contain characters that are uppercase, lowercase, base 10 digits (0 through 9), non-alphabetic characters(i.e. !,$,#,%)  
 Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide),
 [2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
+<br><br>
+## 17. Advanced Audit Policy Configuration
+### 17.1. Account Logon
+#### 17.1.1.  Ensure 'Audit Credential Validation' is set to 'Success 
+and Failure' (Automated)
+
 <br></br>
+  
+
+
 
 ---
 
