@@ -10,17 +10,17 @@
 
 ### Sub Headings
 - [1 Initial Setup](#1-initial-setup)
-  - [Filesystem Configuration](#filesystem-configuration)
-	- [Disable Unused Filesystems](#disable-unused-filesystems)
-	- [Configure tmp](#configure-tmp)
-	- [Configure var](#configure-var)
-  - [Configure Software Updates](#configure-software-updates)
-  - [Filesystem Integrity Checking](#filesystem-integrity-checking)
-  - [Secure Boot Settings](#secure-boot-settings)
-  - [Additional Process Hardening](#additional-process-hardening)
-  - [Mandatory Access Control](#mandatory-access-control)
-  - [Command Line Warning Banners](#command-line-warning-banners)
-  - [GNOME Display Manager](#gnome-display-manager)
+  - [1 Filesystem Configuration](#1-filesystem-configuration)
+	- [1 Disable Unused Filesystems](#1-disable-unused-filesystems)
+	- [2 Configure tmp](#2-configure-tmp)
+	- [3 Configure var](#3-configure-var)
+  - [2 Configure Software Updates](#2-configure-software-updates)
+  - [3 Filesystem Integrity Checking](#3-filesystem-integrity-checking)
+  - [4 Secure Boot Settings](#4-secure-boot-settings)
+  - [5 Additional Process Hardening](#5-additional-process-hardening)
+  - [6 Mandatory Access Control](#6-mandatory-access-control)
+  - [7 Command Line Warning Banners](#7-command-line-warning-banners)
+  - [8 GNOME Display Manager](#8-gnome-display-manager)
 - [2 Services](#2-services)
   - [Configure Time Synchronization](#configure-time-synchronization)
   - [Special Purpose Services](#special-purpose-services)
@@ -40,8 +40,8 @@
 > Commands starting with `#` may require you to start the command with `sudo` instead.
 
 ## 1 Initial Setup
-### Filesystem Configuration
-#### Disable Unused Filesystems
+### 1 Filesystem Configuration
+#### 1 Disable Unused Filesystems
 1. Ensure mounting of cramfs filesystems is disabled (Automated)
 
 Run the following script to check if the filesystem is installed
@@ -219,7 +219,7 @@ Run the following script to remove the filesystem
 	fi
 ```
 
-#### Configure tmp
+#### 2 Configure tmp
 1. Ensure /tmp is a separate partition (Automated)
 
 Run the following command and verify the output shows that `/tmp` is mounted.
@@ -313,7 +313,7 @@ Run the following command to remount `/tmp` with the configured options:
 
 `# mount -o remount /tmp`
 
-#### Configure var
+#### 3 Configure var
 1. Ensure separate partition exists for /var (Automated)
 
 Run the following command and verify output shows /var is mounted.
@@ -384,7 +384,7 @@ Run the following command to remount /var with the configured options:
 
 `# mount -o remount /var`
 
-#### Configure var tmp
+#### 4 Configure var tmp
 1. 
 
 
@@ -397,7 +397,7 @@ Run the following command to remount /var with the configured options:
 4. 
 
 
-#### Configure var log
+#### 5 Configure var log
 1. 
 
 
@@ -410,7 +410,7 @@ Run the following command to remount /var with the configured options:
 4. 
 
 
-#### Configure var log audit
+#### 6 Configure var log audit
 1. 
 
 
@@ -423,7 +423,7 @@ Run the following command to remount /var with the configured options:
 4. 
 
 
-#### Configure home
+#### 7 Configure home
 1. 
 
 
@@ -433,7 +433,7 @@ Run the following command to remount /var with the configured options:
 3. 
 
 
-#### Configure dev shm
+#### 8 Configure dev shm
 1. 
 
 
@@ -443,25 +443,25 @@ Run the following command to remount /var with the configured options:
 3. 
 
 
-#### Disable Automounting
+#### 9 Disable Automounting
 
 
-#### Disable USB Storage
+#### 10 Disable USB Storage
 
 
-### Configure Software Updates
+### 2 Configure Software Updates
 
-### Filesystem Integrity Checking
+### 3 Filesystem Integrity Checking
 
-### Secure Boot Settings
+### 4 Secure Boot Settings
 
-### Additional Process Hardening
+### 5 Additional Process Hardening
 
-### Mandatory Access Control
+### 6 Mandatory Access Control
 
-### Command Line Warning Banners
+### 7 Command Line Warning Banners
 
-### GNOME Display Manager
+### 8 GNOME Display Manager
 
 ---
 
