@@ -89,6 +89,32 @@ Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-
 [2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
 <br></br>
 
+---
+
+## Windows Defender Firewall with Advanced Security
+
+### Private Profile
+
+#### (L1) Ensure 'Windows Firewall: Private: Firewall state' is set to 'On (recommended)' (Automated)
+
+It's reccomended that Windows Defender Firewall is on. Simply type "Windows defender firewall with advanced security" Then turn it on.
+
+To turn the Windows Defender Firewall With Advanced Security on search up group policy, Computer configuration , then Windows Settings, Security Settings, Windows Defender Firewall, click the drop down arrow go into Windows Defender Firewall With Advanced Security, Windows Firewall Properties, Private Profile, Firewall state.
+
+##### How to turn on firewall in enterprise version of windows
+
+
+ Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Private Profile\Firewall state
+
+#### Ensure 'Windows Firewall: Private: Inbound connections' is set to 'Block (default)' (Automated)
+
+Navigate to registry Edit
+HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile
+:DefaultInboundAction
+
+
 ## General Security
 
 #### Update Windows
@@ -252,7 +278,7 @@ Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-
 
 ![Add User](images/windows/add_user.png "Add User To Group")
 
-5. The group should now populate with the created user
+5. The Group should now populate with the created user
 
 ![Updated Group Menu](images/windows/add_group_menu.png "Updated Group Menu")
 
