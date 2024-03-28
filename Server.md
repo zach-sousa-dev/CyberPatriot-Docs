@@ -102,8 +102,56 @@
     - ### 2.2 User Rights Assignment
         - #### 2.2.1 (L1) Ensure 'Access Credential Manager as a trusted caller' is set to 'No One' (Automated)
         ```
-
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access Credential Manager as a trusted caller
         ```
+
+        Setting: No One
+
+        - #### 2.2.2 (L1) Ensure 'Access this computer from the network' is set to 'Administrators, Authenticated Users, ENTERPRISE DOMAIN CONTROLLERS' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access this computer from the network
+        ```
+
+        - #### 2.2.3 (L1) Ensure 'Access this computer from the network' is set to 'Administrators, Authenticated Users' (MS only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access this computer from the network
+        ```
+
+        - #### 2.2.4 (L1) Ensure 'Act as part of the operating system' is set to 'No One' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Act as part of the operating system
+        ```
+
+        Setting: No One
+
+        - #### 2.2.5 (L1) Ensure 'Add workstations to domain' is set to 'Administrators' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Add workstations to domain
+        ```
+
+        Setting: Administrators
+
+        - #### 2.2.6 (L1) Ensure 'Adjust memory quotas for a process' is set to 'Administrators, LOCAL SERVICE, NETWORK SERVICE' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Adjust memory quotas for a process
+        ```
+
+        Setting: Administrators, LOCAL SERVICE, NETWORK SERVICE
+
+        - #### 2.2.7 (L1) Ensure 'Allow log on locally' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Allow log on locally
+        ```
+
+        - #### 2.2.8 (L1) Ensure 'Allow log on through Remote Desktop Services' is set to 'Administrators' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Allow log on through Remote Desktop Services
+        ```
+
+
+
+
+
 
 
     
