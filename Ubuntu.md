@@ -9,31 +9,49 @@
 - [Debian](Debian.md)
 
 ### Sub Headings
-- [1 Initial Setup](#1-initial-setup)
-  - [1 Filesystem Configuration](#1-filesystem-configuration)
-	- [1 Disable Unused Filesystems](#1-disable-unused-filesystems)
-	- [2 Configure tmp](#2-configure-tmp)
-	- [3 Configure var](#3-configure-var)
-  - [2 Configure Software Updates](#2-configure-software-updates)
-  - [3 Filesystem Integrity Checking](#3-filesystem-integrity-checking)
-  - [4 Secure Boot Settings](#4-secure-boot-settings)
-  - [5 Additional Process Hardening](#5-additional-process-hardening)
-  - [6 Mandatory Access Control](#6-mandatory-access-control)
-  - [7 Command Line Warning Banners](#7-command-line-warning-banners)
-  - [8 GNOME Display Manager](#8-gnome-display-manager)
-- [2 Services](#2-services)
-  - [Configure Time Synchronization](#configure-time-synchronization)
-  - [Special Purpose Services](#special-purpose-services)
-  - [Service Clients](#service-clients)
-- [3 Network Configuration](#3-network-configuration)
-  - [Disable Unused Network Protocols and Devices](#disable-unused-network-protocols-and-devices)
-  - [Network Parameters(Host Only)](#network-parameters-host-only)
-  - [Network Parameters Host and Router](#network-parameters-host-and-router)
-  - [Uncommon Network Protocols](#uncommon-network-protocols)
-  - [Firewall Configuration](#firewall-configuration)
-- [4 Logging and Auditing](#4-logging-and-auditing)
-- [5 Access Authentication and Authorization](#5-access-authentication-and-authorization)
-- [6 System Maintenance](#6-system-maintenance)
+- [Ubuntu 22](#ubuntu-22)
+	- [Contents](#contents)
+		- [Other Pages](#other-pages)
+		- [Sub Headings](#sub-headings)
+	- [1 Initial Setup](#1-initial-setup)
+		- [1 Filesystem Configuration](#1-filesystem-configuration)
+			- [1 Disable Unused Filesystems](#1-disable-unused-filesystems)
+			- [2 Configure tmp](#2-configure-tmp)
+			- [3 Configure var](#3-configure-var)
+			- [4 Configure var tmp](#4-configure-var-tmp)
+			- [5 Configure var log](#5-configure-var-log)
+			- [6 Configure var log audit](#6-configure-var-log-audit)
+			- [7 Configure home](#7-configure-home)
+			- [8 Configure dev shm](#8-configure-dev-shm)
+			- [9 Disable Automounting](#9-disable-automounting)
+			- [10 Disable USB Storage](#10-disable-usb-storage)
+		- [2 Configure Software Updates](#2-configure-software-updates)
+		- [3 Filesystem Integrity Checking](#3-filesystem-integrity-checking)
+		- [4 Secure Boot Settings](#4-secure-boot-settings)
+		- [5 Additional Process Hardening](#5-additional-process-hardening)
+		- [6 Mandatory Access Control](#6-mandatory-access-control)
+		- [7 Command Line Warning Banners](#7-command-line-warning-banners)
+		- [8 GNOME Display Manager](#8-gnome-display-manager)
+	- [2 Services](#2-services)
+		- [Configure Time Synchronization](#configure-time-synchronization)
+		- [Special Purpose Services](#special-purpose-services)
+		- [Service Clients](#service-clients)
+	- [3 Network Configuration](#3-network-configuration)
+		- [Disable Unused Network Protocols and Devices](#disable-unused-network-protocols-and-devices)
+		- [Network Parameters Host Only](#network-parameters-host-only)
+		- [Network Parameters Host and Router](#network-parameters-host-and-router)
+		- [Uncommon Network Protocols](#uncommon-network-protocols)
+		- [Firewall Configuration](#firewall-configuration)
+	- [4 Logging and Auditing](#4-logging-and-auditing)
+		- [1 Configure System Accounting (auditd)](#1-configure-system-accounting-auditd)
+		- [2 Configure Logging](#2-configure-logging)
+	- [5 Access Authentication and Authorization](#5-access-authentication-and-authorization)
+		- [1 Configure time-based job schedulers](#1-configure-time-based-job-schedulers)
+		- [2 Configure SSH Server](#2-configure-ssh-server)
+		- [3 Configure privilege escalation](#3-configure-privilege-escalation)
+		- [4 Configure PAM](#4-configure-pam)
+		- [5 User Account and](#5-user-account-and)
+	- [6 System Maintenance](#6-system-maintenance)
 
 ---
 
@@ -489,9 +507,40 @@ Run the following command to remount /var with the configured options:
 
 ## 4 Logging and Auditing
 
+###  1 Configure System Accounting (auditd)
+
+1. Ensure auditing is enabled 
+
+2. Configure  Data Retention
+
+3. Configure auditd rules 
+
+4. Configure auditd file access  
+
+### 2 Configure Logging
+
+1. Sercurity principals for logging
+   
+2. Configure journald 
+   
+3. Ensure journald is configured to send logs to remote log host
+   
+4. configure rsyslog 
+
+
 ---
 
 ## 5 Access Authentication and Authorization
+
+### 1 Configure time-based job schedulers 
+
+### 2 Configure SSH Server 
+
+### 3 Configure privilege escalation 
+
+### 4 Configure PAM
+
+### 5 User Account and 
 
 ---
 
