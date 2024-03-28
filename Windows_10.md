@@ -230,6 +230,270 @@ Policies\User Rights Assignment\Change the time zone
 ```
 Setting: Administrators, LOCAL SERVICE, users   
 Link: [1](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/change-the-time-zone)
+<br></br>
+
+#### 2.2.10 (L1) Ensure 'Create a pagefile' is set to 'Administrators' (Automated)
+```
+2.2.10 (L1) Ensure 'Create a pagefile' is set to 'Administrators' 
+(Automated
+```
+Setting: Administrators   
+Link: [1](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/create-a-pagefile)
+<br></br>
+
+#### 2.2.11 (L1) Ensure 'Create a token object' is set to 'No One' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Create a token object
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-a-token-object)
+<br></br>
+
+#### 2.2.12 (L1) Ensure 'Create global objects' is set to 'Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE' (Automated)
+```
+2.2.12 (L1) Ensure 'Create global objects' is set to 'Administrators, 
+LOCAL SERVICE, NETWORK SERVICE, SERVICE' (Automated
+```
+Setting: Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-global-objects)
+<br></br>
+
+#### 2.2.13 (L1) Ensure 'Create permanent shared objects' is set to 'No One' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Create permanent shared objects
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-permanent-shared-objects)
+<br></br>
+
+#### 2.2.14 (L1) Configure 'Create symbolic links' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Create symbolic links
+```
+Setting: Administrators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-symbolic-links)
+<br></br>
+
+#### 2.2.15 (L1) Ensure 'Debug programs' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Debug programs
+```
+Setting: Administrators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/debug-programs)
+<br></br>
+
+#### 2.2.16 (L1) Ensure 'Deny access to this computer from the network' to include 'Guests' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Deny access to this computer from the network
+```
+Setting: Guest    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/deny-access-to-this-computer-from-the-network)
+<br></br>
+
+#### 2.2.17 (L1) Ensure 'Deny log on as a batch job' to include 'Guests' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Deny log on as a batch job
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/deny-log-on-as-a-batch-job)
+<br></br>
+
+#### 2.2.18 (L1) Ensure 'Deny log on as a service' to include 'Guests' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Deny log on as a service
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/deny-log-on-as-a-service)
+<br></br>
+
+#### 2.2.19 (L1) Ensure 'Deny log on locally' to include 'Guests' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Deny log on locally
+```
+Setting: Guest    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/deny-log-on-locally)
+<br></br>
+
+#### 2.2.20 (L1) Ensure 'Deny log on through Remote Desktop Services' to include 'Guests' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Deny log on through Remote Desktop Services
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/deny-log-on-through-remote-desktop-services)
+<br></br>
+
+#### 2.2.21 (L1) Ensure 'Enable computer and user accounts to be trusted for delegation' is set to 'No One' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Enable computer and user accounts to be trusted for delegation
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/enable-computer-and-user-accounts-to-be-trusted-for-delegation)
+<br></br>
+
+#### 2.2.22 (L1) Ensure 'Force shutdown from a remote system' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Force shutdown from a remote system
+```
+Setting: Administrators   
+Link: [1](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/force-shutdown-from-a-remote-system)
+<br></br>
+
+#### 2.2.23 (L1) Ensure 'Generate security audits' is set to 'LOCAL SERVICE, NETWORK SERVICE' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Generate security audits
+```
+Setting: LOCAL SERVICE, NETWORK SERVICE   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/generate-security-audits)
+<br></br>
+
+#### 2.2.24 (L1) Ensure 'Impersonate a client after authentication' is set to 'Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Impersonate a client after authentication
+```
+Setting: Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/impersonate-a-client-after-authentication)
+<br></br>
+
+#### 2.2.25 (L1) Ensure 'Increase scheduling priority' is set to 'Administrators, Window Manager\Window Manager Group' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Increase scheduling priority
+```
+Setting: On Windows 10 R1607 or older: Administrators
+On Windows 10 R1703 or newer: Administators, Window Manager/Window Manager Group    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/increase-scheduling-priority)
+<br></br>
+
+#### 2.2.26 (L1) Ensure 'Load and unload device drivers' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Load and unload device drivers
+```
+Setting: Administrators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/load-and-unload-device-drivers)
+<br></br>
+
+#### 2.2.27 (L1) Ensure 'Lock pages in memory' is set to 'No One' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Lock pages in memory
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/lock-pages-in-memory)
+<br></br>
+
+#### 2.2.28 (L2) Ensure 'Log on as a batch job' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Windows Settings\Security Settings\Local Policies\User 
+Rights Assignment\Log on as a batch job
+```
+Setting: Administrators, backup operators, performance log users    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/log-on-as-a-batch-job)
+<br></br>
+
+#### 2.2.29 (L2) Configure 'Log on as a service' (Automated)
+```
+Computer Configuration\Windows Settings\Security Settings\Local Policies\User 
+Rights Assignment\Log on as a service
+```
+Setting: NT SERVICE\ALL SERVICES    
+Link:[1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/log-on-as-a-batch-job), [2](https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/microsoft-defender-application-guard/faq-md-app-guard#what-is-the-wdagutilityaccount-local-account-)
+<br></br>
+
+#### 2.2.30 (L1) Ensure 'Manage auditing and security log' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Manage auditing and security log
+``` 
+Setting: Administrators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/manage-auditing-and-security-log)
+<br></br>
+
+#### 2.2.31 (L1) Ensure 'Modify an object label' is set to 'No One' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Modify an object label
+```
+Setting: No one   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/modify-an-object-label)
+<br></br>
+
+#### 2.2.32 (L1) Ensure 'Modify firmware environment values' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Modify firmware environment values
+```
+Setting: Administrators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/modify-firmware-environment-values)
+<br></br>
+
+#### 2.2.33 (L1) Ensure 'Perform volume maintenance tasks' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Perform volume maintenance tasks
+```
+Setting: Administrators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/perform-volume-maintenance-tasks)
+<br></br>
+
+#### 2.2.34 (L1) Ensure 'Profile single process' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Profile single process
+```
+Setting: Administrators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/profile-single-process)
+<br></br>
+
+#### 2.2.35 (L1) Ensure 'Profile system performance' is set to 'Administrators, NT SERVICE\WdiServiceHost' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Profile system performance
+```
+Setting: Windows 7 or newer, NT SERVICE\WdiServiceHost
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/profile-system-performance)
+<br></br>
+
+#### 2.2.36 (L1) Ensure 'Replace a process level token' is set to 'LOCAL SERVICE, NETWORK SERVICE' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Replace a process level token
+```
+Setting: LOCAL SERVICE, NETWORK SERVICE   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/replace-a-process-level-token)
+<br></br>
+
+#### 2.2.37 (L1) Ensure 'Restore files and directories' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Restore files and directories
+```
+Setting: Administrators, backup operators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/restore-files-and-directories)
+<br></br>
+
+#### 2.2.38 (L1) Ensure 'Shut down the system' is set to 'Administrators, Users' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Shut down the system
+```
+Setting: Administrators, backup operators, users    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/shut-down-the-system)
+<br></br>
+
 
 ## General Security
 
