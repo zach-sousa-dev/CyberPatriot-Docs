@@ -52,7 +52,7 @@ Computer Configuration\Policies\Windows Settings\Security Settings\Account
 Policies\Password Policy\Maximum password age
 ```
 
-Setting: 42  
+Setting: 365  
 Links:  [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide), 
 [2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
 <br></br>
