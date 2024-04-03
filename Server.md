@@ -306,3 +306,43 @@
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Perform volume maintenance tasks
         ```
+
+        - #### 2.2.40 (L1) Ensure 'Profile single process' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Profile single process
+        ```
+        
+        - #### 2.2.41 (L1) Ensure 'Profile system performance' is set to 'Administrators, NT SERVICE\WdiServiceHost' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Profile system performance
+        ```
+
+        - #### 2.2.42 (L1) Ensure 'Replace a process level token' is set to 'LOCAL SERVICE, NETWORK SERVICE' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Replace a process level token
+        ```
+
+        - #### 2.2.43 (L1) Ensure 'Restore files and directories' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Restore files and directories
+        ```
+
+        - #### 2.2.44 (L1) Ensure 'Shut down the system' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Shut down the system
+        ```
+
+        - #### 2.2.45 (L1) Ensure 'Synchronize directory service data' is set to 'No One' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Synchronize directory service data
+        ```
+
+        - #### 2.2.46 (L1) Ensure 'Take ownership of files or other objects' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Take ownership of files or other objects
+        ```
+
+        - #### 2.2.46 (L1) Ensure 'Take ownership of files or other objects' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Take ownership of files or other objects
+        ```
