@@ -9,268 +9,539 @@
 - [Debian](Debian.md)
 
 ### Sub Headings
-- [1. Initial Setup](#1.-initial-setup)
-- [2. Services](#2.-services)
-- [3. Network Configuration](#3.-network-configuration)
-- [4. Logging and Auditing](#4.-logging-and-auditing)
-- [5. Access, Authentication, and Authorization](#5.-access,-authentication,-and-authorization)
-- [6. System Maintenance](#6.-system-maintenance)
-- [User Management](#managing-users-in-ubuntu)
-	- [Adding User](#making-a-user)
-  - [Removing User](#removing-a-user)
-  - [Removing User and Backing Up Files](#removing-a-user-and-backing-up-their-files)
-  - [Disable User](#disable-a-user)
-  - [Make User Administrator](#make-user-an-administrator)
-  - [Make User Not Administrator](#remove-administrator-privilege)
-  - [Change Another User's Password](#change-the-password-of-a-user)
-  - [Add User to Group](#add-user-to-group)
-- [Passwords](#passwords)
-	- [Set Minimum Password Requirements](#defining-minimum-password-requirements)
-  - [Change Password Age Rules](#change-password-age-rules)
-  - [Remember Previous Passwords](#remember-5-previous-passwords)
-- [Firewall](#uncomplicated-firewall)
-	- [Check State of UFW](#check-state-of-ufw)
-  - [Enable UFW](#enable-ufw)
-  - [Allow SSH Through UFW](#allow-ssh-through-ufw)
-- [Services](#services-in-ubuntu)
-	- [List Running Services](#list-running-services)
-  - [Stop a Service](#stop-a-service)
-  - [Start a Service](#start-a-service)
-  - [Restart a Service](#restart-a-service)
-  - [Disable a Service](#disable-a-service)
-- [Locking Down](#locking-down)
-	- [Fix Disabled sudo Auth](#fix-disabled-sudo-authentication)
-  - [Disable Root Login from SSH](#disable-root-login-from-ssh)
-  - [Disable ipv4 Port Forwarding](#disable-ipv4-port-forwarding)
-  - [Fix Insecure Permissions on Shadow File](#fix-insecure-permissions-on-shadow-file)
-  - [Turn Off Remote Desktop](#turn-off-remote-desktop)
-- [General Maintenance](#general-maintenance-in-ubuntu)
-	- [Automatically Check for Updates](#automatically-check-for-updates)
-  - [Update Software](#update-software)
-  - [Find Directory Containing Files of Type](#find-deirectory-containing-files-of-type)
-  - [Delete Individual Files of Type](#delete-individual-files-of-type)
-  - [Delete All Files of Type From a Directory](#delete-all-files-of-type-from-a-directory)
-  - [Remove Unwanted Software](#remove-unwanted-software)
+- [Ubuntu 22](#ubuntu-22)
+	- [Contents](#contents)
+		- [Other Pages](#other-pages)
+		- [Sub Headings](#sub-headings)
+	- [1 Initial Setup](#1-initial-setup)
+		- [1 Filesystem Configuration](#1-filesystem-configuration)
+			- [1 Disable Unused Filesystems](#1-disable-unused-filesystems)
+			- [2 Configure tmp](#2-configure-tmp)
+			- [3 Configure var](#3-configure-var)
+			- [4 Configure var tmp](#4-configure-var-tmp)
+			- [5 Configure var log](#5-configure-var-log)
+			- [6 Configure var log audit](#6-configure-var-log-audit)
+			- [7 Configure home](#7-configure-home)
+			- [8 Configure dev shm](#8-configure-dev-shm)
+			- [9 Disable Automounting](#9-disable-automounting)
+			- [10 Disable USB Storage](#10-disable-usb-storage)
+		- [2 Configure Software Updates](#2-configure-software-updates)
+		- [3 Filesystem Integrity Checking](#3-filesystem-integrity-checking)
+		- [4 Secure Boot Settings](#4-secure-boot-settings)
+		- [5 Additional Process Hardening](#5-additional-process-hardening)
+		- [6 Mandatory Access Control](#6-mandatory-access-control)
+		- [7 Command Line Warning Banners](#7-command-line-warning-banners)
+		- [8 GNOME Display Manager](#8-gnome-display-manager)
+	- [2 Services](#2-services)
+		- [Configure Time Synchronization](#configure-time-synchronization)
+		- [Special Purpose Services](#special-purpose-services)
+		- [Service Clients](#service-clients)
+	- [3 Network Configuration](#3-network-configuration)
+		- [Disable Unused Network Protocols and Devices](#disable-unused-network-protocols-and-devices)
+		- [Network Parameters Host Only](#network-parameters-host-only)
+		- [Network Parameters Host and Router](#network-parameters-host-and-router)
+		- [Uncommon Network Protocols](#uncommon-network-protocols)
+		- [Firewall Configuration](#firewall-configuration)
+	- [4 Logging and Auditing](#4-logging-and-auditing)
+		- [1 Configure System Accounting (auditd)](#1-configure-system-accounting-auditd)
+		- [2 Configure Logging](#2-configure-logging)
+	- [5 Access Authentication and Authorization](#5-access-authentication-and-authorization)
+		- [1 Configure time-based job schedulers](#1-configure-time-based-job-schedulers)
+		- [2 Configure SSH Server](#2-configure-ssh-server)
+		- [3 Configure privilege escalation](#3-configure-privilege-escalation)
+		- [4 Configure PAM](#4-configure-pam)
+		- [5 User Account and](#5-user-account-and)
+	- [6 System Maintenance](#6-system-maintenance)
+
+---
+
+> Commands starting with `#` may require you to start the command with `sudo` instead.
+
+## 1 Initial Setup
+### 1 Filesystem Configuration
+#### 1 Disable Unused Filesystems
+1. Ensure mounting of cramfs filesystems is disabled (Automated)
+
+Run the following script to check if the filesystem is installed
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_mname="cramfs" # set module name
+	# Check how module will be loaded
+	l_loadable="$(modprobe -n -v "$l_mname")"
+	if grep -Pq -- '^\h*install \/bin\/(true|false)' <<< "$l_loadable"; then
+		l_output="$l_output\n - module: \"$l_mname\" is not loadable: \"$l_loadable\""
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is loadable: \"$l_loadable\""
+	fi
+	# Check is the module currently loaded
+	if ! lsmod | grep "$l_mname" > /dev/null 2>&1; then
+		l_output="$l_output\n - module: \"$l_mname\" is not loaded"
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is loaded"
+	fi
+	# Check if the module is deny listed
+	if grep -Pq -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*; then
+		l_output="$l_output\n - module: \"$l_mname\" is deny listed in: \"$(grep -Pl -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*)\""
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is not deny listed"
+	fi
+	# Report results. If no failures output in l_output2, we pass
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+Run the following script to remove the filesystem
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_mname="cramfs" # set module name
+	if ! modprobe -n -v "$l_mname" | grep -P -- '^\h*install \/bin\/(true|false)'; then
+		echo -e " - setting module: \"$l_mname\" to be not loadable"
+		echo -e "install $l_mname /bin/false" >> /etc/modprobe.d/"$l_mname".conf
+	fi
+	if lsmod | grep "$l_mname" > /dev/null 2>&1; then
+		echo -e " - unloading module \"$l_mname\""
+		modprobe -r "$l_mname"
+	fi
+	if ! grep -Pq -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*; then
+		echo -e " - deny listing \"$l_mname\""
+		echo -e "blacklist $l_mname" >> /etc/modprobe.d/"$l_mname".conf
+	fi
+}
+```
+
+
+2. Ensure mounting of squashfs filesystems is disabled (Automated)
+
+> Snap packages use this filesystem
+
+Run the following script to check if the filesystem is installed
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_mname="squashfs" # set module name
+	# Check how module will be loaded
+	l_loadable="$(modprobe -n -v "$l_mname")"
+	if grep -Pq -- '^\h*install \/bin\/(true|false)' <<< "$l_loadable"; then
+		l_output="$l_output\n - module: \"$l_mname\" is not loadable: \"$l_loadable\""
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is loadable: \"$l_loadable\""
+	fi
+	# Check is the module currently loaded
+	if ! lsmod | grep "$l_mname" > /dev/null 2>&1; then
+		l_output="$l_output\n - module: \"$l_mname\" is not loaded"
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is loaded"
+	fi
+	# Check if the module is deny listed
+	if grep -Pq -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*; then
+		l_output="$l_output\n - module: \"$l_mname\" is deny listed in: \"$(grep -Pl -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*)\""
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is not deny listed"
+	fi
+	# Report results. If no failures output in l_output2, we pass
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+
+```
+Run the following script to remove the filesystem
+
+``` bash
+#!/usr/bin/env bash
+{
+ l_mname="squashfs" # set module name
+ if ! modprobe -n -v "$l_mname" | grep -P -- '^\h*install \/bin\/(true|false)'; then
+	echo -e " - setting module: \"$l_mname\" to be not loadable"
+	echo -e "install $l_mname /bin/false" >> /etc/modprobe.d/"$l_mname".conf
+ fi
+ if lsmod | grep "$l_mname" > /dev/null 2>&1; then
+	echo -e " - unloading module \"$l_mname\""
+	modprobe -r "$l_mname"
+ fi
+ if ! grep -Pq -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*; then
+	echo -e " - deny listing \"$l_mname\""
+	echo -e "blacklist $l_mname" >> /etc/modprobe.d/"$l_mname".conf
+ fi
+}
+
+```
+
+3. Ensure mounting of udf filesystems is disabled (Automated)
+
+> Microsoft Azure uses this filesystem
+
+Run the following script to check if the filesystem is installed
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_mname="udf" # set module name
+	# Check how module will be loaded
+	l_loadable="$(modprobe -n -v "$l_mname")"
+	if grep -Pq -- '^\h*install \/bin\/(true|false)' <<< "$l_loadable"; then
+		l_output="$l_output\n - module: \"$l_mname\" is not loadable: \"$l_loadable\""
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is loadable: \"$l_loadable\""
+	fi
+	# Check is the module currently loaded
+	if ! lsmod | grep "$l_mname" > /dev/null 2>&1; then
+		l_output="$l_output\n - module: \"$l_mname\" is not loaded"
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is loaded"
+	fi
+	# Check if the module is deny listed
+	if grep -Pq -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*; then
+		l_output="$l_output\n - module: \"$l_mname\" is deny listed in: \"$(grep -Pl -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*)\""
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is not deny listed"
+	fi
+	# Report results. If no failures output in l_output2, we pass
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+Run the following script to remove the filesystem
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_mname="udf" # set module name
+	if ! modprobe -n -v "$l_mname" | grep -P -- '^\h*install \/bin\/(true|false)'; then
+		echo -e " - setting module: \"$l_mname\" to be not loadable"
+		echo -e "install $l_mname /bin/false" >> /etc/modprobe.d/"$l_mname".conf
+	fi
+	if lsmod | grep "$l_mname" > /dev/null 2>&1; then
+		echo -e " - unloading module \"$l_mname\""
+		modprobe -r "$l_mname"
+	fi
+	if ! grep -Pq -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*; then
+		echo -e " - deny listing \"$l_mname\""
+		echo -e "blacklist $l_mname" >> /etc/modprobe.d/"$l_mname".conf
+	fi
+```
+
+#### 2 Configure tmp
+1. Ensure /tmp is a separate partition (Automated)
+
+Run the following command and verify the output shows that `/tmp` is mounted.
+
+```
+# findmnt --kernel /tmp
+TARGET SOURCE FSTYPE OPTIONS 
+/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,inode6
+```
+
+Ensure that systemd will mount the `/tmp` partition at boot time.
+
+`# systemctl is-enabled tmp.mount`
+`enabled`
+
+First ensure that systemd is correctly configured to ensure that `/tmp` will be mounted at 
+boot time.
+
+`# systemctl unmask tmp.mount`
+
+> **More Information**
+> 
+> ![Additional tmp information](images/ubuntu/1-1-2-1.png)
+
+[\[1\]](https://www.freedesktop.org/wiki/Software/systemd/APIFileSystems/)
+[\[2\]](https://www.freedesktop.org/software/systemd/man/latest/systemd-fstab-generator.html)
+
+2. Ensure nodev option set on `/tmp` partition (Automated)
+
+> This follows the same steps as 3. and 4.
+
+Verify that the `nodev` option is set for the `/tmp` mount.
+Run the following command to verify that the `nodev` mount option is set.
+Example:
+
+`# findmnt --kernel /tmp | grep nodev`
+
+`/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel`
+
+Edit the `/etc/fstab` file and add `nodev` to the fourth field (mounting options) for the `/tmp`
+partition.
+Example:
+
+`<device> /tmp <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0`
+
+Run the following command to remount `/tmp` with the configured options:
+
+`# mount -o remount /tmp`
+
+3. Ensure noexec option set on /tmp partition (Automated)
+
+> This follows the same steps as 2. and 4.
+
+Verify that the `noexec` option is set for the `/tmp` mount.
+Run the following command to verify that the `noexec` mount option is set.
+Example:
+
+`# findmnt --kernel /tmp | grep noexec`
+
+`/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel`
+
+Edit the `/etc/fstab` file and add `noexec` to the fourth field (mounting options) for the 
+`/tmp` partition.
+Example:
 
+`<device> /tmp <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0`
 
-## 1. Initial Setup
+Run the following command to remount `/tmp` with the configured options:
 
-## 2. Services
+`# mount -o remount /tmp`
 
-## 3. Network Configuration
+4. Ensure nosuid option set on /tmp partition (Automated)
 
-## 4. Logging and Auditing
+> This follows the same steps as 2. and 3.
 
-## 5. Access, Authentication, and Authorization
+Verify that the `nosuid` option is set for the `/tmp` mount.
+Run the following command to verify that the `nosuid` mount option is set.
+Example:
 
-## 6. System Maintenance
+`# findmnt --kernel /tmp | grep nosuid`
 
-> :page_with_curl: Currently, not *every* action that we need to perform in Ubuntu is documented using terminal commands (GUI is used instead). If you discover a command alternative please take note of it so it can be added to the documentation.
+`/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel`
 
-> :page_with_curl: Make sure to replace anything wrapped in `<these angle brackets>` with what you need. Ex. `<username>` change to `linda`. 
+Edit the `/etc/fstab` file and add `nosuid` to the fourth field (mounting options) for the 
+`/tmp` partition.
+Example:
 
-> :page_with_curl: Any time you use `sudo` you will be prompted for a password. Your password can be found in the README. Remember, Linux doesn't show passwords as you type them!
-> If you are not prompted with a password refer to **Fix Disabled sudo Authentication** in [Locking Down](#locking-down).
+`<device> /tmp <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0`
 
+Run the following command to remount `/tmp` with the configured options:
 
-### Managing Users in Ubuntu
+`# mount -o remount /tmp`
 
-- #### Making a User
+#### 3 Configure var
+1. Ensure separate partition exists for /var (Automated)
 
-	1. In the terminal, run: `sudo adduser <username>`
+Run the following command and verify output shows /var is mounted.
+Example:
 
-- #### Removing a User
+```
+# findmnt --kernel /var
+TARGET SOURCE FSTYPE OPTIONS
+/var /dev/sdb ext4 rw,relatime,seclabel,data=ordered
+```
 
-	> It is recommended to [back up the user's files](#removing-a-user-and-backing-up-their-files) before deletion
+For new installations, during installation create a custom partition setup and specify a 
+separate partition for `/var`.
+For systems that were previously installed, create a new partition and configure 
+`/etc/fstab` as appropriate.
 
-	1. In the terminal, run: `sudo deluser --remove-home <username>`
+> When modifying `/var` it is advisable to bring the system to emergency mode (so auditd 
+is not running), rename the existing directory, mount the new file system, and migrate 
+the data over before returning to multi-user mode.
 
-- #### Removing a User and Backing Up Their Files
+[\[1\]](https://tldp.org/HOWTO/LVM-HOWTO/)
 
-	1. In the terminal, run: `sudo mkdir /oldusers-data`
-	2. In the terminal, run: `sudo chown root:root /oldusers-data`
-	3. In the terminal, run: `sudo chmod 0700 /oldusers-data`
-	4. In the terminal, run: `sudo deluser -remove-home -backup-to /oldusers-data`
+2. Ensure nodev option set on /var partition (Automated)
 
-- #### Disable a User
+> This follows the same steps as 3.
 
-	1. In the terminal, run: `sudo usermod -L <username>`
+Verify that the `nodev` option is set for the `/var` mount.
+Run the following command to verify that the `nodev` mount option is set.
+Example:
 
-- #### Make User an Administrator
+`# findmnt --kernel /var`
 
-	1. In the terminal, run: `sudo usermod –aG sudo <username>`
+`/var /dev/sdb ext4 rw,nosuid,nodev,relatime,seclabel`
 
-- #### Remove Administrator Privilege
+> **IF** output is produced, ensure it includes the `nodev` option
 
-	1. In the terminal, run: `sudo deluser <username> sudo`
+**IF** the `/var` partition exists, edit the `/etc/fstab` file and add `nodev` to the fourth field 
+(mounting options) for the `/var` partition.
+Example:
 
-- #### Change the Password of a User
+`<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
 
-	1. In the terminal, run: `sudo passwd <username>`
-	2. Follow the prompts
+Run the following command to remount /var with the configured options:
 
-> :page_with_curl: Remember, Linux does **not** display passwords as you type them.
+`# mount -o remount /var`
 
-- #### Add User to Group
-	1. In the terminal, run: `sudo gpasswd –a <username> <group-name>`
+3. Ensure nosuid option set on /var partition (Automated)
 
-### Passwords
+> This follows the same steps as 3.
 
-- #### Defining Minimum Password Requirements
+Verify that the `nosuid` option is set for the `/var` mount.
+Run the following command to verify that the `nosuid` mount option is set.
+Example:
 
-	1. In the terminal, run: `sudo nano /etc/pam.d/common-password`
-	2. In the file, look for the line that contains `password requisite`
-	3. Replace that line with `password requisite pam_cracklib.so retry=3 minlen=10 difok=3 ucredit=-1 lcredit=-1 dcredit=-1  ocredit=-1`
-	4. Press CRTL + X to save and exit
+`# findmnt --kernel /var`
 
-- #### Change Password Age Rules
+`/var /dev/sdb ext4 rw,nosuid,nodev,relatime,seclabel`
 
-	1. In the terminal, run: `sudo nano /etc/login.defs`
-	2. Look for the lines `PASS_MAX_DAYS`, `PASS_MIN_DAYS`, and `PASS_WARN_AGE`
-	3. Edit the values to be something like the following: `PASS_MAX_DAYS   99999`, `PASS_MIN_DAYS   1`, and `PASS_WARN_AGE   7`
+> **IF** output is produced, ensure it includes the `nosuid` option
 
-	> :page_with_curl: The number of days here is somewhat arbitrary - at least for the competition, however as a general
-	> practice `PASS_MIN_DAYS` should be set to some number greater than zero. This prevents users from cycling through
-	> new passwords to circumvent the restricition of reusing a previous password.
+**IF** the `/var` partition exists, edit the `/etc/fstab` file and add `nosuid` to the fourth field 
+(mounting options) for the `/var` partition.
+Example:
 
-  5. Press CRTL + X to save and exit
-  
-- #### Remember 5 Previous Passwords
+`<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
 
-	1. In the terminal, run: `sudo nano /etc/pam.d/common-password`
-	2. Look for the line that contains `password required`
-	3. Replace the end of the line with `pam_unix.so remember=5` 
+Run the following command to remount /var with the configured options:
 
-### Uncomplicated Firewall
+`# mount -o remount /var`
 
-- #### Check status of ufw
+#### 4 Configure var tmp
+1. 
 
-	1. In the terminal, run: `sudo ufw status`
 
-	> :bulb: You can use this to verify whether ufw is installed, based on if the command is recognized.
+2. 
 
-- #### Enable ufw
 
-	1. In the terminal, run: `sudo ufw enable`
+3. 
 
-- #### Allow ssh through ufw
 
-	1. In the terminal, run: `sudo ufw allow ssh`
+4. 
 
-	> :page_with_curl: Only do this if ssh is a critical service in the specifications and that it is written explicity that you should allow ssh through ufw.
 
-### Services in Ubuntu
+#### 5 Configure var log
+1. 
 
-- #### List Running Services
 
-	1. In the terminal, run: `systemctl list-units --type=service --state=active`
+2. 
 
-	> :bulb: You can use this to search for any suspect services or services you *thought* you turned off.
 
-- #### Stop a Service
+3. 
 
-	1. In the terminal, run: `sudo systemctl stop <service-name>`
 
-- #### Start a Service
+4. 
 
-	1. In the terminal, run: `sudo systemctl start <service-name>`
 
-- #### Restart a Service
+#### 6 Configure var log audit
+1. 
 
-	1. In the terminal, run: `sudo systemctl restart <service-name>`
 
-- #### Disable a Service
+2. 
 
-	1. In the terminal, run: `sudo systemctl disable <service-name>`
 
-### Locking Down
+3. 
 
-- #### Fix Disabled sudo Authentication
 
-	> :bulb: If you've been running sudo commands, but you aren't being prompted for a password, sudo authentication is *probably* disabled. :smiley:
+4. 
 
-	1. In the terminal, run: `sudo nano /etc/sudoers`
-	2. Search for the line `Defaults !authenticate`
-	3. Remove the `!`
-	4. Press CRTL + X to save and exit
 
-- #### Disable Root Login From ssh
+#### 7 Configure home
+1. 
 
-	1. In the terminal, run: `sudo nano /etc/ssh/sshd_config`
-	2. Look for `PermitRootLogin`
-	3. Change `yes` to `no`
-	4. Press CRTL + X to save and exit
 
-- #### Disable ipv4 Port Forwarding
+2. 
 
-	1. In the terminal, run: `sudo nano /etc/sysctl.conf`
-	2. Change the line `net.ipv4.ip_forward=1` to `net.ipv4.ip_forward=0`
-	3. Press CRTL + X to save and exit
 
-	> :question: Enabling port forwarding basically makes the device act as a router. Unless we absolutely
-	> need it, keeping port forwarding enabled just means the device is more vulnerable as any packets or
-	> data could be passed into it.
+3. 
 
-- #### Fix Insecure Permissions on Shadow File
 
-	1. In the terminal, run: `sudo chmod 0640 /etc/shadow`
+#### 8 Configure dev shm
+1. 
 
-	> :question: `/etc/shadow` is a file that contains information about each user's password,
-	> and is used for authentication purposes. Normally, the file *should* have 640 permissions,
-	> which means the owner (which is root) can read, write, but not execute,
-	> the group (administrators) can read, can't write nor execute, and everyone else can't read,
-	> write nor execute. Allowing anyone with less authority to have full access to this file presents
-	> a security risk as it would be extremely easy to gather hashed passwords.
 
-- #### Turn Off Remote Desktop
+2. 
 
-	> :page_with_curl: Currently missing our own documentation, for now
-	> visit [this website.](https://geekrewind.com/how-to-enable-or-disable-remote-desktop-in-ubuntu-linux/)
 
-	> :question: Having remote desktop enabled for no real reason presents a security risk in that
-	> unauthorized people can control the device, mostly if a user is signed in and has the
-	> remote desktop service running unknowingly (or knowingly with malicious intent). 
+3. 
 
-### General Maintenance in Ubuntu
 
-- #### Automatically Check for Updates
+#### 9 Disable Automounting
 
-	1. Open "Software and Updates"
 
-	![Software and Updates](images/ubuntu/softwareandupdates.png "Launching Software and Updates")
+#### 10 Disable USB Storage
 
-	2. Navigate to the "Updates" tab
 
-	![Updates](images/ubuntu/updates.png "Navigating to Updates")
+### 2 Configure Software Updates
 
-	3. Select the dropdown menu next to "Automatically check for updates" and select daily
+### 3 Filesystem Integrity Checking
 
-	![Daily](images/ubuntu/daily.png "Selecting Daily from drop down")
+### 4 Secure Boot Settings
 
-	4. Enter the password for your user account, if prompted
+### 5 Additional Process Hardening
 
-	![Authenticate](images/ubuntu/auth.png "Entering password")
+### 6 Mandatory Access Control
 
-	5. Press "Authenticate"
+### 7 Command Line Warning Banners
 
-- #### Update Software
+### 8 GNOME Display Manager
 
-	1. In the terminal, run: `sudo apt update`
+---
 
-- #### Find Directory Containing Files of Type
+## 2 Services
+### Configure Time Synchronization
 
-	1. In the terminal, run: `locate *<file-extenstion>`, for example: `locate *.mp3`
+### Special Purpose Services
 
-- #### Delete Individual Files of Type
+### Service Clients
 
-	1. In the terminal, run: `sudo find . -type f -name "*<file-extension>" -exec rm -i {} \;`
-	2. You will be prompted to delete each file that is found, type `y` to delete or `n` to keep it
+---
 
-- #### Delete All Files of Type From a Directory
+## 3 Network Configuration
+### Disable Unused Network Protocols and Devices
 
-	1. In the terminal, run: `sudo rm /home/<directory>/*.mp3`
+### Network Parameters Host Only
 
-- #### Remove Unwanted Software
+### Network Parameters Host and Router
 
-	1. In the terminal, run: `sudo apt remove <package-name>`
-	2. In the terminal, run: `sudo apt autoremove`
+### Uncommon Network Protocols
+
+### Firewall Configuration
+
+---
+
+## 4 Logging and Auditing
+
+###  1 Configure System Accounting (auditd)
+
+1. Ensure auditing is enabled 
+
+2. Configure  Data Retention
+
+3. Configure auditd rules 
+
+4. Configure auditd file access  
+
+### 2 Configure Logging
+
+1. Sercurity principals for logging
+   
+2. Configure journald 
+   
+3. Ensure journald is configured to send logs to remote log host
+   
+4. configure rsyslog 
+
+
+---
+
+## 5 Access Authentication and Authorization
+
+### 1 Configure time-based job schedulers 
+
+### 2 Configure SSH Server 
+
+### 3 Configure privilege escalation 
+
+### 4 Configure PAM
+
+### 5 User Account and 
+
+---
+
+## 6 System Maintenance
