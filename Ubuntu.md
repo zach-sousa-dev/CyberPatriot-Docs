@@ -345,6 +345,7 @@ Example:
 
 ```
 # findmnt --kernel /var
+
 TARGET SOURCE FSTYPE OPTIONS
 /var /dev/sdb ext4 rw,relatime,seclabel,data=ordered
 ```
@@ -438,6 +439,7 @@ Example:
 
 ```
 # findmnt --kernel /var/tmp
+
 /var/tmp /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
 ```
 
@@ -447,7 +449,7 @@ Example:
 (mounting options) for the `/var/tmp` partition.
 Example:
 
-`<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+`<device> /var/tmp <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
 
 Run the following command to remount `/var/tmp` with the configured options:
 
@@ -461,6 +463,7 @@ Example:
 
 ```
 # findmnt --kernel /var/tmp
+
 /var/tmp /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
 ```
 
@@ -470,7 +473,7 @@ Example:
 (mounting options) for the `/var/tmp` partition.
 Example:
 
-`<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+`<device> /var/tmp <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
 
 Run the following command to remount `/var/tmp` with the configured options:
 
@@ -484,6 +487,7 @@ Example:
 
 ```
 # findmnt --kernel /var/tmp
+
 /var/tmp /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
 ```
 
@@ -493,7 +497,7 @@ Example:
 (mounting options) for the `/var/tmp` partition.
 Example:
 
-`<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+`<device> /var/tmp <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
 
 Run the following command to remount `/var/tmp` with the configured options:
 
@@ -501,56 +505,397 @@ Run the following command to remount `/var/tmp` with the configured options:
 
 
 #### 5 Configure var log
-1. 
+1. Ensure separate partition exists for /var/log (Automated)
 
+Run the following command and verify output shows `/var/log` is mounted.
+Example:
 
-2. 
+```
+# findmnt --kernel /var/log
 
+TARGET SOURCE FSTYPE OPTIONS
+/var/log /dev/sdb ext4 rw,relatime,seclabel,data=ordered
+```
 
-3. 
+For new installations, during installation create a custom partition setup and specify a 
+separate partition for `/var/log`.
+For systems that were previously installed, create a new partition and configure 
+`/etc/fstab` as appropriate.
 
+2. Ensure nodev option set on /var/log partition (Automated)
 
-4. 
+Verify that the `nodev` option is set for the `/var/log` mount.
+Run the following command to verify that the `nodev` mount option is set.
+Example:
 
+```
+# findmnt --kernel /var/log
+
+/var/log /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `nodev` option
+
+**IF** the `/var/log` partition exists, edit the `/etc/fstab` file and add `nodev` to the fourth field 
+(mounting options) for the `/var/log` partition.
+Example:
+
+`<device> /var/log <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/log` with the configured options:
+
+`# mount -o remount /var/log`
+
+3. Ensure noexec option set on /var/log partition (Automated)
+
+Verify that the `noexec` option is set for the `/var/log` mount.
+Run the following command to verify that the `noexec` mount option is set.
+Example:
+
+```
+# findmnt --kernel /var/log
+
+/var/log /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `noexec` option
+
+**IF** the `/var/log` partition exists, edit the `/etc/fstab` file and add `noexec` to the fourth field 
+(mounting options) for the `/var/log` partition.
+Example:
+
+`<device> /var/log <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/log` with the configured options:
+
+`# mount -o remount /var/log`
+
+4. Ensure nosuid option set on /var/log partition (Automated)
+
+Verify that the `nosuid` option is set for the `/var/log` mount.
+Run the following command to verify that the `nosuid` mount option is set.
+Example:
+
+```
+# findmnt --kernel /var/log
+
+/var/log /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `nosuid` option
+
+**IF** the `/var/log` partition exists, edit the `/etc/fstab` file and add `nosuid` to the fourth field 
+(mounting options) for the `/var/log` partition.
+Example:
+
+`<device> /var/log <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/log` with the configured options:
+
+`# mount -o remount /var/log`
 
 #### 6 Configure var log audit
-1. 
+1. Ensure separate partition exists for /var/log/audit (Automated)
 
+Run the following command and verify output shows `/var/log/audit` is mounted.
+Example:
 
-2. 
+```
+# findmnt --kernel /var/log/audit
 
+TARGET SOURCE FSTYPE OPTIONS
+/var/log/audit /dev/sdb ext4 rw,relatime,seclabel,data=ordered
+```
 
-3. 
+For new installations, during installation create a custom partition setup and specify a 
+separate partition for `/var/log`.
+For systems that were previously installed, create a new partition and configure 
+`/etc/fstab` as appropriate.
 
+2. Ensure noexec option set on /var/log/audit partition (Automated)
 
-4. 
+Verify that the `noexec` option is set for the `/var/log/audit` mount.
+Run the following command to verify that the `noexec` mount option is set.
+Example:
+
+```
+# findmnt --kernel /var/log/audit
+
+/var/log/audit /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `noexec` option
+
+**IF** the `/var/log/audit` partition exists, edit the `/etc/fstab` file and add `noexec` to the fourth field 
+(mounting options) for the `/var/log/audit` partition.
+Example:
+
+`<device> /var/log/audit <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/log/audit` with the configured options:
+
+`# mount -o remount /var/log/audit`
+
+3. Ensure nodev option set on /var/log/audit partition (Automated)
+
+Verify that the `nodev` option is set for the `/var/log/audit` mount.
+Run the following command to verify that the `nodev` mount option is set.
+Example:
+
+```
+# findmnt --kernel /var/log/audit
+
+/var/log/audit /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `nodev` option
+
+**IF** the `/var/log/audit` partition exists, edit the `/etc/fstab` file and add `nodev` to the fourth field 
+(mounting options) for the `/var/log/audit` partition.
+Example:
+
+`<device> /var/log/audit <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/log/audit` with the configured options:
+
+`# mount -o remount /var/log/audit`
+
+4. Ensure nosuid option set on /var/log/audit partition (Automated)
+
+Verify that the `nosuid` option is set for the `/var/log/audit` mount.
+Run the following command to verify that the `nosuid` mount option is set.
+Example:
+
+```
+# findmnt --kernel /var/log/audit
+
+/var/log/audit /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `nosuid` option
+
+**IF** the `/var/log/audit` partition exists, edit the `/etc/fstab` file and add `nosuid` to the fourth field 
+(mounting options) for the `/var/log/audit` partition.
+Example:
+
+`<device> /var/log/audit <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/log/audit` with the configured options:
+
+`# mount -o remount /var/log/audit`
 
 
 #### 7 Configure home
-1. 
+1. Ensure separate partition exists for /home (Automated)
 
+Run the following command and verify output shows `/home` is mounted:
 
-2. 
+```
+# findmnt --kernel /home
 
+TARGET SOURCE FSTYPE OPTIONS
+/home /dev/sdb ext4 rw,relatime,seclabel
+```
 
-3. 
+For new installations, during installation create a custom partition setup and specify a 
+separate partition for `/home`.
+For systems that were previously installed, create a new partition and configure 
+`/etc/fstab` as appropriate.
 
+2. Ensure nodev option set on /home partition (Automated)
+
+Verify that the `nodev` option is set for the `/home` mount.
+Run the following command to verify that the `nodev` mount option is set.
+Example:
+
+```
+# findmnt --kernel /home
+
+/home /dev/sdb ext4 rw,nosuid,nodev,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `nodev` option
+
+**IF** the `/home` partition exists, edit the `/etc/fstab` file and add `nodev` to the fourth field 
+(mounting options) for the `/home` partition.
+Example:
+
+`<device> /home <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/home` with the configured options:
+
+`# mount -o remount /home`
+
+3. Ensure nosuid option set on /home partition (Automated)
+
+Verify that the `nosuid` option is set for the `/home` mount.
+Run the following command to verify that the `nosuid` mount option is set.
+Example:
+
+```
+# findmnt --kernel /home
+
+/home /dev/sdb ext4 rw,nosuid,nodev,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `nosuid` option
+
+**IF** the `/home` partition exists, edit the `/etc/fstab` file and add `nosuid` to the fourth field 
+(mounting options) for the `/home` partition.
+Example:
+
+`<device> /home <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/home` with the configured options:
+
+`# mount -o remount /home`
 
 #### 8 Configure dev shm
-1. 
+1. Ensure nodev option set on /dev/shm partition (Automated)
 
+Verify that the `nodev` option is set for the `/dev/shm` mount.
+Run the following command to verify that the `nodev` mount option is set.
+Example:
 
-2. 
+`# findmnt --kernel /dev/shm | grep nodev`
 
+Edit the `/etc/fstab` file and add nodev to the fourth field (mounting options) for the 
+`/dev/shm` partition.
+Run the following command to remount `/dev/shm` using the updated options from 
+`/etc/fstab`:
 
-3. 
+`# mount -o remount /dev/shm`
 
+2. Ensure noexec option set on /dev/shm partition (Automated)
+
+Verify that the `noexec` option is set for the `/dev/shm` mount.
+Run the following command to verify that the `noexec` mount option is set.
+Example:
+
+```
+# findmnt --kernel /dev/shm | grep noexec
+
+/dev/shm tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+Edit the `/etc/fstab` file and add `noexec` to the fourth field (mounting options) for the 
+`/dev/shm` partition.
+Example:
+
+`<device> /dev/shm <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0`
+
+Run the following command to remount `/dev/shm` with the configured options:
+
+`# mount -o remount /dev/shm`
+
+3. Ensure nosuid option set on /dev/shm partition (Automated)
+
+Verify that the `nosuid` option is set for the `/dev/shm` mount.
+Run the following command to verify that the `nosuid` mount option is set.
+Example:
+
+`# findmnt --kernel /dev/shm | grep nosuid`
+
+Edit the `/etc/fstab` file and add `nosuid` to the fourth field (mounting options) for the 
+`/dev/shm` partition.
+Run the following command to remount `/dev/shm` using the updated options from 
+`/etc/fstab`:
+
+`# mount -o remount /dev/shm`
 
 #### 9 Disable Automounting
 
+As a preference `autofs` should not be installed unless other packages depend on it.
+Run the following command to verify `autofs` is not installed:
+
+```
+# systemctl is-enabled autofs
+
+Failed to get unit file state for autofs.service: No such file or directory
+```
+
+Run the following command to verify `autofs` is not enabled if installed:
+
+```
+# systemctl is-enabled autofs
+
+disabled
+```
+
+If there are no other packages that depends on `autofs`, remove the package with:
+
+`# apt purge autofs`
+
+**OR** if there are dependencies on the `autofs` package:
+Run the following commands to mask `autofs`:
+
+```
+# systemctl stop autofs
+# systemctl mask autofs
+```
 
 #### 10 Disable USB Storage
 
+Run the following script to verify `usb-storage` is disabled:
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_mname="usb-storage" # set module name
+	# Check how module will be loaded
+	l_loadable="$(modprobe -n -v "$l_mname")"
+	if grep -Pq -- '^\h*install \/bin\/(true|false)' <<< "$l_loadable"; then
+		l_output="$l_output\n - module: \"$l_mname\" is not loadable: 
+		\"$l_loadable\""
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is loadable: 
+		\"$l_loadable\""
+	fi
+	# Check is the module currently loaded
+	if ! lsmod | grep "$l_mname" > /dev/null 2>&1; then
+		l_output="$l_output\n - module: \"$l_mname\" is not loaded"
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is loaded"
+	fi
+	# Check if the module is deny listed
+	if grep -Pq -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*; then
+		l_output="$l_output\n - module: \"$l_mname\" is deny listed in: 
+		\"$(grep -Pl -- "^\h*blacklist\h+$l_mname\b" /etc/modprobe.d/*)\""
+	else
+		l_output2="$l_output2\n - module: \"$l_mname\" is not deny listed"
+	fi
+	# Report results. If no failures output in l_output2, we pass
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit 
+		failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to disable `usb-storage`:
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_mname="usb-storage" # set module name
+	if ! modprobe -n -v "$l_mname" | grep -P -- '^\h*install \/bin\/(true|false)'; then
+		echo -e " - setting module: \"$l_mname\" to be not loadable"
+		echo -e "install $l_mname /bin/false" >> /etc/modprobe.d/"$l_mname".conf
+	fi
+	if lsmod | grep "$l_mname" > /dev/null 2>&1; then
+		echo -e " - unloading module \"$l_mname\""
+		modprobe -r "$l_mname"
+	fi
+	if ! grep -Pq -- "^\h*blacklist\h+$l_mname\b" /etc modprobe.d/*; then
+		echo -e " - deny listing \"$l_mname\""
+		echo -e "blacklist $l_mname" >> /etc/modprobe.d/"$l_mname".conf
+	fi
+}
+```
 
 ### 2 Configure Software Updates
 

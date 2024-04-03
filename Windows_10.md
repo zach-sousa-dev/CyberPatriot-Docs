@@ -52,7 +52,7 @@ Computer Configuration\Policies\Windows Settings\Security Settings\Account
 Policies\Password Policy\Maximum password age
 ```
 
-Setting: 365  
+Setting: 42  
 Links:  [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide), 
 [2](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-policy)
 <br></br>
@@ -108,48 +108,289 @@ and Failure' (Automated)
 <br></br>
 It's reccomended that Windows Defender Firewall is on. Simply type "Windows defender firewall with advanced security" Then turn it on.
 
-To turn the Windows Defender Firewall With Advanced Security on search up group policy, Computer configuration , then Windows Settings, Security Settings, Windows Defender Firewall, click the drop down arrow go into Windows Defender Firewall With Advanced Security, Windows Firewall Properties, Private Profile, Firewall state.
+**To turn the Windows Defender Firewall With Advanced Security on search up group policy, Computer configuration , then Windows Settings, Security Settings, Windows Defender Firewall, click the drop down arrow go into Windows Defender Firewall With Advanced Security, Windows Firewall Properties, Private Profile, Firewall state.**
 
 <br></br>
 
 ### How to turn on firewall in enterprise version of windows
 
-
+```
  Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
 Defender Firewall with Advanced Security\Windows Defender Firewall with 
 Advanced Security\Windows Firewall Properties\Private Profile\Firewall state
-
+```
 ### Ensure 'Windows Firewall: Private: Inbound connections' is set to 'Block (default)' (Automated)
 
 <br></br>
-
+```
 Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
 Defender Firewall with Advanced Security\Windows Defender Firewall with 
 Advanced Security\Windows Firewall Properties\Private Profile\Inbound 
 connections
-
+```
 
 Set it to ***Block(Default)***
 
 
 ### (L1) Ensure 'Windows Firewall: Private: Outbound connections' is set to 'Allow (default)' (Automated)
 <br></br>
-
+```
 Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
 Defender Firewall with Advanced Security\Windows Defender Firewall with 
 Advanced Security\Windows Firewall Properties\Private Profile\Outbound 
 connections
-
+```
 This should be set to ***Allow(Defautlt)***
 
 ###  Ensure 'Windows Firewall: Private: Settings: Display a notification' is set to 'No' (Automated)
-
+```
 Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
 Defender Firewall with Advanced Security\Windows Defender Firewall with 
 Advanced Security\Windows Firewall Properties\Private Profile\Settings 
 Customize\Display a notification
-
+```
 This setting should be set to ***No***
+
+### (L1) Ensure 'Windows Firewall: Private: Logging: Name' is set to'%SystemRoot%\System32\logfiles\firewall\privatefw.log' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Private Profile\Logging 
+Customize\Name
+```
+To establish the recommended configuration via GP, set the following UI path to 
+%SystemRoot%\System32\logfiles\firewall\privatefw.log:
+
+### (L1) Ensure 'Windows Firewall: Private: Logging: Size limit (KB)' is set to '16,384 KB or greater' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Private Profile\Logging 
+Customize\Size limit (KB)
+```
+To establish the recommended configuration via GP, set the following UI path to 16,384 
+KB or greater:
+
+ ### Ensure 'Windows Firewall: Private: Logging: Log dropped packets' is set to 'Yes' (Automated)
+
+```
+ Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+ Defender Firewall with Advanced Security\Windows Defender Firewall with 
+ Advanced Security\Windows Firewall Properties\Private Profile\Logging 
+ Customize\Log dropped packets
+```
+ To establish the recommended configuration via GP, set the following UI path to Yes
+
+ ### (L1) Ensure 'Windows Firewall: Private: Logging: Log successful connections' is set to 'Yes' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Private Profile\Logging 
+Customize\Log successful connections
+
+```
+To establish the recommended configuration via GP, set the following UI path to Yes
+
+https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/configure-the-windows-firewall-log
+
+### (L1) Ensure 'Windows Firewall: Public: Firewall state' is set to 'On (recommended)' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Firewall state
+
+```
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to On 
+(recommended):
+
+https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/best-practices-configuring
+
+### (L1) Ensure 'Windows Firewall: Public: Inbound connections' is set to 'Block (default)' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Inbound 
+connections
+```
+
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to Block 
+(default):
+
+https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/best-practices-configuring
+
+
+
+### (L1) Ensure 'Windows Firewall: Public: Outbound connections' is set to 'Allow (default)' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Outbound 
+connections
+```
+
+**REMEDIATION:** To establish the recommended configuration via GP, set the following UI path to Allow 
+(default):
+
+https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/best-practices-configuring
+
+
+### (L1) Ensure 'Windows Firewall: Public: Settings: Display a notification' is set to 'No' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Settings 
+Customize\Display a notification
+```
+
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to 'No'
+
+### (L1) Ensure 'Windows Firewall: Public: Settings: Apply local firewall rules' is set to 'No' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Settings 
+Customize\Apply local firewall rules
+```
+
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to No
+
+###  (L1) Ensure 'Windows Firewall: Public: Settings: Apply local connection security rules' is set to 'No' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Settings 
+Customize\Apply local connection security rules
+```
+
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to No
+
+
+###  (L1) Ensure 'Windows Firewall: Public: Logging: Name' is set to '%SystemRoot%\System32\logfiles\firewall\publicfw.log' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Logging 
+Customize\Name
+```
+
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to 
+%SystemRoot%\System32\logfiles\firewall\publicfw.log:
+
+https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/configure-the-windows-firewall-log
+
+###  (L1) Ensure 'Windows Firewall: Public: Logging: Size limit (KB)' is set to '16,384 KB or greater' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Logging 
+Customize\Size limit (KB)
+```
+
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to 16,384 
+KB or greater:
+
+
+### (L1) Ensure 'Windows Firewall: Public: Logging: Log dropped packets' is set to 'Yes' (Automated)
+
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Logging 
+Customize\Log dropped packets
+```
+
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to Yes
+
+###  (L1) Ensure 'Windows Firewall: Public: Logging: Log successful connections' is set to 'Yes' (Automated)
+
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Windows 
+Defender Firewall with Advanced Security\Windows Defender Firewall with 
+Advanced Security\Windows Firewall Properties\Public Profile\Logging 
+Customize\Log successful connections
+```
+
+**REMIDIATION:** To establish the recommended configuration via GP, set the following UI path to Yes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #### 1.1.6 (L1) Ensure 'Relax minimum password length limits' is set to 'Enabled' (Automated)
