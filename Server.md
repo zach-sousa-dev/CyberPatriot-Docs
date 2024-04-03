@@ -347,7 +347,26 @@
         Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Take ownership of files or other objects
         ```
 
+    - ### 2.3 Security Options
+        - #### 2.3.1.1 (L1) Ensure 'Accounts: Block Microsoft accounts' is set to 'Users can't add or log on with Microsoft accounts' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Block Microsoft accounts
+        ```
 
+        - #### 2.3.1.2 (L1) Ensure 'Accounts: Guest account status' is set to 'Disabled' (MS only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Guest account status
+        ```
+
+        - #### 2.3.1.3 (L1) Ensure 'Accounts: Limit local account use of blank passwords to console logon only' is set to 'Enabled' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Limit local account use of blank passwords to console logon only
+        ```
+
+        - #### 2.3.1.4 (L1) Configure 'Accounts: Rename administrator account' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename administrator account
+        ```
 
 - ## 9. Windows Defender Firewall with Advanced Security
   - ### 9.1 Domain Proflie
@@ -410,4 +429,4 @@
     - #### 9.2.7 Ensure 'Windows Firewall: Private: Log dropped packets' is set to 'Yes' (Automated)
     - #### 9.2.8 Ensure 'Windows Firewall: Private: Log successful connections' is set to 'Yes' (Automated)
 - #### 9.3 Public Profile
-  -  ####
+  

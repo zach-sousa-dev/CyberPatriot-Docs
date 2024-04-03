@@ -134,163 +134,43 @@ Content\Turn off Spotlight collection on Desktop
 ``` 
 Setting: Enabled  
  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
+Links:  [1](https://docs.microsoft.com/en-us/windows/configuration/windows-spotlight)
 <br></br>
 
 
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
+#### 19.7.25 Network Sharing
+##### 19.7.25.1 (L1) Ensure 'Prevent users from sharing files within their profile.' is set to 'Enabled' (Automated)
+
 ``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
+User Configuration\Policies\Administrative Templates\Windows 
+Components\Network Sharing\Prevent users from sharing files within their 
+profile.
 ``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
+Setting: Enabled  
 <br></br>
 
 
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
+#### 19.7.40 Windows Installer
+##### 19.7.40.1 (L1) Ensure 'Always install with elevated privileges' is set to 'Disabled' (Automated)
+
 ``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
+User Configuration\Policies\Administrative Templates\Windows 
+Components\Windows Installer\Always install with elevated privileges
+
 ``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
+Setting: Disabled:
+ 
+Links:  [1](https://docs.microsoft.com/en-us/windows/win32/msi/alwaysinstallelevated)
 <br></br>
 
 
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
+#### 19.7.42.2 Playback
+##### 19.7.42.2.1 (L2) Ensure 'Prevent Codec Download' is set to 'Enabled' (Automated)
 ``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
+User Configuration\Policies\Administrative Templates\Windows 
+Components\Windows Media Player\Playback\Prevent Codec Download
 ``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
+Setting: Enabled  
 
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
-
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
-
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
-
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
-
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
-
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
-
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
-
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
-<br></br>
-
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
 <br></br>
 
