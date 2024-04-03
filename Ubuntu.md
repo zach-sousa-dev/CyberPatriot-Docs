@@ -273,9 +273,11 @@ Verify that the `nodev` option is set for the `/tmp` mount.
 Run the following command to verify that the `nodev` mount option is set.
 Example:
 
-`# findmnt --kernel /tmp | grep nodev`
+```
+# findmnt --kernel /tmp | grep nodev
 
-`/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel`
+/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel
+```
 
 Edit the `/etc/fstab` file and add `nodev` to the fourth field (mounting options) for the `/tmp`
 partition.
@@ -295,9 +297,11 @@ Verify that the `noexec` option is set for the `/tmp` mount.
 Run the following command to verify that the `noexec` mount option is set.
 Example:
 
-`# findmnt --kernel /tmp | grep noexec`
+```
+# findmnt --kernel /tmp | grep noexec
 
-`/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel`
+/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel
+```
 
 Edit the `/etc/fstab` file and add `noexec` to the fourth field (mounting options) for the 
 `/tmp` partition.
@@ -317,9 +321,11 @@ Verify that the `nosuid` option is set for the `/tmp` mount.
 Run the following command to verify that the `nosuid` mount option is set.
 Example:
 
-`# findmnt --kernel /tmp | grep nosuid`
+```
+# findmnt --kernel /tmp | grep nosuid
 
-`/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel`
+/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,relatime,seclabel
+```
 
 Edit the `/etc/fstab` file and add `nosuid` to the fourth field (mounting options) for the 
 `/tmp` partition.
@@ -362,9 +368,11 @@ Verify that the `nodev` option is set for the `/var` mount.
 Run the following command to verify that the `nodev` mount option is set.
 Example:
 
-`# findmnt --kernel /var`
+```
+# findmnt --kernel /var
 
-`/var /dev/sdb ext4 rw,nosuid,nodev,relatime,seclabel`
+/var /dev/sdb ext4 rw,nosuid,nodev,relatime,seclabel
+```
 
 > **IF** output is produced, ensure it includes the `nodev` option
 
@@ -374,7 +382,7 @@ Example:
 
 `<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
 
-Run the following command to remount /var with the configured options:
+Run the following command to remount `/var` with the configured options:
 
 `# mount -o remount /var`
 
@@ -386,9 +394,11 @@ Verify that the `nosuid` option is set for the `/var` mount.
 Run the following command to verify that the `nosuid` mount option is set.
 Example:
 
-`# findmnt --kernel /var`
+```
+# findmnt --kernel /var
 
-`/var /dev/sdb ext4 rw,nosuid,nodev,relatime,seclabel`
+/var /dev/sdb ext4 rw,nosuid,nodev,relatime,seclabel
+```
 
 > **IF** output is produced, ensure it includes the `nosuid` option
 
@@ -398,21 +408,96 @@ Example:
 
 `<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
 
-Run the following command to remount /var with the configured options:
+Run the following command to remount `/var` with the configured options:
 
 `# mount -o remount /var`
 
 #### 4 Configure var tmp
-1. 
+1. Ensure separate partition exists for /var/tmp (Automated)
 
+Run the following command and verify output shows `/var/tmp` is mounted.
+Example:
 
-2. 
+```
+# findmnt --kernel /var/tmp
 
+TARGET SOURCE FSTYPE OPTIONS
+/var/tmp /dev/sdb ext4 rw,relatime,seclabel,data=ordered
+```
 
-3. 
+For new installations, during installation create a custom partition setup and specify a 
+separate partition for `/var/tmp`.
+For systems that were previously installed, create a new partition and configure 
+`/etc/fstab` as appropriate.
 
+2. Ensure noexec option set on /var/tmp partition (Automated)
 
-4. 
+Verify that the `noexec` option is set for the `/var/tmp` mount.
+Run the following command to verify that the `noexec` mount option is set.
+Example:
+
+```
+# findmnt --kernel /var/tmp
+/var/tmp /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `noexec` option
+
+**IF** the `/var/tmp` partition exists, edit the `/etc/fstab` file and add `noexec` to the fourth field 
+(mounting options) for the `/var/tmp` partition.
+Example:
+
+`<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/tmp` with the configured options:
+
+`# mount -o remount /var/tmp`
+
+3. Ensure nosuid option set on /var/tmp partition (Automated)
+
+Verify that the `nosuid` option is set for the `/var/tmp` mount.
+Run the following command to verify that the `nosuid` mount option is set.
+Example:
+
+```
+# findmnt --kernel /var/tmp
+/var/tmp /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `nosuid` option
+
+**IF** the `/var/tmp` partition exists, edit the `/etc/fstab` file and add `nosuid` to the fourth field 
+(mounting options) for the `/var/tmp` partition.
+Example:
+
+`<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/tmp` with the configured options:
+
+`# mount -o remount /var/tmp`
+
+4. Ensure nodev option set on /var/tmp partition (Automated)
+
+Verify that the `nodev` option is set for the `/var/tmp` mount.
+Run the following command to verify that the `nodev` mount option is set.
+Example:
+
+```
+# findmnt --kernel /var/tmp
+/var/tmp /dev/sdb ext4 rw,nosuid,nodev,noexec,relatime,seclabel
+```
+
+> **IF** output is produced, ensure it includes the `nodev` option
+
+**IF** the `/var/tmp` partition exists, edit the `/etc/fstab` file and add `nodev` to the fourth field 
+(mounting options) for the `/var/tmp` partition.
+Example:
+
+`<device> /var <fstype> defaults,rw,nosuid,nodev,relatime 0 0`
+
+Run the following command to remount `/var/tmp` with the configured options:
+
+`# mount -o remount /var/tmp`
 
 
 #### 5 Configure var log

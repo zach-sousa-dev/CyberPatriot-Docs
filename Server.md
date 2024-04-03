@@ -98,6 +98,8 @@
 
         Links: [1](https://www.cisecurity.org/insights/white-papers/cis-password-policy-guide)
 
+---
+
 - ## 2. Local Policies
     - ### 2.2 User Rights Assignment
         - #### 2.2.1 (L1) Ensure 'Access Credential Manager as a trusted caller' is set to 'No One' (Automated)
@@ -148,14 +150,199 @@
         Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Allow log on through Remote Desktop Services
         ```
 
+        - #### 2.2.9 (L1) Ensure 'Allow log on through Remote Desktop Services' is set to 'Administrators, Remote Desktop Users' (MS only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Allow log on through Remote Desktop Services
+        ```
 
+        - #### 2.2.10 (L1) Ensure 'Back up files and directories' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Back up files and directories
+        ```
 
+        - #### 2.2.11 (L1) Ensure 'Change the system time' is set to 'Administrators, LOCAL SERVICE' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Change the system time
+        ```
 
+        - #### 2.2.12 (L1) Ensure 'Change the time zone' is set to 'Administrators, LOCAL SERVICE' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Change the time zone
+        ```
 
+        - #### 2.2.13 (L1) Ensure 'Create a pagefile' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create a pagefile
+        ```
 
+        - #### 2.2.14 (L1) Ensure 'Create a token object' is set to 'No One' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create a token object
+        ```
 
-    
+        - #### 2.2.15 (L1) Ensure 'Create global objects' is set to 'Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create global objects
+        ```
 
+        - #### 2.2.16 (L1) Ensure 'Create permanent shared objects' is set to 'No One' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create permanent shared objects
+        ```
 
+        - #### 2.2.17 (L1) Ensure 'Create symbolic links' is set to 'Administrators' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create symbolic links
+        ```
+
+        - #### 2.2.18 (L1) Ensure 'Create symbolic links' is set to 'Administrators, NT VIRTUAL MACHINE\Virtual Machines' (MS only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create symbolic links
+        ```
+
+        - #### 2.2.19 (L1) Ensure 'Debug programs' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Debug programs
+        ```
+
+        - #### 2.2.20 (L1) Ensure 'Deny access to this computer from the network' to include 'Guests' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny access to this computer from the network
+        ```
+
+        - #### 2.2.21 (L1) Ensure 'Deny log on as a batch job' to include 'Guests' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+        Policies\User Rights Assignment\Deny log on as a batch job
+        ```
+
+        - #### 2.2.22 (L1) Ensure 'Deny log on as a service' to include 'Guests' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny log on as a service
+        ```
+
+        - #### 2.2.23 (L1) Ensure 'Deny log on locally' to include 'Guests' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny log on locally
+        ```
+
+        - #### 2.2.24 (L1) Ensure 'Deny log on through Remote Desktop Services' to include 'Guests' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny log on through Remote Desktop Services
+        ```
+
+        - #### 2.2.25 (L1) Ensure 'Enable computer and user accounts to be trusted for delegation' is set to 'Administrators' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Enable computer and user accounts to be trusted for delegation
+        ```
+
+        - #### 2.2.26 (L1) Ensure 'Enable computer and user accounts to be trusted for delegation' is set to 'No One' (MS only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Enable computer and user accounts to be trusted for delegation
+        ```
+
+        - #### 2.2.27 (L1) Ensure 'Force shutdown from a remote system' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Force shutdown from a remote system
+        ```
+
+        - #### 2.2.28 (L1) Ensure 'Generate security audits' is set to 'LOCAL SERVICE, NETWORK SERVICE' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Generate security audits
+        ```
+
+        - #### 2.2.29 (L1) Ensure 'Impersonate a client after authentication' is set to 'Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Impersonate a client after authentication
+        ```
+
+        - #### 2.2.30 (L1) Ensure 'Impersonate a client after authentication' is set to 'Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE' and (when the Web Server (IIS) Role with Web Services Role Service is installed) 'IIS_IUSRS' (MS only) (Automated)
+
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Impersonate a client after authentication
+        ```
+
+        - #### 2.2.31 (L1) Ensure 'Increase scheduling priority' is set to 'Administrators, Window Manager\Window Manager Group' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Increase scheduling priority
+        ```
+
+        - #### 2.2.32 (L1) Ensure 'Load and unload device drivers' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Load and unload device drivers
+        ```
+
+        - #### 2.2.33 (L1) Ensure 'Lock pages in memory' is set to 'No One' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Lock pages in memory
+        ```
+
+        - #### 2.2.34 (L2) Ensure 'Log on as a batch job' is set to 'Administrators' (DC Only) (Automated)
+        ```
+        Computer Configuration\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Log on as a batch job
+        ```
+
+        - #### 2.2.35 (L1) Ensure 'Manage auditing and security log' is set to 'Administrators' and (when Exchange is running in the environment) 'Exchange Servers' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Manage auditing and security log
+        ```
+
+        - #### 2.2.36 (L1) Ensure 'Manage auditing and security log' is set to 'Administrators' (MS only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Manage auditing and security log
+        ```
+
+        - #### 2.2.37 (L1) Ensure 'Modify an object label' is set to 'No One' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Modify an object label
+        ```
+
+        - #### 2.2.38 (L1) Ensure 'Modify firmware environment values' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Modify firmware environment values
+        ```
+
+        - #### 2.2.39 (L1) Ensure 'Perform volume maintenance tasks' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Perform volume maintenance tasks
+        ```
+
+        - #### 2.2.40 (L1) Ensure 'Profile single process' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Profile single process
+        ```
         
-        
+        - #### 2.2.41 (L1) Ensure 'Profile system performance' is set to 'Administrators, NT SERVICE\WdiServiceHost' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Profile system performance
+        ```
+
+        - #### 2.2.42 (L1) Ensure 'Replace a process level token' is set to 'LOCAL SERVICE, NETWORK SERVICE' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Replace a process level token
+        ```
+
+        - #### 2.2.43 (L1) Ensure 'Restore files and directories' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Restore files and directories
+        ```
+
+        - #### 2.2.44 (L1) Ensure 'Shut down the system' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Shut down the system
+        ```
+
+        - #### 2.2.45 (L1) Ensure 'Synchronize directory service data' is set to 'No One' (DC only) (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Synchronize directory service data
+        ```
+
+        - #### 2.2.46 (L1) Ensure 'Take ownership of files or other objects' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Take ownership of files or other objects
+        ```
+
+        - #### 2.2.46 (L1) Ensure 'Take ownership of files or other objects' is set to 'Administrators' (Automated)
+        ```
+        Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Take ownership of files or other objects
+        ```
