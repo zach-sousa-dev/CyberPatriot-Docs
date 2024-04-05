@@ -798,6 +798,114 @@ Setting: Administrators, backup operators, users
 Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/shut-down-the-system)
 <br></br>
 
+#### 2.2.39 (L1) Ensure 'Take ownership of files or other objects' is set to 'Administrators' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\User Rights Assignment\Take ownership of files or other objects
+```
+Setting: Administrators   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/take-ownership-of-files-or-other-objects)
+<br></br>
+
+## 2.3 Security Options
+This Section contans recommendations for security options.
+### 2.3.1 Accounts
+This sections contains recommendations related to default accounts.
+<br></br>
+
+#### 2.3.1.1 (L1) Ensure 'Accounts: Block Microsoft accounts' is set to 'Users can't add or log on with Microsoft accounts' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+NoConnectedUser
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Accounts: Block Microsoft accounts
+```
+Setting: Users are able to use Microsoft accounts with Windows    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/accounts-block-microsoft-accounts)
+<br></br>
+
+#### 2.3.1.2 (L1) Ensure 'Accounts: Guest account status' is set to 'Disabled' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Accounts: Guest account status
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/accounts-guest-account-status)
+<br></br>
+
+#### 2.3.1.3 (L1) Ensure 'Accounts: Limit local account use of blank passwords to console logon only' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:LimitBlankPasswordUse
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Accounts: Limit local account use of blank 
+passwords to console logon only
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/accounts-limit-local-account-use-of-blank-passwords-to-console-logon-only)
+<br></br>
+
+#### 2.3.1.4 (L1) Configure 'Accounts: Rename administrator account' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Accounts: Rename administrator account
+```
+Setting: Administrator    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/accounts-rename-administrator-account)
+<br></br>
+
+#### 2.3.1.5 (L1) Configure 'Accounts: Rename guest account' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Accounts: Rename guest account
+```
+Setting: Guest    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/accounts-rename-guest-account)
+<br></br>
+
+### 2.3.2 Audit
+This section contains recommendations related to auditing controls
+<br></br>
+
+#### 2.3.2.1 (L1) Ensure 'Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit policy category settings' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:SCENoApplyLegacyAudit
+Policy
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Audit: Force audit policy subcategory settings 
+(Windows Vista or later) to override audit policy category settings
+```
+Setting: Enabled    
+Links: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/audit-force-audit-policy-subcategory-settings-to-override), [2](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/component-updates/command-line-process-auditing#to-ensure-that-advanced-audit-policy-configuration-settings-are-not-overwritten)
+<br></br>
+
+#### 2.3.2.2 (L1) Ensure 'Audit: Shut down system immediately if unable to log security audits' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:CrashOnAuditFail
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Audit: Shut down system immediately if unable to 
+log security audits
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/audit-shut-down-system-immediately-if-unable-to-log-security-audits)
+<br></br>
+
+
 ---
 
 ## 19. Administrative Templates (User) 
