@@ -31,8 +31,6 @@ Setting: Enabled: 900 or fewer, but not 0
 
 <br></br>
 
-## 1. Account wPolicies 
-### 1.1 Password Policies
 #### 19.5.1 Notifications
 ##### 19.5.1.1 (L1) Ensure 'Turn off toast notifications on the lock screen' is set to 'Enabled' (Automated)
 
@@ -83,7 +81,9 @@ Setting: Enabled
 User Configuration\Policies\Administrative Templates\Windows Components\Cloud 
 Content\Configure Windows spotlight on lock screen 
 ``` 
-Setting: Disabled  
+Setting: Disabled 
+Links:
+[1](https://docs.microsoft.com/en-us/windows/configuration/windows-spotlight#how-do-you-disable-windows-spotlight-for-managed-devices) 
 <br></br>
 
 ##### 19.7.7.2 (L1) Ensure 'Do not suggest third-party content in Windows spotlight' is set to 'Enabled' (Automated)
@@ -102,18 +102,6 @@ User Configuration\Policies\Administrative Templates\Windows Components\Cloud
 Content\Do not use diagnostic data for tailored experiences
 ``` 
 Setting: Enabled  
-<br></br>
-
-## 1. Account wPolicies 
-### 1.1 Password Policies
-#### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
-``` 
-Computer Configuration\Policies\Windows Settings\Security Settings\Account 
-Policies\Password Policy\Enforce password history 
-``` 
-Setting: 24  
-Links:  [1](https://www.cisecurity.org/white-papers/cis-password-policy-guide/),
-[2](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
 <br></br>
 
 ##### 19.7.7.4 (L2) Ensure 'Turn off all Windows spotlight features' is set to 'Enabled' (Automated)
