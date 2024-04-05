@@ -367,9 +367,75 @@
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename administrator account
         ```
-        <br><br>
-        ---
-        ## 19. Administrative Templates (User) 
+<br><br>
+---
+
+- ## 9. Windows Defender Firewall with Advanced Security
+  - ### 9.1 Domain Proflie
+  - ### 9.2 Private Profile
+    - #### 9.2.1 Ensure 'Windows Firewall: Private: Firewall state' is set to 'On (recommended)'(Automated)
+      Navigate to the UI Path articulated in the Remediation section and confirm it is set as
+      prescribed. This group policy setting is backed by the following registry location:
+     ```
+    HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile :EnableFirewall
+    ```
+    To establish the recommended configuration via GP, set the following UI path to On
+    (recommended):
+      ```
+      Computer Configuration\Policies\Windows Settings\Security Settings\Windows
+      Defender Firewall with Advanced Security\Windows Defender Firewall with
+      Advanced Security\Windows Firewall Properties\Private Profile\Firewall state
+      ```
+    Default value: **On** (recommended)
+    - #### 9.2.2 Ensure 'Windows Firewall: Private: Inbound connections' is set to 'block (default)'(Automated)
+      Navigate to the UI Path articulated in the Remediation section and confirm it is set as
+      prescribed. This group policy setting is backed by the following registry location:
+      ```
+      HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile :DefaultInboundAction
+      ```
+      To establish the recommended configuration via GP, set the following UI path to Block (default):
+      ```
+      Computer Configuration\Policies\Windows Settings\Security Settings\Windows
+      Defender Firewall with Advanced Security\Windows Defender Firewall with
+      Advanced Security\Windows Firewall Properties\Private Profile\Inbound
+      connections
+      ```
+       Default value: **Block** (Default) (recommended)
+      - #### 9.2.3 Ensure 'Windows Firewall: Private: Outbound connects is set to 'Allow' (default)(Automated)
+      ***Note:** If you set Outbound connections to Block and then deploy the firewall policy by
+      using a GPO, computers that receive the GPO settings cannot receive subsequent
+      Group Policy updates unless you create and deploy an outbound rule that enables
+      Group Policy to work. Predefined rules for Core Networking include outbound rules that
+      enable Group Policy to work. Ensure that these outbound rules are active, and
+      thoroughly test firewall profiles before deploying.* <br></br>
+    Navigate to the UI Path articulated in the Remediation section and confirm it is set as
+    prescribed. This group policy setting is backed by the following registry location:
+     ```
+ HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile
+:DefaultOutboundAction
+  ```
+  To establish the recommended configuration via GP, set the following UI path to Allow
+  (default):
+```
+  Computer Configuration\Policies\Windows Settings\Security Settings\Windows
+  Defender Firewall with Advanced Security\Windows Defender Firewall with
+  Advanced Security\Windows Firewall Properties\Private Profile\Outbound
+  connections
+    ```
+  Defalut Value: **Allow**
+ 
+    - #### 9.2.4 Ensure 'Windows Firewall: Private: Settings: displat a notification' is set to 'no' (Automated)
+
+    - #### 9.2.5 Ensure 'Windows Firewall: Private: Logging: Name' is set to '%SystemTooy%\System32\logfiles\firewall\Privatefw.log'(Automated)
+    - #### 9.2.6 Ensure 'Windows Firewall: Private: Logging: Size limit (KB)'' is set to '16,384 KB' or greater (Automated).
+    - #### 9.2.7 Ensure 'Windows Firewall: Private: Log dropped packets' is set to 'Yes' (Automated)
+    - #### 9.2.8 Ensure 'Windows Firewall: Private: Log successful connections' is set to 'Yes' (Automated)
+- #### 9.3 Public Profile
+
+<br><br>
+---
+
+## 19. Administrative Templates (User) 
 ### 19.1 Control Panel
 #### 19.1.3 Personalization (formerly Desktop Themes)
 ##### 19.1.3.1 (L1) Ensure 'Enable screen saver' is set to 'Enabled' (Automated)
@@ -380,7 +446,6 @@ Panel\Personalization\Enable screen saver
 Setting: Enabled  
 
 <br></br>
-
 
 ##### 19.1.3.2 (L1) Ensure 'Password protect the screen saver' is set to 
 'Enabled' (Automated)
@@ -533,3 +598,4 @@ Setting: Enabled
 
 <br></br>
 
+---
