@@ -14,24 +14,26 @@
 		- [Other Pages](#other-pages)
 		- [Sub Headings](#sub-headings)
 	- [1 Initial Setup](#1-initial-setup)
-		- [1 Filesystem Configuration](#1-filesystem-configuration)
-			- [1 Disable Unused Filesystems](#1-disable-unused-filesystems)
-			- [2 Configure tmp](#2-configure-tmp)
-			- [3 Configure var](#3-configure-var)
-			- [4 Configure var tmp](#4-configure-var-tmp)
-			- [5 Configure var log](#5-configure-var-log)
-			- [6 Configure var log audit](#6-configure-var-log-audit)
-			- [7 Configure home](#7-configure-home)
-			- [8 Configure dev shm](#8-configure-dev-shm)
-			- [9 Disable Automounting](#9-disable-automounting)
-			- [10 Disable USB Storage](#10-disable-usb-storage)
-		- [2 Configure Software Updates](#2-configure-software-updates)
-		- [3 Filesystem Integrity Checking](#3-filesystem-integrity-checking)
-		- [4 Secure Boot Settings](#4-secure-boot-settings)
-		- [5 Additional Process Hardening](#5-additional-process-hardening)
-		- [6 Mandatory Access Control](#6-mandatory-access-control)
-		- [7 Command Line Warning Banners](#7-command-line-warning-banners)
-		- [8 GNOME Display Manager](#8-gnome-display-manager)
+		- [1.1 Filesystem Configuration](#1-filesystem-configuration)
+			- [1.1.1 Disable Unused Filesystems](#1-disable-unused-filesystems)
+			- [1.1.2 Configure tmp](#2-configure-tmp)
+			- [1.1.3 Configure var](#3-configure-var)
+			- [1.1.4 Configure var tmp](#4-configure-var-tmp)
+			- [1.1.5 Configure var log](#5-configure-var-log)
+			- [1.1.6 Configure var log audit](#6-configure-var-log-audit)
+			- [1.1.7 Configure home](#7-configure-home)
+			- [1.1.8 Configure dev shm](#8-configure-dev-shm)
+			- [1.1.9 Disable Automounting](#9-disable-automounting)
+			- [1.1.10 Disable USB Storage](#10-disable-usb-storage)
+		- [1.2 Configure Software Updates](#2-configure-software-updates)
+		- [1.3 Filesystem Integrity Checking](#3-filesystem-integrity-checking)
+		- [1.4 Secure Boot Settings](#4-secure-boot-settings)
+		- [1.5 Additional Process Hardening](#5-additional-process-hardening)
+		- [1.6 Mandatory Access Control](#6-mandatory-access-control)
+			- [1.6.1 Configure AppArmor](#1-configure-apparmor)
+		- [1.7 Command Line Warning Banners](#7-command-line-warning-banners)
+		- [1.8 GNOME Display Manager](#8-gnome-display-manager)
+		- [1.9 Ensure updates, patches, and additional security software are installed](#9-ensure-updates-patches-and-additional-security-software-are-installed)
 	- [2 Services](#2-services)
 		- [Configure Time Synchronization](#configure-time-synchronization)
 		- [Special Purpose Services](#special-purpose-services)
@@ -898,18 +900,365 @@ Run the following script to disable `usb-storage`:
 ```
 
 ### 2 Configure Software Updates
+1. Ensure package manager repositories are configured (Manual)
+
+Run the following command and verify package repositories are configured correctly:
+
+`# apt-cache policy`
+
+Configure your package manager repositories according to site policy.
+
+2. Ensure GPG keys are configured (Manual)
+
+Verify GPG keys are configured correctly for your package manager:
+
+`# apt-key list`
+
+Update your package manager GPG keys in accordance with site policy.
 
 ### 3 Filesystem Integrity Checking
+1.  Ensure AIDE is installed (Automated)
+
+Run the following commands to verify AIDE is installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' aide aide-common
+
+aide install ok installed installed
+aide-common install ok installed installed
+```
+
+Install AIDE using the appropriate package manager or manual installation:
+
+`# apt install aide aide-common`
+
+Configure AIDE as appropriate for your environment. Consult the AIDE documentation 
+for options.
+
+Run the following commands to initialize AIDE:
+
+```
+# aideinit
+# mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db
+```
+
+2. Ensure filesystem integrity is regularly checked (Automated)
+
+Run the following commands to verify a cron job scheduled to run the aide check.
+
+`# grep -Prs '^([^#\n\r]+\h+)?(\/usr\/s?bin\/|^\h*)aide(\.wrapper)?\h+(--check|([^#\n\r]+\h+)?\$AIDEARGS)\b' /etc/cron.* /etc/crontab /var/spool/cron/`
+
+If cron will be used to schedule and run aide check:
+
+Run the following command:
+
+`# crontab -u root -e`
+
+Add the following line to the crontab:
+
+`0 5 * * * /usr/bin/aide.wrapper --config /etc/aide/aide.conf --check`
+
+[\[1\]](https://github.com/konstruktoid/hardening/blob/master/config/aidecheck.service)
+[\[2\]](https://github.com/konstruktoid/hardening/blob/master/config/aidecheck.timer)
 
 ### 4 Secure Boot Settings
+1. Ensure bootloader password is set (Automated)
+
+```
+# grep "^set superusers" /boot/grub/grub.cfg
+
+set superusers="<username>"
+
+# grep "^password" /boot/grub/grub.cfg
+
+password_pbkdf2 <username> <encrypted-password>
+```
+
+Create an encrypted password with `grub-mkpasswd-pbkdf2`:
+
+```
+# grub-mkpasswd-pbkdf2
+
+Enter password: <password>
+Reenter password: <password>
+PBKDF2 hash of your password is <encrypted-password>
+```
+
+Add the following into a custom `/etc/grub.d` configuration file:
+
+```
+cat <<EOF
+set superusers="<username>"
+password_pbkdf2 <username> <encrypted-password>
+EOF
+```
+
+Run the following command to update the grub2 configuration:
+
+`# update-grub`
+
+2. Ensure permissions on bootloader config are configured (Automated)
+
+Run the following command and verify `Uid` and `Gid` are both `0/root` and Access is `0400` or more restrictive.
+
+```
+# stat /boot/grub/grub.cfg
+
+Access: (0400/-r--------) Uid: ( 0/ root) Gid: ( 0/ root)
+```
+
+Run the following commands to set permissions on your grub configuration:
+
+```
+# chown root:root /boot/grub/grub.cfg
+# chmod u-wx,go-rwx /boot/grub/grub.cfg
+```
+
+3. Ensure authentication required for single user mode (Automated)
+
+Perform the following to determine if a password is set for the root user:
+
+`# grep -Eq '^root:\$[0-9]' /etc/shadow || echo "root is locked"`
+
+No result should be returned.
+
+Run the following command and follow the prompts to set a password for the root user:
+
+`# passwd root`
 
 ### 5 Additional Process Hardening
+1. Ensure address space layout randomization (ASLR) is enabled (Automated)
+
+Run the following script to verify kernel.randomize_va_space is set to 2:
+
+``` bash
+#!/usr/bin/env bash
+{
+	krp="" pafile="" fafile=""
+	kpname="kernel.randomize_va_space" 
+	kpvalue="2"
+	searchloc="/run/sysctl.d/*.conf /etc/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf"
+	krp="$(sysctl "$kpname" | awk -F= '{print $2}' | xargs)"
+	pafile="$(grep -Psl -- "^\h*$kpname\h*=\h*$kpvalue\b\h*(#.*)?$" $searchloc)"
+	fafile="$(grep -s -- "^\s*$kpname" $searchloc | grep -Pv --"\h*=\h*$kpvalue\b\h*" | awk -F: '{print $1}')"
+	if [ "$krp" = "$kpvalue" ] && [ -n "$pafile" ] && [ -z "$fafile" ]; then
+		echo -e "\nPASS:\n\"$kpname\" is set to \"$kpvalue\" in the running configuration and in \"$pafile\""
+	else
+		echo -e "\nFAIL: "
+		[ "$krp" != "$kpvalue" ] && echo -e "\"$kpname\" is set to \"$krp\" in the running configuration\n"
+		[ -n "$fafile" ] && echo -e "\n\"$kpname\" is set incorrectly in \"$fafile\""
+		[ -z "$pafile" ] && echo -e "\n\"$kpname = $kpvalue\" is not set in a kernel parameter configuration file\n"
+	fi
+}
+```
+
+Set the following parameter in `/etc/sysctl.conf` or a `/etc/sysctl.d/*` file:
+Example:
+
+`# printf "kernel.randomize_va_space = 2" >> /etc/sysctl.d/60-kernel_sysctl.conf`
+
+Run the following command to set the active kernel parameter:
+
+`# sysctl -w kernel.randomize_va_space=2`
+
+[\[1\]](https://manpages.ubuntu.com/manpages/focal/man5/sysctl.d.5.html)
+
+2. Ensure prelink is not installed (Automated)
+
+Verify `prelink` is not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' prelink
+
+prelink unknown ok not-installed not-installed
+```
+
+Run the following command to restore binaries to normal:
+
+`# prelink -ua`
+
+Uninstall prelink using the appropriate package manager or manual installation:
+
+`# apt purge prelink`
+
+3. Ensure Automatic Error Reporting is not enabled (Automated)
+
+Run the following command to verify that the Apport Error Reporting Service is not enabled:
+
+`# dpkg-query -s apport > /dev/null 2>&1 && grep -Psi --'^\h*enabled\h*=\h*[^0]\b' /etc/default/apport`
+
+Nothing should be returned.
+
+Run the following command to verify that the apport service is not active:
+
+`# systemctl is-active apport.service | grep '^active'`
+
+Nothing should be returned.
+
+Edit `/etc/default/apport` and add or edit the enabled parameter to equal 0:
+
+`enabled=0`
+
+Run the following commands to stop and disable the apport service
+
+```
+# systemctl stop apport.service
+# systemctl --now disable apport.service
+```
+
+4. Ensure core dumps are restricted (Automated)
+
+Run the following commands and verify output matches:
+
+```
+# grep -Es '^(\*|\s).*hard.*core.*(\s+#.*)?$' /etc/security/limits.conf /etc/security/limits.d/*
+
+* hard core 0
+
+# sysctl fs.suid_dumpable
+
+fs.suid_dumpable = 0
+
+# grep "fs.suid_dumpable" /etc/sysctl.conf /etc/sysctl.d/*
+
+fs.suid_dumpable = 0
+```
+
+Run the following command to check if systemd-coredump is installed:  
+`# systemctl is-enabled coredump.service`
+
+if `enabled`, `masked`, or `disabled` is returned systemd-coredump is installed
+
+Add the following line to `/etc/security/limits.conf` or a `/etc/security/limits.d/*`file:  
+`* hard core 0`
+
+Set the following parameter in `/etc/sysctl.conf` or a `/etc/sysctl.d/*` file:  
+`fs.suid_dumpable = 0`
+
+Run the following command to set the active kernel parameter:  
+`# sysctl -w fs.suid_dumpable=0`
+
+**IF** systemd-coredump is installed:  
+edit `/etc/systemd/coredump.conf` and add/modify the following lines:
+
+```
+Storage=none
+ProcessSizeMax=0
+```
+
+Run the command:  
+`systemctl daemon-reload`
 
 ### 6 Mandatory Access Control
+#### 1 Configure AppArmor
+1. Ensure AppArmor is installed (Automated)
+
+Verify that AppArmor is installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' apparmor
+
+apparmor install ok installed installed
+```
+
+Install AppArmor.
+
+`# apt install apparmor`
+
+2. Ensure AppArmor is enabled in the bootloader configuration (Automated)
+
+Run the following commands to verify that all `linux` lines have the `apparmor=1` and `security=apparmor` parameters set:
+
+```
+# grep "^\s*linux" /boot/grub/grub.cfg | grep -v "apparmor=1"
+
+Nothing should be returned
+# grep "^\s*linux" /boot/grub/grub.cfg | grep -v "security=apparmor"
+
+Nothing should be returned
+```
+
+Edit `/etc/default/grub` and add the `apparmor=1` and `security=apparmor` parameters to the `GRUB_CMDLINE_LINUX=` line
+
+`GRUB_CMDLINE_LINUX="apparmor=1 security=apparmor"`
+
+Run the following command to update the `grub2` configuration:
+
+`# update-grub`
+
+3. Ensure all AppArmor Profiles are in enforce or complain mode (Automated)
+
+Run the following command and verify that profiles are loaded, and are in either enforce or complain mode:
+
+`# apparmor_status | grep profiles`
+
+```
+37 profiles are loaded.
+35 profiles are in enforce mode.
+2 profiles are in complain mode.
+4 processes have profiles defined.
+```
+
+Run the following command and verify no processes are unconfined:
+
+`# apparmor_status | grep processes`
+
+```
+4 processes have profiles defined.
+4 processes are in enforce mode.
+0 processes are in complain mode.
+0 processes are unconfined but have a profile defined.
+```
+
+Run the following command to set all profiles to enforce mode
+
+`# aa-enforce /etc/apparmor.d/*`
+
+**OR**
+
+Run the following command to set all profiles to complain mode:
+
+`# aa-complain /etc/apparmor.d/*`
+
+4. Ensure all AppArmor Profiles are enforcing (Automated)
+
+Run the following commands and verify that profiles are loaded and are not in complain mode:
+
+`# apparmor_status | grep profiles`
+
+```
+34 profiles are loaded.
+34 profiles are in enforce mode.
+0 profiles are in complain mode.
+2 processes have profiles defined.
+```
+
+Run the following command and verify that no processes are unconfined:
+
+`apparmor_status | grep processes`
+
+```
+2 processes have profiles defined.
+2 processes are in enforce mode.
+0 processes are in complain mode.
+0 processes are unconfined but have a profile defined.
+```
+
+Run the following command to set all profiles to enforce mode:
+
+`# aa-enforce /etc/apparmor.d/*`
 
 ### 7 Command Line Warning Banners
 
 ### 8 GNOME Display Manager
+
+### 9 Ensure updates patches and additional security software are installed
+
+Run the following commands: 
+
+`# apt update`
+
+`# apt upgrade`
 
 ---
 
