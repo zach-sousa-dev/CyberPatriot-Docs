@@ -905,6 +905,305 @@ Setting: Disabled
 Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/audit-shut-down-system-immediately-if-unable-to-log-security-audits)
 <br></br>
 
+## 2.3.3 DCOM
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+### 2.3.4 Devices
+This section contains recommendations related to managing devices.
+<br></br>
+
+#### 2.3.4.1 (L2) Ensure 'Devices: Prevent users from installing printer drivers' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Print\Providers\LanMan 
+Print Services\Servers:AddPrinterDrivers
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Devices: Prevent users from installing printer 
+drivers
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/devices-prevent-users-from-installing-printer-drivers)
+<br></br>
+
+#### 2.3.5 Domain controller
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+#### 2.3.6 Domain Member
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+#### 2.3.7 Interactive logon
+<br></br>
+
+#### 2.3.7.1 (L1) Ensure 'Interactive logon: Do not require CTRL+ALT+DEL' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+DisableCAD
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Do not require CTRL+ALT+DEL
+```
+Setting:    
+On Windows 7 or older: Disabled   
+On Windows 10 or newer: Enabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-do-not-require-ctrl-alt-del)
+<br></br>
+
+#### 2.3.7.2 (L1) Ensure 'Interactive logon: Don't display last signed-in' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+DontDisplayLastUserName
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Don't display last signed-in
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-do-not-display-last-user-name)
+<br></br>
+
+#### 2.3.7.3 (BL) Ensure 'Interactive logon: Machine account lockout threshold' is set to '10 or fewer invalid logon attempts, but not 0' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+MaxDevicePasswordFailedAttempts
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Machine account lockout 
+threshold
+```
+Default: 0 logon attempts     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-machine-account-lockout-threshold)
+<br></br>
+
+#### 2.3.7.4 (L1) Ensure 'Interactive logon: Machine inactivity limit' is set to '900 or fewer second(s), but not 0' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+InactivityTimeoutSecs
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Machine inactivity limit
+```
+Setting: 0 seconds    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-machine-inactivity-limit)
+<br></br>
+
+#### 2.3.7.5 (L1) Configure 'Interactive logon: Message text for users attempting to log on' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+LegalNoticeText
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Message text for users 
+attempting to log on
+```
+Setting: No message     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-message-text-for-users-attempting-to-log-on)
+<br></br>
+
+#### 2.3.7.6 (L1) Configure 'Interactive logon: Message title for users attempting to log on' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+LegalNoticeCaption
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Message title for users 
+attempting to log on
+```
+Setting: No message     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-message-title-for-users-attempting-to-log-on)
+<br></br>
+
+#### 2.3.7.7 (L1) Ensure 'Interactive logon: Prompt user to change password before expiration' is set to 'between 5 and 14 days' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows 
+NT\CurrentVersion\Winlogon:PasswordExpiryWarning
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Prompt user to change password 
+before expiration
+```
+Setting: 5 days   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-prompt-user-to-change-password-before-expiration)
+<br></br>
+
+#### 2.3.7.8 (L1) Ensure 'Interactive logon: Smart card removal behavior' is set to 'Lock Workstation' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows 
+NT\CurrentVersion\Winlogon:ScRemoveOption
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Smart card removal behavior
+```
+Setting: No action    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-smart-card-removal-behavior)
+<br></br>
+
+### 2.3.8 Microsoft network client
+This section contains recommendations related to configuring the Microsoft network 
+client.
+<br></br>
+
+#### 2.3.8.1 (L1) Ensure 'Microsoft network client: Digitally sign communications (always)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parame
+ters:RequireSecuritySignature
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network client: Digitally sign 
+communications (always)
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-client-digitally-sign-communications-always)
+<br></br> 
+
+#### 2.3.8.2 (L1) Ensure 'Microsoft network client: Digitally sign communications (if server agrees)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parame
+ters:EnableSecuritySignature
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network client: Digitally sign 
+communications (if server agrees)
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/jj852251(v=ws.11))
+<br></br>
+
+#### 2.3.8.3 (L1) Ensure 'Microsoft network client: Send unencrypted password to third-party SMB servers' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parame
+ters:EnablePlainTextPassword
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network client: Send unencrypted password 
+to third-party SMB servers
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-client-send-unencrypted-password-to-third-party-smb-servers)
+<br></br>
+
+### 2.3.9 Microsoft network server
+This section contains recommendations related to configuring the Microsoft network 
+server.
+<br></br>
+
+#### 2.3.9.1 (L1) Ensure 'Microsoft network server: Amount of idle time required before suspending session' is set to '15 or fewer minute(s)' (Automated)
+Audit shown below:
+```
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Amount of idle time 
+required before suspending session
+```
+Setting: 15 minutes   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-amount-of-idle-time-required-before-suspending-session)
+<br></br>
+
+#### 2.3.9.2 (L1) Ensure 'Microsoft network server: Digitally sign communications (always)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+RequireSecuritySignature
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Digitally sign 
+communications (always)
+```
+Setting: Disabled   
+Link: [1](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always)
+<br></br>
+
+#### 2.3.9.3 (L1) Ensure 'Microsoft network server: Digitally sign communications (if client agrees)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+EnableSecuritySignature
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Digitally sign 
+communications (if client agrees)
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always)
+<br></br>
+
+#### 2.3.9.4 (L1) Ensure 'Microsoft network server: Disconnect clients when logon hours expire' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+enableforcedlogoff
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Disconnect clients when 
+logon hours expire
+```
+Setting: Enabled    
+Link [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-disconnect-clients-when-logon-hours-expire)
+<br></br>
+
+#### 2.3.9.5 (L1) Ensure 'Microsoft network server: Server SPN target name validation level' is set to 'Accept if provided by client' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+SMBServerNameHardeningLevel
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Server SPN target name 
+validation level
+```
+Setting: Off    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-server-spn-target-name-validation-level)
+<br></br>
+
+
+
 
 ---
 

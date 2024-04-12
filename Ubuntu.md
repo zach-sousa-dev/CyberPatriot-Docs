@@ -1425,7 +1425,136 @@ Run the following commands:
 
 ###  1 Configure System Accounting (auditd)
 
-1. Ensure auditing is enabled 
+1. **Ensure auditing is enabled**
+
+	default event logs will be logged to `/var/log/audit/audit.log`
+
+	which will be configured in `/etc/audit/auditd.conf`.
+
+	The following types of audit rules can be specified:
+	* Control rules: Configuration of the auditing system.
+	* File system rules: Allow the auditing of access to a particular file or a directory.
+	Also known as file watches.
+	* System call rules: Allow logging of system calls that any specified program
+	makes.  
+
+	<br>
+
+	Audit rules can be set:
+	* On the command line using the auditctl utility. These rules are not persistent
+	across reboots.
+    * In `/etc/audit/audit.rules`. These rules have to be merged and loaded before
+	they are active.   
+
+	<br>
+
+	Run the following command and verify and audispd-plugins are installed:
+	```
+	# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n'
+	```
+	```
+	auditd audispd-plugins   
+
+	audispd-plugins install ok installed installed
+	auditd install ok installed installed
+	```
+
+	If plugin is not installed run the following command
+	```
+	# apt install auditd audispd-plugins
+
+	```
+
+	<br>
+
+	**Ensure auditd service is enabled and active (Automated)**  
+
+	Run the following command to verify `auditd` is enabled:
+	```
+	# systemctl is-enabled auditd
+	```
+	```
+	enabled
+	```
+
+	Verify result is "enabled".
+	Run the following command to verify auditd is active:
+	```
+	# systemctl is-active auditd
+	```
+	```
+	active
+
+	```
+	Verify result is active
+
+	Run the following command to enable and start auditd:
+	```
+	# systemctl --now enable auditd
+	```
+
+	<br>
+
+	**Ensure auditing for processes that start prior to auditd is
+	enabled (Automated)**
+
+	Run the following command:
+	```
+	# find /boot -type f -name 'grub.cfg' -exec grep -Ph -- '^\h*linux' {} + |
+	grep -v 'audit=1'
+
+	```
+	Nothing should be returned.
+
+	*Remediation:*
+
+	Edit /etc/default/grub and add audit=1 to GRUB_CMDLINE_LINUX:
+	Example:
+
+	```
+	GRUB_CMDLINE_LINUX="audit=1"
+	```
+
+	Run the following command to update the grub2 configuration:
+	```
+	# update-grub
+	```
+
+	<br>
+
+	**Ensure audit_backlog_limit is sufficient (Automated)**
+
+	Run the following command and verify the audit_backlog_limit= parameter is set:
+
+	```
+	# find /boot -type f -name 'grub.cfg' -exec grep -Ph -- '^\h*linux' {} + |
+	grep -Pv 'audit_backlog_limit=\d+\b'
+
+	```
+	Nothing should be returned.
+
+	*Remediation:*   
+
+	Edit `/etc/default/` grub and add `audit_backlog_limit=N` to GRUB_CMDLINE_LINUX.
+	The recommended size for `N` is `8192` or larger.
+	Example:
+
+	```
+	GRUB_CMDLINE_LINUX="audit_backlog_limit=8192"
+	```
+
+	Run the following command to update the grub2 configuration:
+
+	```
+	# update-grub
+	```
+
+	Default Value:
+	if `audit_backlog_limit` is not set, the system defaults to `audit_backlog_limit=64`   
+	   
+	<br>
+
+	
 
 2. Configure  Data Retention
 
