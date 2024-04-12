@@ -1249,8 +1249,145 @@ Run the following command to set all profiles to enforce mode:
 `# aa-enforce /etc/apparmor.d/*`
 
 ### 7 Command Line Warning Banners
+1. Ensure message of the day is configured properly (Automated)
+
+Run the following command and verify no results are returned:
+
+`# grep -Eis "(\\\v|\\\r|\\\m|\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/"//g'))" /etc/motd`
+
+Edit the `/etc/motd` file with the appropriate contents according to your site policy, 
+remove any instances of `\m`, `\r`, `\s`, `\v` or references to the OS platform
+
+**OR** if the motd is not used, this file can be removed.  
+Run the following command to remove the motd file:
+
+`# rm /etc/motd`
+
+2. Ensure local login warning banner is configured properly (Automated)
+
+Run the following command and verify that the contents match site policy:
+
+`# cat /etc/issue`
+
+Run the following command and verify no results are returned:
+
+`# grep -E -i "(\\\v|\\\r|\\\m|\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/"//g'))" /etc/issue`
+
+Edit the `/etc/issue` file with the appropriate contents according to your site policy, remove any instances of `\m`, `\r`, `\s`, `\v` or references to the `OS platform`
+
+`# echo "Authorized uses only. All activity may be monitored and reported." > /etc/issue`
+
+3. Ensure remote login warning banner is configured properly (Automated)
+
+Run the following command and verify that the contents match site policy:
+
+`# cat /etc/issue.net`
+
+Run the following command and verify no results are returned:
+
+`# grep -E -i "(\\\v|\\\r|\\\m|\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/"//g'))" /etc/issue.net`
+
+Edit the `/etc/issue.net` file with the appropriate contents according to your site policy, remove any instances of `\m`, `\r`, `\s`, `\v` or references to the `OS platform`
+
+`# echo "Authorized uses only. All activity may be monitored and reported." > /etc/issue.net`
+
+4. Ensure permissions on /etc/motd are configured (Automated)
+
+Run the following command and verify: `Uid` and `Gid` are both `0/root` and `Access` is `644`, or the file doesn't exist.
+
+```
+# stat -L /etc/motd
+
+Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root)
+	OR
+stat: cannot stat '/etc/motd': No such file or directory
+```
+
+Run the following commands to set permissions on `/etc/motd`:
+
+```
+# chown root:root $(readlink -e /etc/motd)
+# chmod u-x,go-wx $(readlink -e /etc/motd)
+```
+
+**OR** run the following command to remove the `/etc/motd` file:
+
+`# rm /etc/motd`
+
+5. Ensure permissions on /etc/issue are configured (Automated)
+
+Run the following command and verify `Uid` and `Gid` are both `0/root` and `Access` is `644`:
+
+```
+# stat -L /etc/issue
+
+Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root)
+```
+
+Run the following commands to set permissions on `/etc/issue`:
+
+```
+# chown root:root $(readlink -e /etc/issue)
+# chmod u-x,go-wx $(readlink -e /etc/issue)
+```
+
+6. Ensure permissions on /etc/issue.net are configured (Automated)
+
+Run the following command and verify `Uid` and `Gid` are both `0/root` and `Access` is `644`:
+
+```
+# stat -L /etc/issue.net
+
+Access: (0644/-rw-r--r--) Uid: ( 0/ root) Gid: ( 0/ root)
+```
+
+Run the following commands to set permissions on `/etc/issue.net`:
+
+```
+# chown root:root $(readlink -e /etc/issue.net)
+# chmod u-x,go-wx $(readlink -e /etc/issue.net)
+```
 
 ### 8 GNOME Display Manager
+1. 
+
+
+
+2. 
+
+
+
+3. 
+
+
+
+4. 
+
+
+
+5. 
+
+
+
+6. 
+
+
+
+7. 
+
+
+
+8. 
+
+
+
+9. 
+
+
+
+10. 
+
+
 
 ### 9 Ensure updates patches and additional security software are installed
 
