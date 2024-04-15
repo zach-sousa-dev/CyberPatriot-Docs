@@ -14,26 +14,26 @@
 		- [Other Pages](#other-pages)
 		- [Sub Headings](#sub-headings)
 	- [1 Initial Setup](#1-initial-setup)
-		- [1.1 Filesystem Configuration](#1-filesystem-configuration)
-			- [1.1.1 Disable Unused Filesystems](#1-disable-unused-filesystems)
-			- [1.1.2 Configure tmp](#2-configure-tmp)
-			- [1.1.3 Configure var](#3-configure-var)
-			- [1.1.4 Configure var tmp](#4-configure-var-tmp)
-			- [1.1.5 Configure var log](#5-configure-var-log)
-			- [1.1.6 Configure var log audit](#6-configure-var-log-audit)
-			- [1.1.7 Configure home](#7-configure-home)
-			- [1.1.8 Configure dev shm](#8-configure-dev-shm)
-			- [1.1.9 Disable Automounting](#9-disable-automounting)
-			- [1.1.10 Disable USB Storage](#10-disable-usb-storage)
-		- [1.2 Configure Software Updates](#2-configure-software-updates)
-		- [1.3 Filesystem Integrity Checking](#3-filesystem-integrity-checking)
-		- [1.4 Secure Boot Settings](#4-secure-boot-settings)
-		- [1.5 Additional Process Hardening](#5-additional-process-hardening)
-		- [1.6 Mandatory Access Control](#6-mandatory-access-control)
-			- [1.6.1 Configure AppArmor](#1-configure-apparmor)
-		- [1.7 Command Line Warning Banners](#7-command-line-warning-banners)
-		- [1.8 GNOME Display Manager](#8-gnome-display-manager)
-		- [1.9 Ensure updates, patches, and additional security software are installed](#9-ensure-updates-patches-and-additional-security-software-are-installed)
+		- [1 Filesystem Configuration](#1-filesystem-configuration)
+			- [1 Disable Unused Filesystems](#1-disable-unused-filesystems)
+			- [2 Configure tmp](#2-configure-tmp)
+			- [3 Configure var](#3-configure-var)
+			- [4 Configure var tmp](#4-configure-var-tmp)
+			- [5 Configure var log](#5-configure-var-log)
+			- [6 Configure var log audit](#6-configure-var-log-audit)
+			- [7 Configure home](#7-configure-home)
+			- [8 Configure dev shm](#8-configure-dev-shm)
+			- [9 Disable Automounting](#9-disable-automounting)
+			- [10 Disable USB Storage](#10-disable-usb-storage)
+		- [2 Configure Software Updates](#2-configure-software-updates)
+		- [3 Filesystem Integrity Checking](#3-filesystem-integrity-checking)
+		- [4 Secure Boot Settings](#4-secure-boot-settings)
+		- [5 Additional Process Hardening](#5-additional-process-hardening)
+		- [6 Mandatory Access Control](#6-mandatory-access-control)
+			- [1 Configure AppArmor](#1-configure-apparmor)
+		- [7 Command Line Warning Banners](#7-command-line-warning-banners)
+		- [8 GNOME Display Manager](#8-gnome-display-manager)
+		- [9 Ensure updates patches and additional security software are installed](#9-ensure-updates-patches-and-additional-security-software-are-installed)
 	- [2 Services](#2-services)
 		- [Configure Time Synchronization](#configure-time-synchronization)
 		- [Special Purpose Services](#special-purpose-services)
@@ -54,6 +54,8 @@
 		- [4 Configure PAM](#4-configure-pam)
 		- [5 User Account and](#5-user-account-and)
 	- [6 System Maintenance](#6-system-maintenance)
+		- [1 System File Permission](#1-system-file-permission)
+		- [2 Local User and Group Settings](#2-local-user-and-group-settings)
 
 ---
 
@@ -1554,9 +1556,7 @@ Run the following commands:
 	   
 	<br>
 
-	
-
-2. Configure  Data Retention
+2. Configure Data Retention
 
 3. Configure auditd rules 
 
@@ -1590,3 +1590,8 @@ Run the following commands:
 ---
 
 ## 6 System Maintenance
+
+### 1 System File Permission 
+
+### 2 Local User and Group Settings 
+
