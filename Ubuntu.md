@@ -1351,7 +1351,7 @@ Run the following commands to set permissions on `/etc/issue.net`:
 ```
 
 ### 8 GNOME Display Manager
-1. 
+1. Ensure GNOME Display Manager is removed (Automated)
 
 
 
