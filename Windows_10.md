@@ -1202,7 +1202,355 @@ Setting: Off
 Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-server-spn-target-name-validation-level)
 <br></br>
 
+### 2.3.10 Network access
+This section contains recommendations related to network access.
+<br></br>
 
+#### 2.3.10.1 (L1) Ensure 'Network access: Allow anonymous SID/Name translation' is set to 'Disabled' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Allow anonymous SID/Name 
+translation
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-allow-anonymous-sidname-translation)
+<br></br>
+
+#### 2.3.10.2 (L1) Ensure 'Network access: Do not allow anonymous enumeration of SAM accounts' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:RestrictAnonymousSAM
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Do not allow anonymous enumeration 
+of SAM accounts
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-do-not-allow-anonymous-enumeration-of-sam-accounts)
+<br></br>
+
+#### 2.3.10.3 (L1) Ensure 'Network access: Do not allow anonymous enumeration of SAM accounts and shares' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:RestrictAnonymous
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Do not allow anonymous enumeration 
+of SAM accounts and shares
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-do-not-allow-anonymous-enumeration-of-sam-accounts-and-shares)
+<br></br>
+
+#### 2.3.10.4 (L1) Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:DisableDomainCreds
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Do not allow storage of passwords 
+and credentials for network authentication
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-do-not-allow-storage-of-passwords-and-credentials-for-network-authentication)
+<br></br>
+
+#### 2.3.10.5 (L1) Ensure 'Network access: Let Everyone permissions apply to anonymous users' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:EveryoneIncludesAnony
+mous
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Let Everyone permissions apply to 
+anonymous users
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-let-everyone-permissions-apply-to-anonymous-users)
+<br></br>
+
+#### 2.3.10.6 (L1) Ensure 'Network access: Named Pipes that can be accessed anonymously' is set to 'None' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+NullSessionPipes
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Named Pipes that can be accessed 
+anonymously
+```
+Setting: None   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-named-pipes-that-can-be-accessed-anonymously)
+<br></br>
+
+#### 2.3.10.7 (L1) Ensure 'Network access: Remotely accessible registry paths' is configured (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurePipeServers\Winreg\
+AllowedExactPaths:Machine
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Remotely accessible registry paths
+```
+Setting:    
+System\CurrentControlSet\Control\ProductOptions 
+System\CurrentControlSet\Control\Server Applications
+Software\Microsoft\Windows NT\CurrentVersion    
+Link: [1](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-access-remotely-accessible-registry-paths)
+<br></br>
+
+#### 2.3.10.8 (L1) Ensure 'Network access: Remotely accessible registry paths and sub-paths' is configured (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurePipeServers\Winreg\
+AllowedPaths:Machine
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Remotely accessible registry paths 
+and sub-paths
+```
+Setting:    
+System\CurrentControlSet\Control\Print\Printers 
+System\CurrentControlSet\Services\Eventlog
+Software\Microsoft\OLAP Server
+Software\Microsoft\Windows NT\CurrentVersion\Print
+Software\Microsoft\Windows NT\CurrentVersion\Windows 
+System\CurrentControlSet\Control\ContentIndex 
+System\CurrentControlSet\Control\Terminal Server 
+System\CurrentControlSet\Control\Terminal Server\UserConfig 
+System\CurrentControlSet\Control\Terminal Server\DefaultUserConfiguration 
+Software\Microsoft\Windows NT\CurrentVersion\Perflib 
+System\CurrentControlSet\Services\SysmonLog   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-remotely-accessible-registry-paths-and-subpaths)
+<br></br>
+
+#### 2.3.10.9 (L1) Ensure 'Network access: Restrict anonymous access to Named Pipes and Shares' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+RestrictNullSessAccess
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local
+Policies\Security Options\Network access: Restrict anonymous access to Named 
+Pipes and Shares
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-restrict-anonymous-access-to-named-pipes-and-shares)
+<br></br>
+
+#### 2.3.10.10 (L1) Ensure 'Network access: Restrict clients allowed to make remote calls to SAM' is set to 'Administrators: Remote Access: Allow' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:restrictremotesam
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Restrict clients allowed to make 
+remote calls to SAM
+```
+Setting: Administrators (Allow Remote Access)   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-restrict-clients-allowed-to-make-remote-sam-calls)
+<br></br>
+
+#### 2.3.10.11 (L1) Ensure 'Network access: Shares that can be accessed anonymously' is set to 'None' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+NullSessionShares
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Shares that can be accessed 
+anonymously
+```
+Setting: None     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-shares-that-can-be-accessed-anonymously)
+<br></br>
+
+#### 2.3.10.12 (L1) Ensure 'Network access: Sharing and security model for local accounts' is set to 'Classic - local users authenticate as themselves' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:ForceGuest
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Sharing and security model for 
+local accounts
+```
+Setting:    
+On domain-joined computers: Classic
+On stand-alone computers: Guest only    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-sharing-and-security-model-for-local-accounts)
+<br></br>
+
+### 2.3.11 Network security
+This section contains recommendations related to network security.
+<br></br>
+
+#### 2.3.11.1 (L1) Ensure 'Network security: Allow Local System to use computer identity for NTLM' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:UseMachineId
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Allow Local System to use 
+computer identity for NTLM
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-allow-local-system-to-use-computer-identity-for-ntlm)
+<br></br>
+
+#### 2.3.11.2 (L1) Ensure 'Network security: Allow LocalSystem NULL session fallback' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0:AllowNullSessi
+onFallback
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Allow LocalSystem NULL session 
+fallback
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-allow-localsystem-null-session-fallback)
+<br></br>
+
+#### 2.3.11.3 (L1) Ensure 'Network Security: Allow PKU2U authentication requests to this computer to use online identities' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\pku2u:AllowOnlineID
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network Security: Allow PKU2U authentication 
+requests to this computer to use online identities
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-allow-pku2u-authentication-requests-to-this-computer-to-use-online-identities)
+<br></br>
+
+#### 2.3.11.4 (L1) Ensure 'Network security: Configure encryption types allowed for Kerberos' is set to 'AES128_HMAC_SHA1, AES256_HMAC_SHA1, Future encryption types' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\
+Kerberos\Parameters:SupportedEncryptionTypes
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Configure encryption types 
+allowed for Kerberos
+```
+Setting: RC4_HMAC_MD5, AES128_HMAC_SHA1, AES256_HMAC_SHA1, Future encryption types    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-configure-encryption-types-allowed-for-kerberos)
+<br></br>
+
+#### 2.3.11.5 (L1) Ensure 'Network security: Do not store LAN Manager hash value on next password change' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:NoLMHash
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Do not store LAN Manager hash 
+value on next password change
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-do-not-store-lan-manager-hash-value-on-next-password-change)
+<br></br>
+
+#### 2.3.11.6 (L1) Ensure 'Network security: Force logoff when logon hours expire' is set to 'Enabled' (Manual)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Force logoff when logon hours 
+expire
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-force-logoff-when-logon-hours-expire)
+<br></br>
+
+#### 2.3.11.7 (L1) Ensure 'Network security: LAN Manager authentication level' is set to 'Send NTLMv2 response only. Refuse LM & NTLM' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:LmCompatibilityLevel
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: LAN Manager authentication level
+```
+Setting: Send NTLMv2 response only    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-lan-manager-authentication-level)
+<br></br>
+
+#### 2.3.11.8 (L1) Ensure 'Network security: LDAP client signing requirements' is set to 'Negotiate signing' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LDAP:LDAPClientIntegrity
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: LDAP client signing requirements
+```
+Setting: Negotiate Signing    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-ldap-client-signing-requirements)
+<br></br>
+
+#### 2.3.11.9 (L1) Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) clients' is set to 'Require NTLMv2 session security, Require 128-bit encryption' (Automated)
+Audit shown below:
+```
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Minimum session security for NTLM 
+SSP based (including secure RPC) clients
+```
+Setting: Require 128-bit encryption   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-minimum-session-security-for-ntlm-ssp-based-including-secure-rpc-clients)
+<br></br>
+
+#### 2.3.11.10 (L1) Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) servers' is set to 'Require NTLMv2 session security, Require 128-bit encryption' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0:NTLMMinServerSec
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Minimum session security for NTLM 
+SSP based (including secure RPC) servers
+```
+Setting: Require 128-bit encryption   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-minimum-session-security-for-ntlm-ssp-based-including-secure-rpc-servers)
+<br></br>
 
 
 ---
