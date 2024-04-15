@@ -1861,7 +1861,7 @@ Run the following commands:
 
 	*Remediation:*
 
-	Edit /etc/default/grub and add audit=1 to GRUB_CMDLINE_LINUX:
+	Edit `/etc/default/grub` and add audit=1 to GRUB_CMDLINE_LINUX:
 	Example:
 
 	```
@@ -1907,7 +1907,345 @@ Run the following commands:
 	   
 	<br>
 
-2. Configure Data Retention
+2. **Configure Data Retention**   
+	
+	**Ensure audit log storage size is configured (Automated)**
+
+    When auditing, it is important to carefully configure the storage requirements for audit
+	logs. By default, auditd will max out the log files at 5MB and retain only 4 copies of
+	them. Older versions will be deleted. It is possible on a system that the 20 MBs of audit
+	logs may fill up the system causing loss of audit data. While the recommendations here
+	provide guidance, check your site policy for audit storage requirements   
+
+	<br>
+
+	Audit:
+	Run the following command and ensure output is in compliance with site policy:
+	```
+	# grep -Po -- '^\h*max_log_file\h*=\h*\d+\b' /etc/audit/auditd.conf
+	max_log_file = <MB>
+	```
+
+	Remediation:
+	Set the following parameter in `/etc/audit/auditd.conf` in accordance with site policy:
+	```
+	max_log_file = <MB>
+	```
+	Default Value:
+	max_log_file = 8
+
+	Additional Information:  
+
+	The max_log_file parameter is measured in megabytes.
+	Other methods of log rotation may be appropriate based on site policy. One example is
+	time-based rotation strategies which don't have native support in auditd configurations.
+	Manual audit of custom configurations should be evaluated for effectiveness and
+	completeness
+
+	<br>
+
+	**Ensure audit logs are not automatically deleted(Automated)** 
+	
+	Description:   
+	The max_log_file_action setting determines how to handle the audit log file reaching
+	the max file size. A value of keep_logs will rotate the logs but never delete old logs.
+
+	Rationale:   
+	In high security contexts, the benefits of maintaining a long audit history exceed the cost
+	of storing the audit history.
+
+	Audit:
+	Run the following command and verify output matches:
+	```
+	# grep max_log_file_action /etc/audit/auditd.conf
+	max_log_file_action = keep_logs
+	```
+	Remediation:   
+	Set the following parameter in `/etc/audit/auditd.conf`:
+	```
+	max_log_file_action = keep_logs
+	```
+
+	<br>
+
+	**Ensure system is disabled when audit logs are full(Automated)**   
+
+	Description:   
+
+	The auditd daemon can be configured to halt the system when the audit logs are full.
+	The admin_space_left_action parameter tells the system what action to take when the
+	system has detected that it is low on disk space. Valid values are ignore, syslog,
+	suspend, single, and halt.   
+
+   * ignore, the audit daemon does nothing
+   * Syslog, the audit daemon will issue a warning to syslog
+   * Suspend, the audit daemon will stop writing records to the disk
+   * single, the audit daemon will put the computer system in single user mode
+   * halt, the audit daemon will shutdown the system  
+  
+	Rationale:   
+
+	In high security contexts, the risk of detecting unauthorized access or nonrepudiation
+	exceeds the benefit of the system's availability.
+
+	Impact:
+	If the admin_space_left_action parameter is set to halt the audit daemon will
+	shutdown the system when the disk partition containing the audit logs becomes full.
+
+	Audit:
+	Run the following commands and verify output matches:
+	```
+	# grep space_left_action /etc/audit/auditd.conf
+
+	space_left_action = email
+	# grep action_mail_acct /etc/audit/auditd.conf
+
+	action_mail_acct = root
+	```
+	Run the following command and verify the output is either halt or single:
+	```
+	# grep -E 'admin_space_left_action\s*=\s*(halt|single)'
+	/etc/audit/auditd.conf
+	admin_space_left_action = <halt|single>
+	```
+
+	Remediation:
+	Set the following parameters in `/etc/audit/auditd.conf`:   
+	```
+	space_left_action = email
+	action_mail_acct = root
+	```
+	set admin_space_left_action to either halt or single in /etc/audit/auditd.conf.
+	Example:   
+	```
+	admin_space_left_action = halt
+	```
+	<br>
+
+	**Configure auditd rules**  
+
+	The Audit system operates on a set of rules that define what is to be captured in the log
+	files.
+	The following types of Audit rules can be specified:
+
+   * Control rules: Allow the Audit system's behavior and some of its configuration to be modified.
+   * File system rules: Allow the auditing of access to a particular file or a directory. (Also known as file watches)
+   * System call rules: Allow logging of system calls that any specified program makes.  
+
+	Audit rules can be set:
+   * on the command line using the auditctl utility. Note that these rules are not persistent across reboots.
+   * in a file ending in .rules in the /etc/audit/audit.d/ directory.  
+
+	<br>
+
+	**Ensure changes to system administration scope (sudoers)is collected (Automated)**  
+
+	Description:  
+
+	Monitor scope changes for system administrators. If the system has been properly
+	configured to force system administrators to log in as themselves first and then use the
+	sudo command to execute privileged commands, it is possible to monitor changes in
+	scope. The file `/etc/sudoers`, or files in `/etc/sudoers.d`, will be written to when the
+	file(s) or related attributes have changed. The audit records will be tagged with the
+	identifier "scope".  
+
+	Rationale:  
+
+	Changes in the `/etc/sudoers` and `/etc/sudoers.d` files can indicate that an
+	unauthorized change has been made to the scope of system administrator activity.  
+
+	Audit:  
+
+	*On disk configuration*  
+
+	Run the following command to check the on disk rules:
+
+	```
+	# awk '/^ *-w/ \
+	&&/\/etc\/sudoers/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	```
+	Verify the output matches:
+	```
+	-w /etc/sudoers -p wa -k scope
+	-w /etc/sudoers.d -p wa -k scope
+	```
+
+	*Running configuration*  
+
+	Run the following command to check loaded rules:
+	```
+	# auditctl -l | awk '/^ *-w/ \
+	&&/\/etc\/sudoers/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	```
+
+	Verify the output matches:
+	```
+	-w /etc/sudoers -p wa -k scope
+	-w /etc/sudoers.d -p wa -k scope
+	```
+
+	Remediation:   
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor scope changes for system administrators.
+	Example:
+	```
+	# printf "
+	-w /etc/sudoers -p wa -k scope
+	-w /etc/sudoers.d -p wa -k scope
+	" >> /etc/audit/rules.d/50-scope.rules
+	```
+
+	Merge and load the rules into active configuration:
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	**Additional Information:**  
+
+	*Potential reboot required*  
+
+	If the auditing configuration is locked (*-e 2*), then *augenrules* will not warn in any way
+	that rules could not be loaded into the running configuration. A system reboot will be
+	required to load the rules into the running configuration.  
+
+	*System call structure*  
+
+	For performance (*man 7 audit.rules*) reasons it is preferable to have all the system
+	calls on one line. However, your configuration may have them on one line each or some
+	other combination. This is important to understand for both the auditing and remediation
+	sections as the examples given are optimized for performance as per the man page.
+
+	<br>
+
+	**Ensure actions as another user are always logged
+	(Automated)**  
+
+	Description:  
+
+	*`sudo`* provides users with temporary elevated privileges to perform operations, either as
+	the superuser or another user.
+
+	Rationale:
+	Creating an audit log of users with temporary elevated privileges and the operation(s)
+	they performed is essential to reporting. Administrators will want to correlate the events
+	written to the audit trail with the records written to *`sudo`*'s logfile to verify if unauthorized
+	commands have been executed.  
+
+	Audit:  
+
+	*64 Bit systems*
+
+	**On disk configuration**
+
+	Run the following command to check the on disk rules:
+
+	```
+	# awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&(/ -C *euid!=uid/||/ -C *uid!=euid/) \
+	&&/ -S *execve/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	```
+
+	Verify the output matches:  
+
+	```
+	-a always,exit -F arch=b64 -C euid!=uid -F auid!=unset -S execve -k
+	user_emulation
+	-a always,exit -F arch=b32 -C euid!=uid -F auid!=unset -S execve -k
+	user_emulation
+	```
+
+	***Running configuration***  
+
+	Run the following command to check loaded rules:
+
+	```
+	# auditctl -l | awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&(/ -C *euid!=uid/||/ -C *uid!=euid/) \
+	&&/ -S *execve/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	```
+
+	Verify the output matches:
+	```
+	-a always,exit -F arch=b64 -S execve -C uid!=euid -F auid!=-1 -F
+	key=user_emulation
+	-a always,exit -F arch=b32 -S execve -C uid!=euid -F auid!=-1 -F
+	key=user_emulation
+	```
+
+	***32 Bit systems***  
+
+	Follow the same procedures as for 64 bit systems and ignore any entries with ***b64***.
+
+	Remediation:  
+
+	Create audit rules  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor elevated privileges.
+
+	**64 Bit systems**
+
+	Example:  
+
+	```
+	# printf "
+	-a always,exit -F arch=b64 -C euid!=uid -F auid!=unset -S execve -k
+	user_emulation
+	-a always,exit -F arch=b32 -C euid!=uid -F auid!=unset -S execve -k
+	user_emulation
+	" >> /etc/audit/rules.d/50-user_emulation.rules
+	```
+
+	*Load audit rules*
+
+	Merge and load the rules into active configuration:  
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.
+
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	**32 Bit systems**  
+
+	Follow the same procedures as for 64 bit systems and ignore any entries with ***b64***.
+
+	**Additional Information:**  
+
+	*Potential reboot required*  
+
+	If the auditing configuration is locked (*-e 2*), then *augenrules* will not warn in any way
+	that rules could not be loaded into the running configuration. A system reboot will be required to load the rules into the running configuration.  
+
+	*System call structure*  
+
+	For performance (*man 7 audit.rules*) reasons it is preferable to have all the system
+	calls on one line. However, your configuration may have them on one line each or some
+	other combination. This is important to understand for both the auditing and remediation
+	sections as the examples given are optimized for performance as per the man page.  
+
+	
 
 3. Configure auditd rules 
 
