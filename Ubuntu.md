@@ -1353,43 +1353,394 @@ Run the following commands to set permissions on `/etc/issue.net`:
 ### 8 GNOME Display Manager
 1. Ensure GNOME Display Manager is removed (Automated)
 
+> Removing the GNOME Display manager will remove the Graphical User Interface (GUI) from the system.
+> You probably don't need to do this unless directly specified that you don't need a GUI
+
+Run the following command and verify `gdm3` is not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' gdm3
+
+gdm3 unknown ok not-installed not-installed
+```
+
+Run the following command to uninstall `gdm3`:
+
+`# apt purge gdm3`
+
+2. Ensure GDM login banner is configured (Automated)
+
+Run the following script to verify that the text banner on the login screen is enabled and set:
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_pkgoutput=""
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	l_pcl="gdm gdm3" # Space seporated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n - Package: \"$l_pn\" exists on the system\n - checking configuration"
+	done
+	if [ -n "$l_pkgoutput" ]; then
+		l_output="" l_output2=""
+		echo -e "$l_pkgoutput"
+		# Look for existing settings and set variables if they exist
+		l_gdmfile="$(grep -Prils '^\h*banner-message-enable\b' /etc/dconf/db/*.d)"
+		if [ -n "$l_gdmfile" ]; then
+			# Set profile name based on dconf db directory ({PROFILE_NAME}.d)
+			l_gdmprofile="$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_gdmfile")"
+			# Check if banner message is enabled
+			if grep -Pisq '^\h*banner-message-enable=true\b' "$l_gdmfile"; then
+				l_output="$l_output\n - The \"banner-message-enable\" option is enabled in \"$l_gdmfile\""
+			else
+				l_output2="$l_output2\n - The \"banner-message-enable\" option is not enabled"
+			fi
+			l_lsbt="$(grep -Pios '^\h*banner-message-text=.*$' "$l_gdmfile")"
+			if [ -n "$l_lsbt" ]; then
+				l_output="$l_output\n - The \"banner-message-text\" option is set in \"$l_gdmfile\"\n - banner-message-text is set to:\n - \"$l_lsbt\""
+			else
+				l_output2="$l_output2\n - The \"banner-message-text\" option is not set"
+			fi
+			if grep -Pq "^\h*system-db:$l_gdmprofile" /etc/dconf/profile/"$l_gdmprofile"; then
+				l_output="$l_output\n - The \"$l_gdmprofile\" profile exists"
+			else
+				l_output2="$l_output2\n - The \"$l_gdmprofile\" profile doesn't exist"
+			fi
+			if [ -f "/etc/dconf/db/$l_gdmprofile" ]; then
+				l_output="$l_output\n - The \"$l_gdmprofile\" profile exists in the dconf database"
+			else
+				l_output2="$l_output2\n - The \"$l_gdmprofile\" profile doesn't exist in the dconf database"
+			fi
+		else
+			l_output2="$l_output2\n - The \"banner-message-enable\" option isn't configured"
+		fi
+	else
+		echo -e "\n\n - GNOME Desktop Manager isn't installed\n - Recommendation is Not Applicable\n- Audit result:\n *** PASS ***\n"
+	fi
+	# Report results. If no failures output in l_output2, we pass
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to verify that the banner message is enabled and set:
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_pkgoutput=""
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	l_pcl="gdm gdm3" # Space seporated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n - Package: \"$l_pn\" exists 
+		on the system\n - checking configuration"
+	done
+	if [ -n "$l_pkgoutput" ]; then
+		l_gdmprofile="gdm" # Set this to desired profile name IaW Local site policy
+		l_bmessage="'Authorized uses only. All activity may be monitored and reported'" # Set to 
+		desired banner message
+		if [ ! -f "/etc/dconf/profile/$l_gdmprofile" ]; then
+			echo "Creating profile \"$l_gdmprofile\""
+			echo -e "user-db:user\nsystem-db:$l_gdmprofile\nfiledb:/usr/share/$l_gdmprofile/greeter-dconf-defaults" > /etc/dconf/profile/$l_gdmprofile
+		fi
+		if [ ! -d "/etc/dconf/db/$l_gdmprofile.d/" ]; then
+			echo "Creating dconf database directory \"/etc/dconf/db/$l_gdmprofile.d/\""
+			mkdir /etc/dconf/db/$l_gdmprofile.d/
+		fi
+		if ! grep -Piq '^\h*banner-message-enable\h*=\h*true\b' /etc/dconf/db/$l_gdmprofile.d/*; then
+			echo "creating gdm keyfile for machine-wide settings"
+			if ! grep -Piq -- '^\h*banner-message-enable\h*=\h*' /etc/dconf/db/$l_gdmprofile.d/*;then
+				l_kfile="/etc/dconf/db/$l_gdmprofile.d/01-banner-message"
+				echo -e "\n[org/gnome/login-screen]\nbanner-message-enable=true" >> "$l_kfile"
+			else
+				l_kfile="$(grep -Pil -- '^\h*banner-message-enable\h*=\h*' /etc/dconf/db/$l_gdmprofile.d/*)"
+				! grep -Pq '^\h*\[org\/gnome\/login-screen\]' "$l_kfile" && sed -ri '/^\s*bannermessage-enable/ i\[org/gnome/login-screen]' "$l_kfile"
+				! grep -Pq '^\h*banner-message-enable\h*=\h*true\b' "$l_kfile" && sed -ri 's/^\s*(banner-message-enable\s*=\s*)(\S+)(\s*.*$)/\1true \3//' "$l_kfile"
+				# sed -ri '/^\s*\[org\/gnome\/login-screen\]/ a\\nbanner-message-enable=true' "$l_kfile"
+			fi
+		fi
+		if ! grep -Piq "^\h*banner-message-text=[\'\"]+\S+" "$l_kfile"; then
+			sed -ri "/^\s*banner-message-enable/ a\banner-message-text=$l_bmessage" "$l_kfile"
+		fi
+		dconf update
+	else
+		echo -e "\n\n - GNOME Desktop Manager isn't installed\n - Recommendation is Not Applicable\n - No remediation required\n"
+	fi
+}
+```
+
+- There is no character limit for the banner message. gnome-shell autodetects longer stretches of text and enters two column mode.
+- The banner message cannot be read from an external file.
+
+**OR**
+
+Run the following command to remove the gdm3 package:
+
+`# apt purge gdm3`
+
+3. Ensure GDM disable-user-list option is enabled (Automated)
+
+Run the following script and to verify that the `disable-user-list` option is enabled or GNOME isn't installed:
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_pkgoutput=""
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	l_pcl="gdm gdm3" # Space seporated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+	done
+	if [ -n "$l_pkgoutput" ]; then
+		output="" output2=""
+		l_gdmfile="$(grep -Pril '^\h*disable-user-list\h*=\h*true\b' /etc/dconf/db)"
+		if [ -n "$l_gdmfile" ]; then
+			output="$output\n - The \"disable-user-list\" option is enabled in \"$l_gdmfile\""
+			l_gdmprofile="$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_gdmfile")"
+			if grep -Pq "^\h*system-db:$l_gdmprofile" /etc/dconf/profile/"$l_gdmprofile"; then
+				output="$output\n - The \"$l_gdmprofile\" exists"
+			else
+				output2="$output2\n - The \"$l_gdmprofile\" doesn't exist"
+			fi
+			if [ -f "/etc/dconf/db/$l_gdmprofile" ]; then
+				output="$output\n - The \"$l_gdmprofile\" profile exists in the dconf database"
+			else
+				output2="$output2\n - The \"$l_gdmprofile\" profile doesn't exist in the dconf database"
+			fi
+		else
+			output2="$output2\n - The \"disable-user-list\" option is not enabled"
+		fi
+		if [ -z "$output2" ]; then
+			echo -e "$l_pkgoutput\n- Audit result:\n *** PASS: ***\n$output\n"
+		else
+			echo -e "$l_pkgoutput\n- Audit Result:\n *** FAIL: ***\n$output2\n"
+			[ -n "$output" ] && echo -e "$output\n"
+		fi
+	else
+		echo -e "\n\n - GNOME Desktop Manager isn't installed\n -Recommendation is Not Applicable\n- Audit result:\n *** PASS ***\n"
+	fi
+}
+```
+
+Run the following script to enable the `disable-user-list` option:
+
+> the `l_gdm_profile` variable in the script can be changed if a different profile name is desired in accordance with local site policy.
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_gdmprofile="gdm"
+	if [ ! -f "/etc/dconf/profile/$l_gdmprofile" ]; then
+		echo "Creating profile \"$l_gdmprofile\""
+		echo -e "user-db:user\nsystem-db:$l_gdmprofile\nfiledb:/usr/share/$l_gdmprofile/greeter-dconf-defaults" > /etc/dconf/profile/$l_gdmprofile
+	fi
+	if [ ! -d "/etc/dconf/db/$l_gdmprofile.d/" ]; then
+		echo "Creating dconf database directory \"/etc/dconf/db/$l_gdmprofile.d/\""
+		mkdir /etc/dconf/db/$l_gdmprofile.d/
+	fi
+	if ! grep -Piq '^\h*disable-user-list\h*=\h*true\b' /etc/dconf/db/$l_gdmprofile.d/*; then
+		echo "creating gdm keyfile for machine-wide settings"
+		if ! grep -Piq -- '^\h*\[org\/gnome\/login-screen\]' /etc/dconf/db/$l_gdmprofile.d/*; then
+			echo -e "\n[org/gnome/login-screen]\n# Do not show the user list\ndisable-user-list=true" >> /etc/dconf/db/$l_gdmprofile.d/00-loginscreen
+		else
+			sed -ri '/^\s*\[org\/gnome\/login-screen\]/ a\# Do not show the user list\ndisable-user-list=true' $(grep -Pil -- '^\h*\[org\/gnome\/loginscreen\]' /etc/dconf/db/$l_gdmprofile.d/*)
+		fi
+	fi
+	dconf update
+}
+```
+
+- When the user profile is created or changed, the user will need to log out and log in again before the changes will be applied.
+
+**OR**
+
+Run the following command to remove the gdm3 package:
+
+`# apt purge gdm3`
+
+4. Ensure GDM screen locks when the user is idle (Automated)
+
+Run the following script to verify that the screen locks when the user is idle:
+
+``` bash
+#!/usr/bin/env bash
+{
+ # Check if GNMOE Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+ # determine system's package manager
+ l_pkgoutput=""
+ if command -v dpkg-query > /dev/null 2>&1; then
+ 	l_pq="dpkg-query -W"
+ elif command -v rpm > /dev/null 2>&1; then
+ 	l_pq="rpm -q"
+ fi
+ # Check if GDM is installed
+ l_pcl="gdm gdm3" # Space seporated list of packages to check
+ for l_pn in $l_pcl; do
+ 	$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+ done
+ # Check configuration (If applicable)
+ if [ -n "$l_pkgoutput" ]; then
+	l_output="" l_output2=""
+	l_idmv="900" # Set for max value for idle-delay in seconds
+	l_ldmv="5" # Set for max value for lock-delay in seconds
+	# Look for idle-delay to determine profile in use, needed for remaining tests
+	l_kfile="$(grep -Psril '^\h*idle-delay\h*=\h*uint32\h+\d+\b' /etc/dconf/db/*/)" # Determine file containing idle-delay key
+ 	if [ -n "$l_kfile" ]; then
+		# set profile name (This is the name of a dconf database)
+		l_profile="$(awk -F'/' '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile")" #Set the key profile name
+		l_pdbdir="/etc/dconf/db/$l_profile.d" # Set the key file dconf db directory
+		# Confirm that idle-delay exists, includes unit32, and value is between 1 and max value for idle-delay
+		l_idv="$(awk -F 'uint32' '/idle-delay/{print $2}' "$l_kfile" | xargs)"
+ 		if [ -n "$l_idv" ]; then
+			[ "$l_idv" -gt "0" -a "$l_idv" -le "$l_idmv" ] && l_output="$l_output\n - The \"idle-delay\" option is set to \"$l_idv\" seconds in \"$l_kfile\""
+			[ "$l_idv" = "0" ] && l_output2="$l_output2\n - The \"idledelay\" option is set to \"$l_idv\" (disabled) in \"$l_kfile\""
+			[ "$l_idv" -gt "$l_idmv" ] && l_output2="$l_output2\n - The \"idle-delay\" option is set to \"$l_idv\" seconds (greater than $l_idmv) in \"$l_kfile\""
+		else
+			l_output2="$l_output2\n - The \"idle-delay\" option is not set in \"$l_kfile\""
+		fi
+		# Confirm that lock-delay exists, includes unit32, and value is between 0 and max value for lock-delay
+		l_ldv="$(awk -F 'uint32' '/lock-delay/{print $2}' "$l_kfile" | xargs)"
+		if [ -n "$l_ldv" ]; then
+			[ "$l_ldv" -ge "0" -a "$l_ldv" -le "$l_ldmv" ] && l_output="$l_output\n - The \"lock-delay\" option is set to \"$l_ldv\" seconds in \"$l_kfile\""
+			[ "$l_ldv" -gt "$l_ldmv" ] && l_output2="$l_output2\n - The \"lock-delay\" option is set to \"$l_ldv\" seconds (greater than $l_ldmv) in \"$l_kfile\""
+		else
+			l_output2="$l_output2\n - The \"lock-delay\" option is not set in \"$l_kfile\""
+		fi
+		# Confirm that dconf profile exists
+		if grep -Psq "^\h*system-db:$l_profile" /etc/dconf/profile/*; then
+			l_output="$l_output\n - The \"$l_profile\" profile exists"
+		else
+			l_output2="$l_output2\n - The \"$l_profile\" doesn't exist"
+		fi
+		# Confirm that dconf profile database file exists
+		if [ -f "/etc/dconf/db/$l_profile" ]; then
+			l_output="$l_output\n - The \"$l_profile\" profile exists in the dconf database"
+		else
+			l_output2="$l_output2\n - The \"$l_profile\" profile doesn't exist in the dconf database"
+		fi
+ 	else
+ 		l_output2="$l_output2\n - The \"idle-delay\" option doesn't exist, remaining tests skipped"
+ 	fi
+ else
+ 	l_output="$l_output\n - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+ fi
+ # Report results. If no failures output in l_output2, we pass
+ [ -n "$l_pkgoutput" ] && echo -e "\n$l_pkgoutput"
+ if [ -z "$l_output2" ]; then
+ 	echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+ else
+	echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+	[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+ fi
+}
+```
+
+- `idle-delay=uint32` Should be 900 seconds (15 minutes) or less, not 0 (disabled) and follow local site policy
+- `lock-delay=uint32` should be 5 seconds or less and follow local site policy
+
+Create or edit a file in the `/etc/dconf/profile/` and verify it includes the following:
+
+```
+user-db:user
+system-db:{NAME_OF_DCONF_DATABASE}
+```
+
+> local is the name of a dconf database used in the examples.  
+
+Example:
+
+`# echo -e '\nuser-db:user\nsystem-db:local' >> /etc/dconf/profile/user`
+
+Create the directory `/etc/dconf/db/{NAME_OF_DCONF_DATABASE}.d/` if it doesn't already exist:  
+Example:
+
+`# mkdir /etc/dconf/db/local.d`
+
+Create the key file `/etc/dconf/db/{NAME_OF_DCONF_DATABASE}.d/{FILE_NAME}` to provide information for the `{NAME_OF_DCONF_DATABASE}` database:  
+Example script:
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_key_file="/etc/dconf/db/local.d/00-screensaver"
+	l_idmv="900" # Set max value for idle-delay in seconds (between 1 and 900)
+	l_ldmv="5" # Set max value for lock-delay in seconds (between 0 and 5)
+	{
+		echo '# Specify the dconf path'
+		echo '[org/gnome/desktop/session]'
+		echo ''
+		echo '# Number of seconds of inactivity before the screen goes blank'
+		echo '# Set to 0 seconds if you want to deactivate the screensaver.'
+		echo "idle-delay=uint32 $l_idmv"
+		echo ''
+		echo '# Specify the dconf path'
+		echo '[org/gnome/desktop/screensaver]'
+		echo ''
+		echo '# Number of seconds after the screen is blank before locking the screen'
+		echo "lock-delay=uint32 $l_ldmv"
+	} > "$l_key_file"
+}
+```
+
+>  You must include the uint32 along with the integer key values as shown.
+
+Run the following command to update the system databases:
+
+`# dconf update`
+
+> Users must log out and back in again before the system-wide settings take effect.
+
+[\[1\]](https://help.gnome.org/admin/system-admin-guide/stable/desktop-lockscreen.html.en)
+
+5. Ensure GDM screen locks cannot be overridden (Automated)
 
 
-2. 
+
+6. Ensure GDM automatic mounting of removable media is disabled (Automated)
 
 
 
-3. 
+7. Ensure GDM disabling automatic mounting of removable media is not overridden (Automated)
 
 
 
-4. 
+8. Ensure GDM autorun-never is enabled (Automated)
 
 
 
-5. 
+9. Ensure GDM autorun-never is not overridden (Automated)
 
 
 
-6. 
+10. Ensure XDCMP is not enabled (Automated)
 
+Run the following command and verify the output:
 
+```
+# grep -Eis '^\s*Enable\s*=\s*true' /etc/gdm3/custom.conf
 
-7. 
+Nothing should be returned
+```
 
+Edit the file `/etc/gdm3/custom.conf` and remove the line:
 
-
-8. 
-
-
-
-9. 
-
-
-
-10. 
-
-
+`Enable=true`
 
 ### 9 Ensure updates patches and additional security software are installed
 
