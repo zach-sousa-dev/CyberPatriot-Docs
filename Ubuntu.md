@@ -35,15 +35,20 @@
 		- [8 GNOME Display Manager](#8-gnome-display-manager)
 		- [9 Ensure updates patches and additional security software are installed](#9-ensure-updates-patches-and-additional-security-software-are-installed)
 	- [2 Services](#2-services)
-		- [Configure Time Synchronization](#configure-time-synchronization)
-		- [Special Purpose Services](#special-purpose-services)
-		- [Service Clients](#service-clients)
+		- [1 Configure Time Synchronization](#1-configure-time-synchronization)
+			- [1 Ensure Time Synchronization is in use](#1-ensure-time-synchronization)
+			- [2 Configure chrony](#2-configure-chrony)
+			- [3 Configure systemd-timesyncd](#3-configure-systemd-timesyncd)
+			- [4 Configure ntp](#4-configure-ntp)
+		- [2 Special Purpose Services](#2-special-purpose-services)
+		- [3 Service Clients](#3-service-clients)
+		- [4 Ensure Nonessential Services are Removed or Masked](#4-ensure-nonessential-services-are-removed-or-masked)
 	- [3 Network Configuration](#3-network-configuration)
-		- [Disable Unused Network Protocols and Devices](#disable-unused-network-protocols-and-devices)
-		- [Network Parameters Host Only](#network-parameters-host-only)
-		- [Network Parameters Host and Router](#network-parameters-host-and-router)
-		- [Uncommon Network Protocols](#uncommon-network-protocols)
-		- [Firewall Configuration](#firewall-configuration)
+		- [1 Disable Unused Network Protocols and Devices](#1-disable-unused-network-protocols-and-devices)
+		- [2 Network Parameters Host Only](#2-network-parameters-host-only)
+		- [3 Network Parameters Host and Router](#3-network-parameters-host-and-router)
+		- [4 Uncommon Network Protocols](#4-uncommon-network-protocols)
+		- [5 Firewall Configuration](#5-firewall-configuration)
 	- [4 Logging and Auditing](#4-logging-and-auditing)
 		- [1 Configure System Accounting (auditd)](#1-configure-system-accounting-auditd)
 		- [2 Configure Logging](#2-configure-logging)
@@ -1710,23 +1715,651 @@ Run the following command to update the system databases:
 
 5. Ensure GDM screen locks cannot be overridden (Automated)
 
+Run the following script to verify that the screen lock can not be overridden:
 
+``` bash
+#!/usr/bin/env bash
+{
+	# Check if GNOME Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+	# determine system's package manager
+	l_pkgoutput=""
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	# Check if GDM is installed
+	l_pcl="gdm gdm3" # Space seporated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+	done
+	# Check configuration (If applicable)
+	if [ -n "$l_pkgoutput" ]; then
+		l_output="" l_output2=""
+		# Look for idle-delay to determine profile in use, needed for remaining tests
+		l_kfd="/etc/dconf/db/$(grep -Psril '^\h*idledelay\h*=\h*uint32\h+\d+\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF1),a,".");print a[1]}').d" #set directory of key file to be locked
+		l_kfd2="/etc/dconf/db/$(grep -Psril '^\h*lockdelay\h*=\h*uint32\h+\d+\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF1),a,".");print a[1]}').d" #set directory of key file to be locked
+			if [ -d "$l_kfd" ]; then # If key file directory doesn't exist, options can't be locked
+				if grep -Prilq '\/org\/gnome\/desktop\/session\/idle-delay\b' "$l_kfd"; then
+				l_output="$l_output\n - \"idle-delay\" is locked in \"$(grep -Pril '\/org\/gnome\/desktop\/session\/idle-delay\b' "$l_kfd")\""
+				else
+				l_output2="$l_output2\n - \"idle-delay\" is not locked"
+				fi
+			else
+				l_output2="$l_output2\n - \"idle-delay\" is not set so it can not be locked"
+			fi
+		if [ -d "$l_kfd2" ]; then # If key file directory doesn't exist, options can't be locked
+			if grep -Prilq '\/org\/gnome\/desktop\/screensaver\/lock-delay\b' "$l_kfd2"; then
+			l_output="$l_output\n - \"lock-delay\" is locked in \"$(grep -Pril '\/org\/gnome\/desktop\/screensaver\/lock-delay\b' "$l_kfd2")\""
+			else
+			l_output2="$l_output2\n - \"lock-delay\" is not locked"
+			fi
+		else
+			l_output2="$l_output2\n - \"lock-delay\" is not set so it can not be locked"
+		fi
+	else
+		l_output="$l_output\n - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+	fi
+	# Report results. If no failures output in l_output2, we pass[ -n "$l_pkgoutput" ] && echo -e "\n$l_pkgoutput"
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to ensure screen locks can not be overridden:
+
+``` bash
+#!/usr/bin/env bash
+{
+	# Check if GNMOE Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+	# determine system's package manager
+	l_pkgoutput=""
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	# Check if GDM is installed
+	l_pcl="gdm gdm3" # Space seporated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="y" && echo -e "\n -Package: \"$l_pn\" exists on the system\n - remediating configuration if needed"
+	done
+	# Check configuration (If applicable)
+	if [ -n "$l_pkgoutput" ]; then
+		# Look for idle-delay to determine profile in use, needed for remaining tests
+		l_kfd="/etc/dconf/db/$(grep -Psril '^\h*idledelay\h*=\h*uint32\h+\d+\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF1),a,".");print a[1]}').d" #set directory of key file to be locked
+		# Look for lock-delay to determine profile in use, needed for remaining tests
+		l_kfd2="/etc/dconf/db/$(grep -Psril '^\h*lockdelay\h*=\h*uint32\h+\d+\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF1),a,".");print a[1]}').d" #set directory of key file to be locked
+			if [ -d "$l_kfd" ]; then # If key file directory doesn't exist, options can't be locked
+				if grep -Prilq '^\h*\/org\/gnome\/desktop\/session\/idle-delay\b' "$l_kfd"; then
+					echo " - \"idle-delay\" is locked in \"$(grep -Pril '^\h*\/org\/gnome\/desktop\/session\/idle-delay\b' "$l_kfd")\""
+				else
+					echo "creating entry to lock \"idle-delay\""
+					[ ! -d "$l_kfd"/locks ] && echo "creating directory $l_kfd/locks" && mkdir "$l_kfd"/locks
+					{
+						echo -e '\n# Lock desktop screensaver idle-delay setting'
+						echo '/org/gnome/desktop/session/idle-delay'
+					} >> "$l_kfd"/locks/00-screensaver 
+				fi
+			else
+				echo -e " - \"idle-delay\" is not set so it can not be locked\n -Please follow Recommendation \"Ensure GDM screen locks when the user is idle\" and follow this Recommendation again"
+			fi
+		if [ -d "$l_kfd2" ]; then # If key file directory doesn't exist, options can't be locked
+			if grep -Prilq '^\h*\/org\/gnome\/desktop\/screensaver\/lockdelay\b' "$l_kfd2"; then
+				echo " - \"lock-delay\" is locked in \"$(grep -Pril '^\h*\/org\/gnome\/desktop\/screensaver\/lock-delay\b' "$l_kfd2")\""
+			else
+				echo "creating entry to lock \"lock-delay\""
+				[ ! -d "$l_kfd2"/locks ] && echo "creating directory $l_kfd2/locks" && mkdir "$l_kfd2"/locks
+				{
+					ho -e '\n# Lock desktop screensaver lock-delay setting'
+				echo '/org/gnome/desktop/screensaver/lock-delay'
+				} >> "$l_kfd2"/locks/00-screensaver 
+			fi
+		else
+			echo -e " - \"lock-delay\" is not set so it can not be locked\n -Please follow Recommendation \"Ensure GDM screen locks when the user is idle\" and follow this Recommendation again"
+		fi
+	else
+		echo -e " - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+	fi
+}
+```
+
+Run the following command to update the system databases:
+
+`# dconf update`
+
+> Users must log out and back in again before the system-wide settings take effect.
+
+[\[1\]](https://help.gnome.org/admin/system-admin-guide/stable/desktop-lockscreen.html.en)
+[\[2\]](https://help.gnome.org/admin/system-admin-guide/stable/dconf-lockdown.html.en)
 
 6. Ensure GDM automatic mounting of removable media is disabled (Automated)
 
+Run the following script to verify automatic mounting is disabled:
 
+``` bash
+#!/usr/bin/env bash
+{
+	l_pkgoutput="" l_output="" l_output2=""
+	# Check if GNOME Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+	# determine system's package manager
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	# Check if GDM is installed
+	l_pcl="gdm gdm3" # Space seporated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+	done
+	# Check configuration (If applicable)
+	if [ -n "$l_pkgoutput" ]; then
+		echo -e "$l_pkgoutput"
+		# Look for existing settings and set variables if they exist
+		l_kfile="$(grep -Prils -- '^\h*automount\b' /etc/dconf/db/*.d)"
+		l_kfile2="$(grep -Prils -- '^\h*automount-open\b' /etc/dconf/db/*.d)"
+		# Set profile name based on dconf db directory ({PROFILE_NAME}.d)
+		if [ -f "$l_kfile" ]; then
+			l_gpname="$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile")"
+		elif [ -f "$l_kfile2" ]; then
+			l_gpname="$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile2")"
+		fi
+		# If the profile name exist, continue checks
+		if [ -n "$l_gpname" ]; then
+			l_gpdir="/etc/dconf/db/$l_gpname.d"
+			# Check if profile file exists
+			if grep -Pq -- "^\h*system-db:$l_gpname\b" /etc/dconf/profile/*; then
+				l_output="$l_output\n - dconf database profile file \"$(grep -Pl -- "^\h*system-db:$l_gpname\b" /etc/dconf/profile/*)\" exists"
+			else
+				l_output2="$l_output2\n - dconf database profile isn't set"
+			fi
+			# Check if the dconf database file exists
+			if [ -f "/etc/dconf/db/$l_gpname" ]; then
+				l_output="$l_output\n - The dconf database \"$l_gpname\" exists"
+			else
+				l_output2="$l_output2\n - The dconf database \"$l_gpname\" doesn't exist"
+			fi
+			# check if the dconf database directory exists
+			if [ -d "$l_gpdir" ]; then
+				l_output="$l_output\n - The dconf directory \"$l_gpdir\" exitst"
+			else
+				l_output2="$l_output2\n - The dconf directory \"$l_gpdir\" doesn't exist"
+			fi
+			# check automount setting
+			if grep -Pqrs -- '^\h*automount\h*=\h*false\b' "$l_kfile"; then
+				l_output="$l_output\n - \"automount\" is set to false in: \"$l_kfile\""
+			else
+				l_output2="$l_output2\n - \"automount\" is not set correctly"
+			fi
+			# check automount-open setting
+			if grep -Pqs -- '^\h*automount-open\h*=\h*false\b' "$l_kfile2"; then
+				l_output="$l_output\n - \"automount-open\" is set to false in: \"$l_kfile2\""
+			else
+				l_output2="$l_output2\n - \"automount-open\" is not set correctly"
+			fi
+		else
+			# Setings don't exist. Nothing further to check
+			l_output2="$l_output2\n - neither \"automount\" or \"automountopen\" is set"
+		fi
+	else
+		l_output="$l_output\n - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+	fi
+	# Report results. If no failures output in l_output2, we pass
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to disable automatic mounting of media for all GNOME users:
+
+``` bash
+#!/usr/bin/env bash
+{
+ l_pkgoutput="" l_output="" l_output2=""
+ l_gpbame="local" # Set to desired dconf profile name (defaule is local)
+ # Check if GNOME Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+ # determine system's package manager
+ if command -v dpkg-query > /dev/null 2>&1; then
+ 	l_pq="dpkg-query -W"
+ elif command -v rpm > /dev/null 2>&1; then
+ 	l_pq="rpm -q"
+ fi
+ # Check if GDM is installed
+ l_pcl="gdm gdm3" # Space seporated list of packages to check
+ for l_pn in $l_pcl; do
+ 	$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+ done
+ echo -e "$l_packageout"
+ # Check configuration (If applicable)
+ if [ -n "$l_pkgoutput" ]; then
+	echo -e "$l_pkgoutput"
+	# Look for existing settings and set variables if they exist
+	l_kfile="$(grep -Prils -- '^\h*automount\b' /etc/dconf/db/*.d)"
+	l_kfile2="$(grep -Prils -- '^\h*automount-open\b' /etc/dconf/db/*.d)"
+	# Set profile name based on dconf db directory ({PROFILE_NAME}.d)
+	if [ -f "$l_kfile" ]; then
+		l_gpname="$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile")"
+		echo " - updating dconf profile name to \"$l_gpname\""
+	elif [ -f "$l_kfile2" ]; then
+		l_gpname="$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile2")"
+		echo " - updating dconf profile name to \"$l_gpname\""
+	fi
+	# check for consistency (Clean up configuration if needed)
+	if [ -f "$l_kfile" ] && [ "$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile")" != "$l_gpname" ]; then
+		sed -ri "/^\s*automount\s*=/s/^/# /" "$l_kfile"
+		l_kfile="/etc/dconf/db/$l_gpname.d/00-media-automount"
+	fi
+	if [ -f "$l_kfile2" ] && [ "$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile2")" != "$l_gpname" ]; then
+		sed -ri "/^\s*automount-open\s*=/s/^/# /" "$l_kfile2"
+	fi
+ 	[ -n "$l_kfile" ] && l_kfile="/etc/dconf/db/$l_gpname.d/00-mediaautomount"
+	# Check if profile file exists
+	if grep -Pq -- "^\h*system-db:$l_gpname\b" /etc/dconf/profile/*; then
+		echo -e "\n - dconf database profile exists in: \"$(grep -Pl --"^\h*system-db:$l_gpname\b" /etc/dconf/profile/*)\""
+	else
+		[ ! -f "/etc/dconf/profile/user" ] && l_gpfile="/etc/dconf/profile/user" || l_gpfile="/etc/dconf/profile/user2"
+		echo -e " - creating dconf database profile"
+		{
+			echo -e "\nuser-db:user"
+			echo "system-db:$l_gpname"
+		} >> "$l_gpfile"
+	fi
+	# create dconf directory if it doesn't exists
+	l_gpdir="/etc/dconf/db/$l_gpname.d"
+	if [ -d "$l_gpdir" ]; then
+		echo " - The dconf database directory \"$l_gpdir\" exists"
+	else
+		echo " - creating dconf database directory \"$l_gpdir\""
+		mkdir "$l_gpdir"
+	fi
+	# check automount-open setting
+	if grep -Pqs -- '^\h*automount-open\h*=\h*false\b' "$l_kfile"; then
+		echo " - \"automount-open\" is set to false in: \"$l_kfile\""
+	else
+		echo " - creating \"automount-open\" entry in \"$l_kfile\""
+		! grep -Psq -- '\^\h*\[org\/gnome\/desktop\/media-handling\]\b' "$l_kfile" && echo '[org/gnome/desktop/media-handling]' >> "$l_kfile"
+		sed -ri '/^\s*\[org\/gnome\/desktop\/media-handling\]/a \\nautomount-open=false'
+	fi
+	# check automount setting
+	if grep -Pqs -- '^\h*automount\h*=\h*false\b' "$l_kfile"; then
+		echo " - \"automount\" is set to false in: \"$l_kfile\""
+	else
+		echo " - creating \"automount\" entry in \"$l_kfile\""
+		! grep -Psq -- '\^\h*\[org\/gnome\/desktop\/media-handling\]\b' "$l_kfile" && echo '[org/gnome/desktop/media-handling]' >> "$l_kfile"
+		sed -ri '/^\s*\[org\/gnome\/desktop\/media-handling\]/a \\nautomount=false'
+	fi
+ else
+ 	echo -e "\n - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+ fi
+ # update dconf database
+ dconf update
+}
+```
+
+[/[1/]](https://access.redhat.com/solutions/20107)
 
 7. Ensure GDM disabling automatic mounting of removable media is not overridden (Automated)
 
+Run the following script to verify disable automatic mounting is locked:
 
+``` bash
+#!/usr/bin/env bash
+{
+	# Check if GNOME Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+	# determine system's package manager
+	l_pkgoutput=""
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	# Check if GDM is installed
+	l_pcl="gdm gdm3" # Space seporated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+	done
+	# Check configuration (If applicable)
+	if [ -n "$l_pkgoutput" ]; then
+		l_output="" l_output2=""
+		# Look for idle-delay to determine profile in use, needed for remaining tests
+		l_kfd="/etc/dconf/db/$(grep -Psril '^\h*automount\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF-1),a,".");print a[1]}').d" #set directory of key file to be locked
+		l_kfd2="/etc/dconf/db/$(grep -Psril '^\h*automount-open\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF-1),a,".");print a[1]}').d" #set directory of key file to be locked
+		if [ -d "$l_kfd" ]; then # If key file directory doesn't exist, options can't be locked
+			if grep -Piq '^\h*\/org/gnome\/desktop\/media-handling\/automount\b' "$l_kfd"; then
+				l_output="$l_output\n - \"automount\" is locked in \"$(grep -Pil '^\h*\/org/gnome\/desktop\/media-handling\/automount\b' "$l_kfd")\""
+			else
+				l_output2="$l_output2\n - \"automount\" is not locked"
+			fi
+		else
+			l_output2="$l_output2\n - \"automount\" is not set so it can not be locked"
+		fi
+		if [ -d "$l_kfd2" ]; then # If key file directory doesn't exist, options can't be locked
+			if grep -Piq '^\h*\/org/gnome\/desktop\/media-handling\/automountopen\b' "$l_kfd2"; then
+				l_output="$l_output\n - \"lautomount-open\" is locked in \"$(grep -Pril '^\h*\/org/gnome\/desktop\/media-handling\/automount-open\b' "$l_kfd2")\""
+			else
+				l_output2="$l_output2\n - \"automount-open\" is not locked"
+			fi
+		else
+		l_output2="$l_output2\n - \"automount-open\" is not set so it can not be locked"
+		fi
+	else
+		l_output="$l_output\n - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+	fi
+	# Report results. If no failures output in l_output2, we pass[ -n "$l_pkgoutput" ] && echo -e "\n$l_pkgoutput"
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to lock disable automatic mounting of media for all GNOME users:
+
+``` bash
+#!/usr/bin/env bash
+{
+	# Check if GNMOE Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+	# determine system's package manager
+	l_pkgoutput=""
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	# Check if GDM is installed
+	l_pcl="gdm gdm3" # Space seporated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="y" && echo -e "\n -Package: \"$l_pn\" exists on the system\n - remediating configuration if needed"
+	done
+	# Check configuration (If applicable)
+	if [ -n "$l_pkgoutput" ]; then
+		# Look for automount to determine profile in use, needed for remaining tests
+		l_kfd="/etc/dconf/db/$(grep -Psril '^\h*automount\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF-1),a,".");print a[1]}').d" #set directory of key file to be locked
+		# Look for automount-open to determine profile in use, needed for remaining tests
+		l_kfd2="/etc/dconf/db/$(grep -Psril '^\h*automount-open\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF-1),a,".");print a[1]}').d" #set directory of key file to be locked
+		if [ -d "$l_kfd" ]; then # If key file directory doesn't exist, options can't be locked
+			if grep -Priq '^\h*\/org/gnome\/desktop\/mediahandling\/automount\b' "$l_kfd"; then
+				echo " - \"automount\" is locked in \"$(grep -Pril '^\h*\/org/gnome\/desktop\/media-handling\/automount\b' "$l_kfd")\""
+			else
+				echo " - creating entry to lock \"automount\""
+				[ ! -d "$l_kfd"/locks ] && echo "creating directory $l_kfd/locks" && mkdir "$l_kfd"/locks
+				{
+					echo -e '\n# Lock desktop media-handling automount setting'
+					echo '/org/gnome/desktop/media-handling/automount'
+				} >> "$l_kfd"/locks/00-media-automount 
+			fi
+		else
+			echo -e " - \"automount\" is not set so it can not be locked\n -Please follow Recommendation \"Ensure GDM automatic mounting of removable media is disabled\" and follow this Recommendation again"
+		fi
+		if [ -d "$l_kfd2" ]; then # If key file directory doesn't exist, options can't be locked
+			if grep -Priq '^\h*\/org/gnome\/desktop\/media-handling\/automountopen\b' "$l_kfd2"; then
+				echo " - \"automount-open\" is locked in \"$(grep -Pril '^\h*\/org/gnome\/desktop\/media-handling\/automount-open\b' "$l_kfd2")\""
+			else
+				echo " - creating entry to lock \"automount-open\""
+				[ ! -d "$l_kfd2"/locks ] && echo "creating directory $l_kfd2/locks" && mkdir "$l_kfd2"/locks
+				{
+					echo -e '\n# Lock desktop media-handling automount-open setting'
+					echo '/org/gnome/desktop/media-handling/automount-open'
+				} >> "$l_kfd2"/locks/00-media-automount
+			fi
+		else
+			echo -e " - \"automount-open\" is not set so it can not be locked\n - Please follow Recommendation \"Ensure GDM automatic mounting of removable media is disabled\" and follow this Recommendation again"
+		fi
+		# update dconf database
+		dconf update
+	else
+		echo -e " - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+	fi
+}
+```
+
+[\[1\]](https://help.gnome.org/admin/system-admin-guide/stable/dconf-lockdown.html.en)
 
 8. Ensure GDM autorun-never is enabled (Automated)
 
+Run the following script to verify that `autorun-never` is set to `true` for GDM:
 
+``` bash
+#!/usr/bin/env bash
+{
+ l_pkgoutput="" l_output="" l_output2=""
+ # Check if GNOME Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+ # determine system's package manager
+	if command -v dpkg-query > /dev/null 2>&1; then
+	l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+	l_pq="rpm -q"
+	fi
+	# Check if GDM is installed
+	l_pcl="gdm gdm3" # Space separated list of packages to check
+	for l_pn in $l_pcl; do
+	$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+	echo -e "$l_pkgoutput"
+	done
+	# Check configuration (If applicable)
+	if [ -n "$l_pkgoutput" ]; then
+		echo -e "$l_pkgoutput"
+		# Look for existing settings and set variables if they exist
+		l_kfile="$(grep -Prils -- '^\h*autorun-never\b' /etc/dconf/db/*.d)"
+		# Set profile name based on dconf db directory ({PROFILE_NAME}.d)
+		if [ -f "$l_kfile" ]; then
+			l_gpname="$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile")"
+		fi
+		# If the profile name exist, continue checks
+		if [ -n "$l_gpname" ]; then
+			l_gpdir="/etc/dconf/db/$l_gpname.d"
+			# Check if profile file exists
+			if grep -Pq -- "^\h*system-db:$l_gpname\b" /etc/dconf/profile/*; then
+				l_output="$l_output\n - dconf database profile file \"$(grep -Pl -- "^\h*system-db:$l_gpname\b" /etc/dconf/profile/*)\" exists"
+			else
+				l_output2="$l_output2\n - dconf database profile isn't set"
+			fi
+			# Check if the dconf database file exists
+			if [ -f "/etc/dconf/db/$l_gpname" ]; then
+				l_output="$l_output\n - The dconf database \"$l_gpname\" exists"
+			else
+				l_output2="$l_output2\n - The dconf database \"$l_gpname\" doesn't exist"
+			fi
+			# check if the dconf database directory exists
+			if [ -d "$l_gpdir" ]; then
+				l_output="$l_output\n - The dconf directory \"$l_gpdir\" exitst"
+			else
+				l_output2="$l_output2\n - The dconf directory \"$l_gpdir\" doesn't exist"
+			fi
+			# check autorun-never setting
+			if grep -Pqrs -- '^\h*autorun-never\h*=\h*true\b' "$l_kfile"; then
+				l_output="$l_output\n - \"autorun-never\" is set to true in: \"$l_kfile\""
+			else
+				l_output2="$l_output2\n - \"autorun-never\" is not set correctly"
+			fi
+		else
+			# Settings don't exist. Nothing further to check
+			l_output2="$l_output2\n - \"autorun-never\" is not set"
+		fi
+	else
+		l_output="$l_output\n - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+	fi
+	# Report results. If no failures output in l_output2, we pass
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to set autorun-never to true for GDM users:
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_pkgoutput="" l_output="" l_output2=""
+	l_gpname="local" # Set to desired dconf profile name (default is local)
+	# Check if GNOME Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+	# determine system's package manager
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	# Check if GDM is installed
+	l_pcl="gdm gdm3" # Space separated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+	done
+	echo -e "$l_pkgoutput"
+	# Check configuration (If applicable)
+	if [ -n "$l_pkgoutput" ]; then
+			echo -e "$l_pkgoutput"
+			# Look for existing settings and set variables if they exist
+			l_kfile="$(grep -Prils -- '^\h*autorun-never\b' /etc/dconf/db/*.d)"
+			# Set profile name based on dconf db directory ({PROFILE_NAME}.d)
+		if [ -f "$l_kfile" ]; then
+			l_gpname="$(awk -F\/ '{split($(NF-1),a,".");print a[1]}' <<< "$l_kfile")"
+			echo " - updating dconf profile name to \"$l_gpname\""
+		fi
+		[ ! -f "$l_kfile" ] && l_kfile="/etc/dconf/db/$l_gpname.d/00-mediaautorun"
+		# Check if profile file exists
+		if grep -Pq -- "^\h*system-db:$l_gpname\b" /etc/dconf/profile/*; then
+			echo -e "\n - dconf database profile exists in: \"$(grep -Pl --"^\h*system-db:$l_gpname\b" /etc/dconf/profile/*)\""
+		else
+			[ ! -f "/etc/dconf/profile/user" ] &&l_gpfile="/etc/dconf/profile/user" || l_gpfile="/etc/dconf/profile/user2"
+			echo -e " - creating dconf database profile"
+			{
+				echo -e "\nuser-db:user"
+				echo "system-db:$l_gpname"
+			} >> "$l_gpfile"
+		fi
+		# create dconf directory if it doesn't exists
+		l_gpdir="/etc/dconf/db/$l_gpname.d"
+		if [ -d "$l_gpdir" ]; then
+			echo " - The dconf database directory \"$l_gpdir\" exists"
+		else
+			echo " - creating dconf database directory \"$l_gpdir\""
+			mkdir "$l_gpdir"
+		fi
+		# check autorun-never setting
+		if grep -Pqs -- '^\h*autorun-never\h*=\h*true\b' "$l_kfile"; then
+			echo " - \"autorun-never\" is set to true in: \"$l_kfile\""
+		else
+			echo " - creating or updating \"autorun-never\" entry in \"$l_kfile\""
+			if grep -Psq -- '^\h*autorun-never' "$l_kfile"; then
+				sed -ri 's/(^\s*autorun-never\s*=\s*)(\S+)(\s*.*)$/\1true \3/' "$l_kfile"
+			else
+				! grep -Psq -- '\^\h*\[org\/gnome\/desktop\/media-handling\]\b' "$l_kfile" && echo '[org/gnome/desktop/media-handling]' >> "$l_kfile"
+				sed -ri '/^\s*\[org\/gnome\/desktop\/media-handling\]/a \\nautorun-never=true' "$l_kfile"
+			fi
+		fi
+	else
+		echo -e "\n - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+	fi
+	# update dconf database
+	dconf update
+}
+```
 
 9. Ensure GDM autorun-never is not overridden (Automated)
 
+Run the following script to verify that `autorun-never=true` cannot be overridden:
 
+``` bash
+#!/usr/bin/env bash
+{
+	# Check if GNOME Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+	# determine system's package manager
+	l_pkgoutput=""
+	if command -v dpkg-query > /dev/null 2>&1; then
+		l_pq="dpkg-query -W"
+	elif command -v rpm > /dev/null 2>&1; then
+		l_pq="rpm -q"
+	fi
+	# Check if GDM is installed
+	l_pcl="gdm gdm3" # Space separated list of packages to check
+	for l_pn in $l_pcl; do
+		$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="$l_pkgoutput\n -Package: \"$l_pn\" exists on the system\n - checking configuration"
+	done
+	# Check configuration (If applicable)
+	if [ -n "$l_pkgoutput" ]; then
+		l_output="" l_output2=""
+		# Look for idle-delay to determine profile in use, needed for remaining tests
+		l_kfd="/etc/dconf/db/$(grep -Psril '^\h*autorun-never\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF-1),a,".");print a[1]}').d" #set directory of key file to be locked
+		if [ -d "$l_kfd" ]; then # If key file directory doesn't exist, options can't be locked
+			if grep -Piq '^\h*\/org/gnome\/desktop\/media-handling\/autorunnever\b' "$l_kfd"; then
+				l_output="$l_output\n - \"autorun-never\" is locked in \"$(grep -Pil '^\h*\/org/gnome\/desktop\/media-handling\/autorun-never\b' "$l_kfd")\""
+			else
+				l_output2="$l_output2\n - \"autorun-never\" is not locked"
+			fi
+		else
+			l_output2="$l_output2\n - \"autorun-never\" is not set so it can not be locked"
+		fi
+	else
+		l_output="$l_output\n - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+	fi
+	# Report results. If no failures output in l_output2, we pass[ -n "$l_pkgoutput" ] && echo -e "\n$l_pkgoutput"
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to ensure that `autorun-never=true` cannot be overridden:
+
+``` bash
+#!/usr/bin/env bash
+{
+ # Check if GNOME Desktop Manager is installed. If package isn't installed, recommendation is Not Applicable\n
+ # determine system's package manager
+ l_pkgoutput=""
+ if command -v dpkg-query > /dev/null 2>&1; then
+ 	l_pq="dpkg-query -W"
+ elif command -v rpm > /dev/null 2>&1; then
+ 	l_pq="rpm -q"
+ fi
+ # Check if GDM is installed
+ l_pcl="gdm gdm3" # Space separated list of packages to check
+ for l_pn in $l_pcl; do
+ 	$l_pq "$l_pn" > /dev/null 2>&1 && l_pkgoutput="y" && echo -e "\n -Package: \"$l_pn\" exists on the system\n - remediating configuration if needed"
+ done
+ # Check configuration (If applicable)
+ if [ -n "$l_pkgoutput" ]; then
+	# Look for autorun to determine profile in use, needed for remaining tests
+	l_kfd="/etc/dconf/db/$(grep -Psril '^\h*autorun-never\b' /etc/dconf/db/*/ | awk -F'/' '{split($(NF-1),a,".");print a[1]}').d" #set directory of key file to be locked
+ 	if [ -d "$l_kfd" ]; then # If key file directory doesn't exist, options can't be locked
+		if grep -Priq '^\h*\/org/gnome\/desktop\/media-handling\/autorunnever\b' "$l_kfd"; then
+			echo " - \"autorun-never\" is locked in \"$(grep -Pril '^\h*\/org/gnome\/desktop\/media-handling\/autorun-never\b' "$l_kfd")\""
+		else
+			echo " - creating entry to lock \"autorun-never\""
+			[ ! -d "$l_kfd"/locks ] && echo "creating directory $l_kfd/locks" && mkdir "$l_kfd"/locks
+			{
+				echo -e '\n# Lock desktop media-handling autorun-never setting'
+				echo '/org/gnome/desktop/media-handling/autorun-never'
+			} >> "$l_kfd"/locks/00-media-autorun 
+		fi
+	else
+		echo -e " - \"autorun-never\" is not set so it can not be locked\n -Please follow Recommendation \"Ensure GDM autorun-never is enabled\" and follow this Recommendation again"
+	fi
+	# update dconf database
+	dconf update
+ else
+ 	echo -e " - GNOME Desktop Manager package is not installed on the system\n - Recommendation is not applicable"
+ fi
+}
+```
 
 10. Ensure XDCMP is not enabled (Automated)
 
@@ -1753,24 +2386,155 @@ Run the following commands:
 ---
 
 ## 2 Services
-### Configure Time Synchronization
+### 1 Configure Time Synchronization
+#### 1 Ensure Time Synchronization is in use
 
-### Special Purpose Services
 
-### Service Clients
+
+#### 2 Configure chrony
+1. 
+
+
+
+2. 
+
+
+
+3. 
+
+
+
+#### 3 Configure systemd-timesyncd
+1. 
+
+
+
+2. 
+
+
+
+#### 4 Configure ntp
+
+1. 
+
+
+
+2. 
+
+
+
+3. 
+
+
+
+4. 
+
+
+
+### 2 Special Purpose Services
+1. 
+
+
+
+2. 
+
+
+
+3. 
+
+
+
+4. 
+
+
+
+5. 
+
+
+
+6. 
+
+
+
+7. 
+
+
+
+8. 
+
+
+
+9. 
+
+
+
+10. 
+
+
+
+11. 
+
+
+
+12. 
+
+
+
+13. 
+
+
+
+14. 
+
+
+
+15. 
+
+
+
+16. 
+
+
+
+### 3 Service Clients
+1. 
+
+
+
+2. 
+
+
+
+3. 
+
+
+
+4. 
+
+
+
+5. 
+
+
+
+6. 
+
+
+
+### 4 Ensure Nonessential Services are Removed or Masked
 
 ---
 
 ## 3 Network Configuration
-### Disable Unused Network Protocols and Devices
+### 1 Disable Unused Network Protocols and Devices
 
-### Network Parameters Host Only
+### 2 Network Parameters Host Only
 
-### Network Parameters Host and Router
+### 3 Network Parameters Host and Router
 
-### Uncommon Network Protocols
+### 4 Uncommon Network Protocols
 
-### Firewall Configuration
+### 5 Firewall Configuration
 
 ---
 
