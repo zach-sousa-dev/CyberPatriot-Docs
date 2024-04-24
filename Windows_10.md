@@ -905,6 +905,970 @@ Setting: Disabled
 Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/audit-shut-down-system-immediately-if-unable-to-log-security-audits)
 <br></br>
 
+## 2.3.3 DCOM
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+### 2.3.4 Devices
+This section contains recommendations related to managing devices.
+<br></br>
+
+#### 2.3.4.1 (L2) Ensure 'Devices: Prevent users from installing printer drivers' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Print\Providers\LanMan 
+Print Services\Servers:AddPrinterDrivers
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Devices: Prevent users from installing printer 
+drivers
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/devices-prevent-users-from-installing-printer-drivers)
+<br></br>
+
+#### 2.3.5 Domain controller
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+#### 2.3.6 Domain Member
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+#### 2.3.7 Interactive logon
+<br></br>
+
+#### 2.3.7.1 (L1) Ensure 'Interactive logon: Do not require CTRL+ALT+DEL' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+DisableCAD
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Do not require CTRL+ALT+DEL
+```
+Setting:    
+On Windows 7 or older: Disabled   
+On Windows 10 or newer: Enabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-do-not-require-ctrl-alt-del)
+<br></br>
+
+#### 2.3.7.2 (L1) Ensure 'Interactive logon: Don't display last signed-in' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+DontDisplayLastUserName
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Don't display last signed-in
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-do-not-display-last-user-name)
+<br></br>
+
+#### 2.3.7.3 (BL) Ensure 'Interactive logon: Machine account lockout threshold' is set to '10 or fewer invalid logon attempts, but not 0' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+MaxDevicePasswordFailedAttempts
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Machine account lockout 
+threshold
+```
+Default: 0 logon attempts     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-machine-account-lockout-threshold)
+<br></br>
+
+#### 2.3.7.4 (L1) Ensure 'Interactive logon: Machine inactivity limit' is set to '900 or fewer second(s), but not 0' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+InactivityTimeoutSecs
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Machine inactivity limit
+```
+Setting: 0 seconds    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-machine-inactivity-limit)
+<br></br>
+
+#### 2.3.7.5 (L1) Configure 'Interactive logon: Message text for users attempting to log on' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+LegalNoticeText
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Message text for users 
+attempting to log on
+```
+Setting: No message     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-message-text-for-users-attempting-to-log-on)
+<br></br>
+
+#### 2.3.7.6 (L1) Configure 'Interactive logon: Message title for users attempting to log on' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+LegalNoticeCaption
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Message title for users 
+attempting to log on
+```
+Setting: No message     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-message-title-for-users-attempting-to-log-on)
+<br></br>
+
+#### 2.3.7.7 (L1) Ensure 'Interactive logon: Prompt user to change password before expiration' is set to 'between 5 and 14 days' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows 
+NT\CurrentVersion\Winlogon:PasswordExpiryWarning
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Prompt user to change password 
+before expiration
+```
+Setting: 5 days   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-prompt-user-to-change-password-before-expiration)
+<br></br>
+
+#### 2.3.7.8 (L1) Ensure 'Interactive logon: Smart card removal behavior' is set to 'Lock Workstation' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows 
+NT\CurrentVersion\Winlogon:ScRemoveOption
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Interactive logon: Smart card removal behavior
+```
+Setting: No action    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-smart-card-removal-behavior)
+<br></br>
+
+### 2.3.8 Microsoft network client
+This section contains recommendations related to configuring the Microsoft network 
+client.
+<br></br>
+
+#### 2.3.8.1 (L1) Ensure 'Microsoft network client: Digitally sign communications (always)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parame
+ters:RequireSecuritySignature
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network client: Digitally sign 
+communications (always)
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-client-digitally-sign-communications-always)
+<br></br> 
+
+#### 2.3.8.2 (L1) Ensure 'Microsoft network client: Digitally sign communications (if server agrees)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parame
+ters:EnableSecuritySignature
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network client: Digitally sign 
+communications (if server agrees)
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/jj852251(v=ws.11))
+<br></br>
+
+#### 2.3.8.3 (L1) Ensure 'Microsoft network client: Send unencrypted password to third-party SMB servers' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parame
+ters:EnablePlainTextPassword
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network client: Send unencrypted password 
+to third-party SMB servers
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-client-send-unencrypted-password-to-third-party-smb-servers)
+<br></br>
+
+### 2.3.9 Microsoft network server
+This section contains recommendations related to configuring the Microsoft network 
+server.
+<br></br>
+
+#### 2.3.9.1 (L1) Ensure 'Microsoft network server: Amount of idle time required before suspending session' is set to '15 or fewer minute(s)' (Automated)
+Audit shown below:
+```
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Amount of idle time 
+required before suspending session
+```
+Setting: 15 minutes   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-amount-of-idle-time-required-before-suspending-session)
+<br></br>
+
+#### 2.3.9.2 (L1) Ensure 'Microsoft network server: Digitally sign communications (always)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+RequireSecuritySignature
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Digitally sign 
+communications (always)
+```
+Setting: Disabled   
+Link: [1](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always)
+<br></br>
+
+#### 2.3.9.3 (L1) Ensure 'Microsoft network server: Digitally sign communications (if client agrees)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+EnableSecuritySignature
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Digitally sign 
+communications (if client agrees)
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always)
+<br></br>
+
+#### 2.3.9.4 (L1) Ensure 'Microsoft network server: Disconnect clients when logon hours expire' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+enableforcedlogoff
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Disconnect clients when 
+logon hours expire
+```
+Setting: Enabled    
+Link [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-disconnect-clients-when-logon-hours-expire)
+<br></br>
+
+#### 2.3.9.5 (L1) Ensure 'Microsoft network server: Server SPN target name validation level' is set to 'Accept if provided by client' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+SMBServerNameHardeningLevel
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Microsoft network server: Server SPN target name 
+validation level
+```
+Setting: Off    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/microsoft-network-server-server-spn-target-name-validation-level)
+<br></br>
+
+### 2.3.10 Network access
+This section contains recommendations related to network access.
+<br></br>
+
+#### 2.3.10.1 (L1) Ensure 'Network access: Allow anonymous SID/Name translation' is set to 'Disabled' (Automated)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Allow anonymous SID/Name 
+translation
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-allow-anonymous-sidname-translation)
+<br></br>
+
+#### 2.3.10.2 (L1) Ensure 'Network access: Do not allow anonymous enumeration of SAM accounts' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:RestrictAnonymousSAM
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Do not allow anonymous enumeration 
+of SAM accounts
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-do-not-allow-anonymous-enumeration-of-sam-accounts)
+<br></br>
+
+#### 2.3.10.3 (L1) Ensure 'Network access: Do not allow anonymous enumeration of SAM accounts and shares' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:RestrictAnonymous
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Do not allow anonymous enumeration 
+of SAM accounts and shares
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-do-not-allow-anonymous-enumeration-of-sam-accounts-and-shares)
+<br></br>
+
+#### 2.3.10.4 (L1) Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:DisableDomainCreds
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Do not allow storage of passwords 
+and credentials for network authentication
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-do-not-allow-storage-of-passwords-and-credentials-for-network-authentication)
+<br></br>
+
+#### 2.3.10.5 (L1) Ensure 'Network access: Let Everyone permissions apply to anonymous users' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:EveryoneIncludesAnony
+mous
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Let Everyone permissions apply to 
+anonymous users
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-let-everyone-permissions-apply-to-anonymous-users)
+<br></br>
+
+#### 2.3.10.6 (L1) Ensure 'Network access: Named Pipes that can be accessed anonymously' is set to 'None' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+NullSessionPipes
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Named Pipes that can be accessed 
+anonymously
+```
+Setting: None   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-named-pipes-that-can-be-accessed-anonymously)
+<br></br>
+
+#### 2.3.10.7 (L1) Ensure 'Network access: Remotely accessible registry paths' is configured (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurePipeServers\Winreg\
+AllowedExactPaths:Machine
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Remotely accessible registry paths
+```
+Setting:    
+System\CurrentControlSet\Control\ProductOptions 
+System\CurrentControlSet\Control\Server Applications
+Software\Microsoft\Windows NT\CurrentVersion    
+Link: [1](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-access-remotely-accessible-registry-paths)
+<br></br>
+
+#### 2.3.10.8 (L1) Ensure 'Network access: Remotely accessible registry paths and sub-paths' is configured (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurePipeServers\Winreg\
+AllowedPaths:Machine
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Remotely accessible registry paths 
+and sub-paths
+```
+Setting:    
+System\CurrentControlSet\Control\Print\Printers 
+System\CurrentControlSet\Services\Eventlog
+Software\Microsoft\OLAP Server
+Software\Microsoft\Windows NT\CurrentVersion\Print
+Software\Microsoft\Windows NT\CurrentVersion\Windows 
+System\CurrentControlSet\Control\ContentIndex 
+System\CurrentControlSet\Control\Terminal Server 
+System\CurrentControlSet\Control\Terminal Server\UserConfig 
+System\CurrentControlSet\Control\Terminal Server\DefaultUserConfiguration 
+Software\Microsoft\Windows NT\CurrentVersion\Perflib 
+System\CurrentControlSet\Services\SysmonLog   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-remotely-accessible-registry-paths-and-subpaths)
+<br></br>
+
+#### 2.3.10.9 (L1) Ensure 'Network access: Restrict anonymous access to Named Pipes and Shares' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+RestrictNullSessAccess
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local
+Policies\Security Options\Network access: Restrict anonymous access to Named 
+Pipes and Shares
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-restrict-anonymous-access-to-named-pipes-and-shares)
+<br></br>
+
+#### 2.3.10.10 (L1) Ensure 'Network access: Restrict clients allowed to make remote calls to SAM' is set to 'Administrators: Remote Access: Allow' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:restrictremotesam
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Restrict clients allowed to make 
+remote calls to SAM
+```
+Setting: Administrators (Allow Remote Access)   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-restrict-clients-allowed-to-make-remote-sam-calls)
+<br></br>
+
+#### 2.3.10.11 (L1) Ensure 'Network access: Shares that can be accessed anonymously' is set to 'None' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters:
+NullSessionShares
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Shares that can be accessed 
+anonymously
+```
+Setting: None     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-shares-that-can-be-accessed-anonymously)
+<br></br>
+
+#### 2.3.10.12 (L1) Ensure 'Network access: Sharing and security model for local accounts' is set to 'Classic - local users authenticate as themselves' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:ForceGuest
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network access: Sharing and security model for 
+local accounts
+```
+Setting:    
+On domain-joined computers: Classic
+On stand-alone computers: Guest only    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-access-sharing-and-security-model-for-local-accounts)
+<br></br>
+
+### 2.3.11 Network security
+This section contains recommendations related to network security.
+<br></br>
+
+#### 2.3.11.1 (L1) Ensure 'Network security: Allow Local System to use computer identity for NTLM' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:UseMachineId
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Allow Local System to use 
+computer identity for NTLM
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-allow-local-system-to-use-computer-identity-for-ntlm)
+<br></br>
+
+#### 2.3.11.2 (L1) Ensure 'Network security: Allow LocalSystem NULL session fallback' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0:AllowNullSessi
+onFallback
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Allow LocalSystem NULL session 
+fallback
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-allow-localsystem-null-session-fallback)
+<br></br>
+
+#### 2.3.11.3 (L1) Ensure 'Network Security: Allow PKU2U authentication requests to this computer to use online identities' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\pku2u:AllowOnlineID
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network Security: Allow PKU2U authentication 
+requests to this computer to use online identities
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-allow-pku2u-authentication-requests-to-this-computer-to-use-online-identities)
+<br></br>
+
+#### 2.3.11.4 (L1) Ensure 'Network security: Configure encryption types allowed for Kerberos' is set to 'AES128_HMAC_SHA1, AES256_HMAC_SHA1, Future encryption types' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\
+Kerberos\Parameters:SupportedEncryptionTypes
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Configure encryption types 
+allowed for Kerberos
+```
+Setting: RC4_HMAC_MD5, AES128_HMAC_SHA1, AES256_HMAC_SHA1, Future encryption types    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-configure-encryption-types-allowed-for-kerberos)
+<br></br>
+
+#### 2.3.11.5 (L1) Ensure 'Network security: Do not store LAN Manager hash value on next password change' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:NoLMHash
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Do not store LAN Manager hash 
+value on next password change
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-do-not-store-lan-manager-hash-value-on-next-password-change)
+<br></br>
+
+#### 2.3.11.6 (L1) Ensure 'Network security: Force logoff when logon hours expire' is set to 'Enabled' (Manual)
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: Force logoff when logon hours 
+expire
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-force-logoff-when-logon-hours-expire)
+<br></br>
+
+#### 2.3.11.7 (L1) Ensure 'Network security: LAN Manager authentication level' is set to 'Send NTLMv2 response only. Refuse LM & NTLM' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa:LmCompatibilityLevel
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: LAN Manager authentication level
+```
+Setting: Send NTLMv2 response only    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-lan-manager-authentication-level)
+<br></br>
+
+#### 2.3.11.8 (L1) Ensure 'Network security: LDAP client signing requirements' is set to 'Negotiate signing' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LDAP:LDAPClientIntegrity
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\Network security: LDAP client signing requirements
+```
+Setting: Negotiate Signing    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-ldap-client-signing-requirements)
+<br></br>
+
+#### 2.3.11.9 (L1) Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) clients' is set to 'Require NTLMv2 session security, Require 128-bit encryption' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0:NTLMinClientSec
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network security: Minimum session security for NTLM SSP based (including secure RPC) clients
+```
+Setting: Require 128-bit encryption   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-minimum-session-security-for-ntlm-ssp-based-including-secure-rpc-clients)
+<br></br>
+
+#### 2.3.11.10 (L1) Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) servers' is set to 'Require NTLMv2 session security, Require 128-bit encryption' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0:NTLMMinServerSec
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network security: Minimum session security for NTLM SSP based (including secure RPC) servers
+```
+Setting: Require 128-bit encryption   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-minimum-session-security-for-ntlm-ssp-based-including-secure-rpc-servers)
+<br></br>
+
+#### 2.3.12 Recovery console
+This section is intentionally blank and exists to ensure the structure of Windows benchmarks is consistent.
+<br></br>
+
+#### 2.3.13 Shutdown
+This section is intentionally blank and exists to ensure the structure of Windows benchmarks is consistent.
+<br></br>
+
+#### 2.3.14 System cryptography
+This section contains recommendations related to system cryptography
+<br></br>
+
+#### 2.3.14.1 (L2) Ensure 'System cryptography: Force strong key protection for user keys stored on the computer' is set to 'User is prompted when the key is first used' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Cryptography:ForceKeyProtection
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\System cryptography: Force strong key protection for user keys stored on the computer
+```
+Setting: User input is not required when new keys are stored and used   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/system-cryptography-force-strong-key-protection-for-user-keys-stored-on-the-computer)
+<br></br>
+
+### 2.3.15 System Objects
+This section contains recommendations related to system objects.
+<br></br>
+
+#### 2.3.15.1 (L1) Ensure 'System objects: Require case insensitivity for non-Windows subsystems' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel:ObCaseInsensitive
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\System objects: Require case insensitivity for non-Windows subsystems
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/system-objects-require-case-insensitivity-for-non-windows-subsystems)
+<br></br>
+
+#### 2.3.15.2 (L1) Ensure 'System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager:ProtectionMode
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/system-objects-strengthen-default-permissions-of-internal-system-objects)
+<br></br>
+
+#### 2.3.16 System settings
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+<br></br>
+
+#### 2.3.17 User Account Control
+This section contains recommendations related to User Account Control.
+<br></br>
+
+#### 2.3.17.1 (L1) Ensure 'User Account Control: Admin Approval Mode for the Built-in Administrator account' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:FilterAdministratorToken
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\User Account Control: Admin Approval Mode for the Built-in Administrator account
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-admin-approval-mode-for-the-built-in-administrator-account)
+<br></br>
+
+#### 2.3.17.2 (L1) Ensure 'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' is set to 'Prompt for consent on the secure desktop' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:ConsentPromptBehaviorAdmin
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Behavior of the elevation 
+prompt for administrators in Admin Approval Mode
+```
+Setting: Prompt for consent for non-Windows binaries    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-behavior-of-the-elevation-prompt-for-administrators-in-admin-approval-mode)
+<br></br>
+
+#### 2.3.17.3 (L1) Ensure 'User Account Control: Behavior of the elevation prompt for standard users' is set to 'Automatically deny elevation requests' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+ConsentPromptBehaviorUser
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Behavior of the elevation 
+prompt for standard users
+```
+Setting: Prompt for credentials     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-behavior-of-the-elevation-prompt-for-standard-users)
+<br></br>
+
+#### 2.3.17.4 (L1) Ensure 'User Account Control: Detect application installations and prompt for elevation' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+EnableInstallerDetection
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Detect application 
+installations and prompt for elevation
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-detect-application-installations-and-prompt-for-elevation)
+<br></br>
+
+#### 2.3.17.5 (L1) Ensure 'User Account Control: Only elevate UIAccess applications that are installed in secure locations' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+EnableSecureUIAPaths
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Only elevate UIAccess 
+applications that are installed in secure locations
+```
+Setting: Enabled       
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-only-elevate-uiaccess-applications-that-are-installed-in-secure-locations)
+<br></br>
+
+#### 2.3.17.6 (L1) Ensure 'User Account Control: Run all administrators in Admin Approval Mode' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+EnableLUA
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Run all administrators in 
+Admin Approval Mode
+```
+Setting: Enabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-run-all-administrators-in-admin-approval-mode)
+<br></br>
+
+#### 2.3.17.7 (L1) Ensure 'User Account Control: Switch to the secure desktop when prompting for elevation' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+PromptOnSecureDesktop
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Switch to the secure desktop 
+when prompting for elevation
+```
+Setting: Enabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-switch-to-the-secure-desktop-when-prompting-for-elevation)
+<br></br>
+
+#### 2.3.17.8 (L1) Ensure 'User Account Control: Virtualize file and registry write failures to per-user locations' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+EnableVirtualization
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Virtualize file and registry 
+write failures to per-user locations
+```
+Setting: Enabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-virtualize-file-and-registry-write-failures-to-per-user-locations)
+<br></br>
+
+### 3 Event Log
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+<br></br>
+
+### 4 Restricted Groups
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+<br></br>
+
+### 5 System Services
+This section contains recommendations for system services.
+<br></br>
+
+#### 5.1 (L2) Ensure 'Bluetooth Audio Gateway Service (BTAGService)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BTAGService:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Bluetooth Audio Gateway Service
+```
+Setting: Manual (Trigger Start)   
+<br></br>
+
+#### 5.2 (L2) Ensure 'Bluetooth Support Service (bthserv)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\bthserv:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Bluetooth Support Service
+```
+Setting: Windows 7 = Manual, Windows 8.0 or newer = Manual (Trigger Start)
+<br></br>
+
+#### 5.3 (L1) Ensure 'Computer Browser (Browser)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Browser:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Computer Browser
+```
+Setting: Windows 7 = Manual, Windows 8.0 through Windows 10 R1703 = Manual (Trigger Start), Windows 10 R1709 or newer = Not Installed (Manual (Trigger Start) when installed)   
+Link: [1](https://techcommunity.microsoft.com/t5/storage-at-microsoft/stop-using-smb1/ba-p/425858)
+<br></br>
+
+#### 5.4 (L2) Ensure 'Downloaded Maps Manager (MapsBroker)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MapsBroker:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Downloaded Maps Manager
+```
+Setting: Automatic (Delayed Start)
+<br></br>
+
+#### 5.5 (L2) Ensure 'Geolocation Service (lfsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Geolocation Service
+
+```
+Setting: Manual (Trigger Start)
+<br></br>
+
+#### 5.6 (L1) Ensure 'IIS Admin Service (IISADMIN)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\IISADMIN:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\IIS Admin Service
+```
+Setting: Not installed    
+<br></br>
+
+#### 5.7 (L1) Ensure 'Infrared monitor service (irmon)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\irmon:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Infrared monitor service
+```
+Setting: Windows 10 R1607 through Windows 10 R809 = Manual, Windows 10 R1903 or newer = Not installed     
+<br></br>
+
+#### 5.8 (L1) Ensure 'Internet Connection Sharing (ICS) (SharedAccess)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Internet Connection Sharing (ICS)
+```
+Setting: Windows 7 through Windows 8.1 = Disabled, Windows 10 R1507 and R1511 = Manual, Windows 10 1607 or newer = Manual (Trigger Start)
+<br></br>
+
+#### 5.9 (L2) Ensure 'Link-Layer Topology Discovery Mapper (lltdsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lltdsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Link-Layer Topology Discovery Mapper
+```
+Setting: Manual
+<br></br>
 
 ---
 
