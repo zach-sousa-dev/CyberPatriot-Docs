@@ -36,7 +36,7 @@
 		- [9 Ensure updates patches and additional security software are installed](#9-ensure-updates-patches-and-additional-security-software-are-installed)
 	- [2 Services](#2-services)
 		- [1 Configure Time Synchronization](#1-configure-time-synchronization)
-			- [1 Ensure Time Synchronization is in use](#1-ensure-time-synchronization)
+			- [1 Ensure Time Synchronization is in use](#1-ensure-time-synchronization-is-in-use)
 			- [2 Configure chrony](#2-configure-chrony)
 			- [3 Configure systemd-timesyncd](#3-configure-systemd-timesyncd)
 			- [4 Configure ntp](#4-configure-ntp)
@@ -3009,7 +3009,355 @@ Run the following commands:
 	other combination. This is important to understand for both the auditing and remediation
 	sections as the examples given are optimized for performance as per the man page.  
 
+	**Ensure events that modify the sudo log file are collected
+	(Automated)**
+
+	***Description:***
+
+	Monitor the sudo log file. If the system has been properly configured to disable the use
+	of the su command and force all administrators to have to log in first and then use sudo
+	to execute privileged commands, then all administrator commands will be logged to
+	/var/log/sudo.log . Any time a command is executed, an audit event will be triggered
+	as the /var/log/sudo.log file will be opened for write and the executed administration
+	command will be written to the log.
+
+	***Rationale:***
 	
+	Changes in `/var/log/sudo.log` indicate that an administrator has executed a command
+	or the log file itself has been tampered with. Administrators will want to correlate the
+	events written to the audit trail with the records written to `/var/log/sudo.log` to verify if
+	unauthorized commands have been executed.
+
+	***Audit:***  
+	<br>
+	On disk configuration
+	Run the following command to check the on disk rules:
+	```
+	# {
+	SUDO_LOG_FILE_ESCAPED=$(grep -r logfile /etc/sudoers* | sed -e
+	's/.*logfile=//;s/,? .*//' -e 's/"//g' -e 's|/|\\/|g')
+	[ -n "${SUDO_LOG_FILE_ESCAPED}" ] && awk "/^ *-w/ \
+	&&/"${SUDO_LOG_FILE_ESCAPED}"/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \
+	|| printf "ERROR: Variable 'SUDO_LOG_FILE_ESCAPED' is unset.\n"
+	}
+	```
+
+	Verify output of matches:
+	```
+	-w /var/log/sudo.log -p wa -k sudo_log_file
+	```
+
+	*Running configuration*
+
+	Run the following command to check loaded rules:
+	```
+	# {
+	SUDO_LOG_FILE_ESCAPED=$(grep -r logfile /etc/sudoers* | sed -e
+	's/.*logfile=//;s/,? .*//' -e 's/"//g' -e 's|/|\\/|g')
+	[ -n "${SUDO_LOG_FILE_ESCAPED}" ] && auditctl -l | awk "/^ *-w/ \
+	&&/"${SUDO_LOG_FILE_ESCAPED}"/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \
+	|| printf "ERROR: Variable 'SUDO_LOG_FILE_ESCAPED' is unset.\n"
+	}
+	```
+
+	Verify output matches:
+	```
+	-w /var/log/sudo.log -p wa -k sudo_log_file
+	```
+
+	Remediation:  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in .rules extension,
+	with the relevant rules to monitor events that modify the sudo log file.
+	Example:  
+
+	```
+	# {
+	SUDO_LOG_FILE=$(grep -r logfile /etc/sudoers* | sed -e 's/.*logfile=//;s/,?
+	.*//' -e 's/"//g')
+	[ -n "${SUDO_LOG_FILE}" ] && printf "
+	-w ${SUDO_LOG_FILE} -p wa -k sudo_log_file
+	" >> /etc/audit/rules.d/50-sudo.rules || printf "ERROR: Variable
+	'SUDO_LOG_FILE_ESCAPED' is unset.\n"
+	}
+	```
+
+	Merge and load the rules into active configuration:  
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.  
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	Additional Information:  
+
+	*Potential reboot required*   
+
+	If the auditing configuration is locked (`-e 2`), then `augenrules` will not warn in any way
+	that rules could not be loaded into the running configuration. A system reboot will be
+	required to load the rules into the running configuration.
+
+	*System call structure*
+
+	For performance (`man 7 audit.rules`) reasons it is preferable to have all the system
+	calls on one line. However, your configuration may have them on one line each or some
+	other combination. This is important to understand for both the auditing and remediation
+	sections as the examples given are optimized for performance as per the man page.
+
+	**Ensure events that modify date and time information are
+	collected (Automated)**  
+
+	*Description:*
+
+	Capture events where the system date and/or time has been modified. The parameters
+	in this section are set to determine if the;
+
+   * `adjtimex` - tune kernel clock
+   * `settimeofday` - set time using `timeval` and `timezone` structures
+   * `stime` - using seconds since 1/1/1970
+   * `clock_settime` - allows for the setting of several internal clocks and timers
+
+
+
+	system calls have been executed. Further, ensure to write an audit record to the
+	configured audit log file upon exit, tagging the records with a unique identifier such as
+	"time-change".
+
+
+	**On disk configuration**
+	Run the following command to check the on disk rules:  
+
+	```
+	# {
+	awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&/ -S/ \
+	&&(/adjtimex/ \
+	||/settimeofday/ \
+	||/clock_settime/ ) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	awk '/^ *-w/ \
+	&&/\/etc\/localtime/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	}
+	```  
+
+	Verify output of matches:  
+	```
+	-a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k timechange
+	-a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -k timechange
+	-w /etc/localtime -p wa -k time-change
+	```
+
+	**Running configuration**  
+
+	Run the following command to check loaded rules:
+
+	```
+	# {
+	auditctl -l | awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&/ -S/ \
+	&&(/adjtimex/ \
+	||/settimeofday/ \
+	||/clock_settime/ ) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	auditctl -l | awk '/^ *-w/ \
+	&&/\/etc\/localtime/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	}
+	```
+
+	Verify the output includes:
+	```
+	a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -F
+	key=time-change
+	-a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -F
+	key=time-change
+	-w /etc/localtime -p wa -k time-change
+	```
+
+	Remediation:  
+
+	Create audit rules
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor events that modify date and time information.
+
+	**64 Bit systems**
+
+	Example:
+	```
+	# printf "
+	-a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k timechange
+	-a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -k timechange
+	-w /etc/localtime -p wa -k time-change
+	" >> /etc/audit/rules.d/50-time-change.rules
+	```
+
+	*Load audit rules*
+
+	<br>
+
+	Merge and load the rules into active configuration:
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	**Ensure events that modify the system's network
+	environment are collected (Automated)**
+
+
+	*Description:*
+
+	Record changes to network environment files or system calls. The below parameters
+	monitors the following system calls, and wr
+
+	- sethostname - set the systems host name
+	- setdomainname - set the systems domain name
+
+	The files being monitored are:
+
+	- `/etc/issue` and `/etc/issue.net` - messages displayed pre-login
+	- `/etc/hosts` - file containing host names and associated IP addresses
+	- `/etc/networks` - symbolic names for networks
+	- `/etc/network/` - directory containing network interface scripts and configurations files  
+	
+	<br>
+
+	*Rationale:*  
+
+	Monitoring `sethostname` and `setdomainname` will identify potential unauthorized changes
+	to host and domainname of a system. The changing of these names could potentially
+	break security parameters that are set based on those names. The `/etc/hosts` file is
+	monitored for changes that can indicate an unauthorized intruder is trying to change
+	machine associations with IP addresses and trick users and processes into connecting
+	to unintended machines. Monitoring `/etc/issue` and `/etc/issue.net` is important, as
+	intruders could put disinformation into those files and trick users into providing
+	information to the intruder. Monitoring `/etc/network` is important as it can show if
+	network interfaces or scripts are being modified in a way that can lead to the machine
+	becoming unavailable or compromised. All audit records should have a relevant tag
+	associated with them.
+
+	<br>
+
+	*Audit:*  
+
+	64 Bit systems  
+
+	<br>
+
+	*On disk configuration* 
+
+	Run the following commands to check the on disk rules:
+	```
+	# awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b(32|64)/ \
+	&&/ -S/ \
+	&&(/sethostname/ \
+	||/setdomainname/) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	# awk '/^ *-w/ \
+	&&(/\/etc\/issue/ \
+	||/\/etc\/issue.net/ \
+	||/\/etc\/hosts/ \
+	||/\/etc\/network/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	```
+
+	Verify the output matches:  
+	```
+	-a always,exit -F arch=b64 -S sethostname,setdomainname -k system-locale
+	-a always,exit -F arch=b32 -S sethostname,setdomainname -k system-locale
+	-w /etc/issue -p wa -k system-locale
+	-w /etc/issue.net -p wa -k system-locale
+	-w /etc/hosts -p wa -k system-locale
+	-w /etc/networks -p wa -k system-locale
+	```
+	*Running configuration*  
+	Run the following command to check loaded rules:
+	```
+	# auditctl -l | awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b(32|64)/ \
+	&&/ -S/ \
+	&&(/sethostname/ \
+	||/setdomainname/) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	# auditctl -l | awk '/^ *-w/ \
+	&&(/\/etc\/issue/ \
+	||/\/etc\/issue.net/ \
+	||/\/etc\/hosts/ \
+	||/\/etc\/network/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	```
+	Verify the output includes:  
+	```
+	-a always,exit -F arch=b64 -S sethostname,setdomainname -F key=system-locale
+	-a always,exit -F arch=b32 -S sethostname,setdomainname -F key=system-locale
+	-w /etc/issue -p wa -k system-locale
+	-w /etc/issue.net -p wa -k system-locale
+	-w /etc/hosts -p wa -k system-locale
+	-w /etc/networks -p wa -k system-locale
+	-w /etc/network/ -p wa -k system-locale
+	```
+
+	*Remediation:*  
+		
+	*Create audit rules*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor events that modify the system's network environment.
+
+	*64 Bit systems*
+
+	Example:  
+	```
+	# printf "
+	-a always,exit -F arch=b64 -S sethostname,setdomainname -k system-locale
+	-a always,exit -F arch=b32 -S sethostname,setdomainname -k system-locale
+	-w /etc/issue -p wa -k system-locale
+	-w /etc/issue.net -p wa -k system-locale
+	-w /etc/hosts -p wa -k system-locale
+	-w /etc/networks -p wa -k system-locale
+	-w /etc/network/ -p wa -k system-locale
+	" >> /etc/audit/rules.d/50-system_local.rules
+	```  
+	*Load audit rules*  
+
+	Merge and load the rules into active configuration:
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	***Ensure use of privileged commands are collected
+	(Automated)***
+
+
+
+
 
 3. Configure auditd rules 
 
