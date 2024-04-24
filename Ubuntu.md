@@ -2389,47 +2389,395 @@ Run the following commands:
 ### 1 Configure Time Synchronization
 #### 1 Ensure Time Synchronization is in use
 
+> Only one time synchronization method should be in use on the system. Configuring multiple time synchronization methods could lead to unexpected or unreliable results
 
+On physical systems, and virtual systems where host based time synchronization is not available.  
+**One** of the three time synchronization daemons should be available; `chrony`, `systemd-timesyncd`, or `ntp`  
+Run the following script to verify that a single time synchronization daemon is available on the system:
+
+``` bash
+#!/usr/bin/env bash
+{
+	output="" l_tsd="" l_sdtd="" chrony="" l_ntp=""
+	dpkg-query -W chrony > /dev/null 2>&1 && l_chrony="y"
+	dpkg-query -W ntp > /dev/null 2>&1 && l_ntp="y" || l_ntp=""
+	systemctl list-units --all --type=service | grep -q 'systemdtimesyncd.service' && systemctl is-enabled systemd-timesyncd.service | grep -q 'enabled' && l_sdtd="y"# ! systemctl is-enabled systemd-timesyncd.service | grep -q 'enabled' && l_nsdtd="y" || l_nsdtd=""
+	if [[ "$l_chrony" = "y" && "$l_ntp" != "y" && "$l_sdtd" != "y" ]]; then
+		l_tsd="chrony"
+		output="$output\n- chrony is in use on the system"
+	elif [[ "$l_chrony" != "y" && "$l_ntp" = "y" && "$l_sdtd" != "y" ]]; then
+		l_tsd="ntp"
+		output="$output\n- ntp is in use on the system"
+	elif [[ "$l_chrony" != "y" && "$l_ntp" != "y" ]]; then
+		if systemctl list-units --all --type=service | grep -q 'systemdtimesyncd.service' && systemctl is-enabled systemd-timesyncd.service | grep -Eq '(enabled|disabled|masked)'; then
+			l_tsd="sdtd"
+			output="$output\n- systemd-timesyncd is in use on the system"
+		fi
+	else
+		[[ "$l_chrony" = "y" && "$l_ntp" = "y" ]] && output="$output\n- both chrony and ntp are in use on the system"
+		[[ "$l_chrony" = "y" && "$l_sdtd" = "y" ]] && output="$output\n- both chrony and systemd-timesyncd are in use on the system"
+		[[ "$l_ntp" = "y" && "$l_sdtd" = "y" ]] && output="$output\n- both ntp and systemd-timesyncd are in use on the system"
+	fi
+	if [ -n "$l_tsd" ]; then
+		echo -e "\n- PASS:\n$output\n"
+	else
+		echo -e "\n- FAIL:\n$output\n"
+	fi
+}
+```
+
+On physical systems, and virtual systems where host based time synchronization is not 
+available.
+Select one of the three time synchronization daemons; `chrony(1)`, `systemd-timesyncd (2)`, or `ntp (3)`, and following the remediation procedure for the selected daemon.
+> Note: enabling more than one synchronization daemon could lead to unexpected or unreliable results:
+
+1. `chrony`
+
+Run the following command to install `chrony`:
+
+`# apt install chrony`
+
+Run the following commands to stop and mask the `systemd-timesyncd` daemon:
+
+``` 
+# systemctl stop systemd-timesyncd.service
+# systemctl --now mask systemd-timesyncd.service
+```
+
+Run the following command to remove the `ntp` package:
+
+`# apt purge ntp`
+
+> Subsection: `Configure chrony` should be followed  
+> Subsections: `Configure systemd-timesyncd` and `Configure ntp` should be skipped
+
+2. `systemd-timesync`
+
+Run the following command to remove the `chrony` package:
+
+`# apt purge chrony`
+
+Run the following command to remove the `ntp` package:
+
+`# apt purge ntp`
+
+> Subsection: `Configure systemd-timesyncshould` be followed  
+> Subsections: `Configure chrony` and `Configure ntp` should be skipped
+
+3. `ntp`
+
+Run the following command to install `ntp`:
+
+`# apt install ntp`
+
+Run the following commands to stop and mask the `systemd-timesyncd` daemon:
+
+``` 
+# systemctl stop systemd-timesyncd.service
+# systemctl --now mask systemd-timesyncd.service
+```
+
+Run the following command to remove the `chrony` package:
+
+`# apt purge chrony`
+
+> Subsection: `Configure ntp` should be followed  
+> Subsections: `Configure systemd-timesyncd` and `Configure chrony` should be skipped
 
 #### 2 Configure chrony
-1. 
+1. Ensure chrony is configured with authorized timeserver (Manual)
 
+**IF** `chrony` is in use on the system, run the following command to display the server and/or pool directive:
 
+`# grep -Pr --include=*.{sources,conf} '^\h*(server|pool)\h+\H+' /etc/chrony/`
 
-2. 
+Verify that at least one `pool` line and/or at least three `server` lines are returned, and the timeserver on the returned lines follows local site policy  
+Output examples:  
 
+`pool` directive:
 
+```
+pool time.nist.gov iburst maxsources 4 #The maxsources option is unique to the pool directive
+```
 
-3. 
+`server` directive:
 
+```
+server time-a-g.nist.gov iburst
+server 132.163.97.3 iburst
+server time-d-b.nist.gov iburst
+```
 
+Edit `/etc/chrony/chrony.conf` or a file ending in `.sources` in `/etc/chrony/sources.d/` and add or edit server or pool lines as appropriate according to local site policy:
+
+`<[server|pool]> <[remote-server|remote-pool]>`
+
+Examples:  
+
+`pool` directive:
+
+```
+pool time.nist.gov iburst maxsources 4 #The maxsources option is unique to the pool directive
+```
+
+`server` directive:
+
+```
+server time-a-g.nist.gov iburst
+server 132.163.97.3 iburst
+server time-d-b.nist.gov iburst
+```
+
+Run one of the following commands to load the updated time sources into `chronyd` running config:
+
+```
+# systemctl restart chronyd
+- OR if sources are in a .sources file -
+# chronyc reload sources
+```
+
+If pool and/or server directive(s) are set in a sources file in `/etc/chrony/sources.d`, the line:
+
+`sourcedir /etc/chrony/sources.d`
+
+must be present in `/etc/chrony/chrony.conf`
+
+2. Ensure chrony is running as user _chrony (Automated)
+
+**IF** chrony is in use on the system, run the following command to verify the chronydservice is being run as the _chrony user:  
+`# ps -ef | awk '(/[c]hronyd/ && $1!="_chrony") { print $1 }'`  
+Nothing should be returned
+
+Add or edit the user line to `/etc/chrony/chrony.conf` or a file ending in `.conf` in `/etc/chrony/conf.d/`:
+
+`user _chrony`
+
+3. Ensure chrony is enabled and running (Automated)
+
+**IF** `chrony` is in use on the system, run the following commands:
+Run the following command to verify that the `chrony` service is enabled:
+
+```
+# systemctl is-enabled chrony.service
+enabled
+```
+Run the following command to verify that the `chrony` service is active:
+
+```
+# systemctl is-active chrony.service
+active
+```
+
+In order to start `chrony`:
+
+Run the following command to unmask `chrony.service`:
+
+`# systemctl unmask chrony.service`
+
+Run the following command to enable and start `chrony.service`:
+
+`# systemctl --now enable chrony.service`
 
 #### 3 Configure systemd-timesyncd
-1. 
+1. Ensure systemd-timesyncd configured with authorized timeserver (Manual)
 
+**IF** `systemd-timesyncd` is in use on the system, run the following command:
 
+`# find /etc/systemd -type f -name '*.conf' -exec grep -Ph '^\h*(NTP|FallbackNTP)=\H+' {} +`
 
-2. 
+Verify that `NPT=<space_seporated_list_of_servers>` and/or `FallbackNTP=<space_seporated_list_of_servers>` is returned and that the time server(s) shown follows local site policy  
+Example Output:
 
+```
+/etc/systemd/timesyncd.conf.d/50-timesyncd.conf:NTP=time.nist.gov
+/etc/systemd/timesyncd.conf.d/50-timesyncd.conf:FallbackNTP=time-a-g.nist.gov 
+time-b-g.nist.gov time-c-g.nist.gov
+```
+
+Edit or create a file in `/etc/systemd/timesyncd.conf.d `ending in `.conf` and add the `NTP=` and/or `FallbackNTP=` lines to the `[Time]` section:  
+Example:
+
+```
+[Time]
+NTP=time.nist.gov # Uses the generic name for NIST's time servers 
+-AND/ORFallbackNTP=time-a-g.nist.gov time-b-g.nist.gov time-c-g.nist.gov # Space 
+separated list of NIST time servers
+```
+
+> Servers added to these line(s) should follow local site policy. NIST servers are for example. The `timesyncd.conf.d `directory may need to be created
+
+Example script: The following example script will create the `systemd-timesyncd` drop-in configuration snippet:
+
+``` bash
+#!/usr/bin/env bash
+ntp_ts="time.nist.gov"
+ntp_fb="time-a-g.nist.gov time-b-g.nist.gov time-c-g.nist.gov"
+disfile="/etc/systemd/timesyncd.conf.d/50-timesyncd.conf"
+if ! find /etc/systemd -type f -name '*.conf' -exec grep -Ph '^\h*NTP=\H+' {} +; then
+	[ ! -d /etc/systemd/timesyncd.conf.d ] && mkdir /etc/systemd/timesyncd.conf.d
+	! grep -Pqs '^\h*\[Time\]' "$disfile" && echo "[Time]" >> "$disfile"
+	echo "NTP=$ntp_ts" >> "$disfile"
+fi
+if ! find /etc/systemd -type f -name '*.conf' -exec grep -Ph '^\h*FallbackNTP=\H+' {} +; then
+	[ ! -d /etc/systemd/timesyncd.conf.d ] && mkdir /etc/systemd/timesyncd.conf.d
+	! grep -Pqs '^\h*\[Time\]' "$disfile" && echo "[Time]" >> "$disfile"
+	echo "FallbackNTP=$ntp_fb" >> "$disfile"
+fi
+```
+
+Run the following command to reload the `systemd-timesyncd ` configuration:
+
+`# systemctl try-reload-or-restart systemd-timesyncd`
+
+2. Ensure systemd-timesyncd is enabled and running (Automated)
+
+**IF** `systemd-timesyncd` is in use on the system, run the following commands:
+
+Run the following command to verify that the `systemd-timesyncd` service is enabled:  
+```
+# systemctl is-enabled systemd-timesyncd.service
+enabled
+```
+
+Run the following command to verify that the `systemd-timesyncd` service is active:  
+```
+# systemctl is-active systemd-timesyncd.service
+active
+```
+
+In order to start `systemd-timesync`:
+
+Run the following command to unmask `systemd-timesyncd.service`:
+
+`# systemctl unmask systemd-timesyncd.service`
+
+Run the following command to enable and start `systemd-timesyncd.service`:
+
+`# systemctl --now enable systemd-timesyncd.service`
 
 
 #### 4 Configure ntp
+1. Ensure ntp access control is configured (Automated)
 
-1. 
+**IF** `ntp` is in use on the system, run the following command to verify the `restrict` lines:
 
+```
+# grep -P -- '^\h*restrict\h+((-4\h+)?|-6\h+)default\h+(?:[^#\n\r]+\h+)*(?!(?:\2|\3|\4|\5))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h+(?:[^#\n\r]+\h+)*(?!(?:\1|\3|\4|\5))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h+(?:[^#\n\r]+\h+)*(?!(?:\1|\2|\4|\5))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h+(?:[^#\n\r]+\h+)*(?!(?:\1|\2|\3|\5))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h+(?:[^#\n\r]+\h+)*(?!(?:\1|\2|\3|\4))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h*(?:\h+\H+\h*)*(?:\h+#.*)?$' /etc/ntp.conf
+```
 
+Output should be similar to:
 
-2. 
+```
+restrict -4 default kod notrap nomodify nopeer noquery
+restrict -6 default kod notrap nomodify nopeer noquery
+```
 
+Verify that the output includes two lines, and both lines include: `default`, `kod`, `nomodify`, `notrap`, `nopeer` and `noquery`.
 
+Add or edit restrict lines in `/etc/ntp.conf` to match the following:
 
-3. 
+```
+restrict -4 default kod notrap nomodify nopeer noquery
+restrict -6 default kod notrap nomodify nopeer noquery
+```
 
+2. Ensure ntp is configured with authorized timeserver (Manual)
 
+**IF** `ntp` is in use on the system, run the following command to display the server and/or pool mode:
 
-4. 
+`# grep -P -- '^\h*(server|pool)\h+\H+' /etc/ntp.conf`
 
+Verify that at least one `pool` line and/or at least three `server` lines are returned, and the timeserver on the returned lines follows local site policy  
+Output examples:  
 
+`pool` mode:
+
+```
+pool time.nist.gov iburst maxsources 4 #The maxsources option is unique to the pool directive
+```
+
+`server` mode:
+
+```
+server time-a-g.nist.gov iburst
+server 132.163.97.3 iburst
+server time-d-b.nist.gov iburst
+```
+
+Edit `/etc/ntp.conf` and add or edit `server` or `pool` lines as appropriate according to local site policy:
+
+`<[server|pool]> <[remote-server|remote-pool]>`
+
+Examples:
+
+`pool` mode:
+
+```
+pool time.nist.gov iburst maxsources 4 #The maxsources option is unique to the pool directive
+```
+
+`server` mode:
+
+```
+server time-a-g.nist.gov iburst
+server 132.163.97.3 iburst
+server time-d-b.nist.gov iburst
+```
+
+Run the following command to load the updated time sources into `ntp` running config:
+
+`# systemctl restart ntp`
+
+3. Ensure ntp is running as user ntp (Automated)
+
+**IF** `ntp` is in use on the system run the following command to verify the `ntpd` daemon is being run as the user `ntp`:
+
+`# ps -ef | awk '(/[n]tpd/ && $1!="ntp") { print $1 }'`  
+Nothing should be returned
+
+Run the following command to verify the `RUNASUSER=` is set to `ntp` in `/etc/init.d/ntp`:
+
+```
+# grep -P -- '^\h*RUNASUSER=' /etc/init.d/ntp
+
+RUNASUSER=ntp
+```
+
+Add or edit the following line in `/etc/init.d/ntp`:
+
+`RUNASUSER=ntp`
+
+Run the following command to restart `ntp.servocee`:
+
+`# systemctl restart ntp.service`
+
+4. Ensure ntp is enabled and running (Automated)
+
+**IF** `ntp` is in use on the system, run the following commands:  
+Run the following command to verify that the `ntp` service is enabled:
+
+```
+# systemctl is-enabled ntp.service
+
+enabled
+```
+
+Run the following command to verify that the `ntp` service is active:
+
+```
+# systemctl is-active ntp.service
+
+active
+```
+
+**IF** `ntp` is in use on the system, run the following commands:  
+Run the following command to unmask `ntp.service`:
+
+`# systemctl unmask ntp.service`
+
+Run the following command to enable and start `ntp.service`:
+
+`# systemctl --now enable ntp.service`
 
 ### 2 Special Purpose Services
 1. 
@@ -2522,6 +2870,19 @@ Run the following commands:
 
 
 ### 4 Ensure Nonessential Services are Removed or Masked
+
+Run the following command:  
+`# lsof -i -P -n | grep -v "(ESTABLISHED)"`  
+Review the output to ensure that all services listed are required on the system. If a listed service is not required, remove the package containing the service. If the package containing a non-essential service is required, stop and mask the non-essential service.
+
+Run the following command to remove the package containing the service:
+
+`# apt purge <package_name>`
+
+**OR** If required packages have a dependency:  
+Run the following command to stop and mask the service:
+
+`# systemctl --now mask <service_name>`
 
 ---
 
