@@ -10,6 +10,8 @@
 
 >:page_with_curl: This documentation is being swiftly written in preparation for the CyberPatriot Nationals. Basically, it might be a little messy.
 
+>:page_with_curl: You will need to install GPMC! Refer to: [Link](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn265969(v=ws.11)) and you will need a domain user account: [Link](https://learn.microsoft.com/en-us/microsoft-desktop-optimization-pack/medv-v1/how-to-configure-a-domain-user-or-groupmedvv2)
+
 - ## 1. Account Policies
     - ### 1.1 Password Policies
         - #### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
