@@ -2789,23 +2789,74 @@ Run the following command to enable and start `ntp.service`:
 
 1. Ensure X Window System is not installed (Automated)
 
+> Many Linux systems run applications which require a Java runtime. Some Linux Java packages have a dependency on specific X Windows xorg-x11-fonts. One workaround to avoid this dependency is to use the "headless" Java packages for your specific Java runtime, if provided by your distribution.
+
+Verify X Windows System is not installed:
+
+`dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' xserver-xorg* | grep -Pi '\h+installed\b'`
+
+Nothing should be returned
+
+Remove the X Windows System packages:
+
+`apt purge xserver-xorg*`
 
 
 2. Ensure Avahi Server is not installed (Automated)
 
+Run the following command to verify `avahi-daemon` is not installed:
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' avahi-daemon
 
+avahi-daemon unknown ok not-installed not-installed
+```
+
+Run the following commands to remove `avahi-daemon`:
+
+```
+# systemctl stop avahi-daaemon.service
+# systemctl stop avahi-daemon.socket
+# apt purge avahi-daemon
+```
 
 3. Ensure CUPS is not installed (Automated)
 
+Run the following command to verify `cups` is not Installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' cups
+
+cups unknown ok not-installed not-installed
+```
+
+Run one of the following commands to remove `cups`:
+
+`# apt purge cups`
 
 4. Ensure DHCP Server is not installed (Automated)
 
+Run the following commands to verify `isc-dhcp-server` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' iscdhcp-server
+isc-dhcp-server unknown ok not-installed not-installed
+```
+
+Run the following command to remove `isc-dhcp-server`:
+`# apt purge isc-dhcp-server`
 
 5. Ensure LDAP server is not installed (Automated)
 
+Run the following command to verify `slapd` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' slapd
+
+slapd unknown ok not-installed not-installed
+```
+
+Run one of the following commands to remove `slapd`:
+`# apt purge slapd`
 
 6. Ensure NFS is not installed (Automated)
 
@@ -2854,27 +2905,89 @@ Run the following command to enable and start `ntp.service`:
 ### 3 Service Clients
 1. Ensure NIS Client is not installed (Automated)
 
+Verify `nis` is not installed. Use the following command to provide the needed 
+information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nis
+
+nis unknown ok not-installed not-installed
+```
+
+Uninstall `nis`:
+
+`# apt purge nis`
 
 2. Ensure rsh client is not installed (Automated)
 
+Verify `rsh` is not installed. Use the following command to provide the needed 
+information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rsh-client
+
+rsh-client unknown ok not-installed not-installed
+```
+
+Uninstall `rsh`:
+
+`# apt purge rsh`
 
 3. Ensure talk client is not installed (Automated)
 
+Verify `talk` is not installed. The following command may provide the needed information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' talk
+
+talk unknown ok not-installed not-installed
+```
+
+Uninstall `talk`:
+
+`# apt purge talk`
 
 4. Ensure telnet client is not installed (Automated)
 
+Verify `telnet` is not installed. The following command may provide the needed information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' telnet
+
+telnet unknown ok not-installed not-installed
+```
+
+Uninstall `telnet`:
+
+`# apt purge telnet`
 
 5. Ensure LDAP client is not installed (Automated)
 
+Verify `ldap-utils` is not installed. The following command may provide the needed information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' ldap-utils
+
+ldap-utils unknown ok not-installed not-installed
+```
+
+Uninstall `ldap-utils`:
+
+`# apt purge ldap-utils`
 
 6. Ensure RPC is not installed (Automated)
 
+Verify `rpcbind` is not installed. The following command may provide the needed information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rpcbind
+
+rpcbind unknown ok not-installed not-installed
+```
+
+Uninstall `rpcbind`:
+
+`# apt purge rpcbind`
 
 ### 4 Ensure Nonessential Services are Removed or Masked
 
