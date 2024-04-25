@@ -2780,92 +2780,99 @@ Run the following command to enable and start `ntp.service`:
 `# systemctl --now enable ntp.service`
 
 ### 2 Special Purpose Services
-1. 
+
+> This section describes services that are installed on systems that specifically need to run these services. If any of these services are not required, it is recommended that they be deleted from the system to reduce the potential attack surface. If a package is required as a dependency, and the service is not required, the service should be stopped and masked.
+
+`# systemctl --now mask <service_name>`
+
+> If any of the following services are required **DO NOT** delete them
+
+1. Ensure X Window System is not installed (Automated)
 
 
 
-2. 
+2. Ensure Avahi Server is not installed (Automated)
 
 
 
-3. 
+3. Ensure CUPS is not installed (Automated)
 
 
 
-4. 
+4. Ensure DHCP Server is not installed (Automated)
 
 
 
-5. 
+5. Ensure LDAP server is not installed (Automated)
 
 
 
-6. 
+6. Ensure NFS is not installed (Automated)
 
 
 
-7. 
+7. Ensure DNS Server is not installed (Automated)
 
 
 
-8. 
+8. Ensure FTP Server is not installed (Automated)
 
 
 
-9. 
+9. Ensure HTTP server is not installed (Automated)
 
 
 
-10. 
+10. Ensure IMAP and POP3 server are not installed (Automated)
 
 
 
-11. 
+11. Ensure Samba is not installed (Automated)
 
 
 
-12. 
+12. Ensure HTTP Proxy Server is not installed (Automated)
 
 
 
-13. 
+13. Ensure SNMP Server is not installed (Automated)
 
 
 
-14. 
+14. Ensure NIS Server is not installed (Automated)
 
 
 
-15. 
+15. Ensure mail transfer agent is configured for local-only mode (Automated)
 
 
 
-16. 
+16. Ensure rsync service is either not installed or masked (Automated)
 
 
 
 ### 3 Service Clients
-1. 
+1. Ensure NIS Client is not installed (Automated)
 
 
 
-2. 
+2. Ensure rsh client is not installed (Automated)
 
 
 
-3. 
+3. Ensure talk client is not installed (Automated)
 
 
 
-4. 
+4. Ensure telnet client is not installed (Automated)
 
 
 
-5. 
+5. Ensure LDAP client is not installed (Automated)
 
 
 
-6. 
+6. Ensure RPC is not installed (Automated)
 
 
 
