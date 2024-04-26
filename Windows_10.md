@@ -1870,6 +1870,484 @@ Services\Link-Layer Topology Discovery Mapper
 Setting: Manual
 <br></br>
 
+#### 5.10 (L1) Ensure 'LxssManager (LxssManager)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LxssManager:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\LxssManager
+```
+Setting: Not installed (Manual when installed)
+<br></br>
+
+#### 5.11 (L1) Ensure 'Microsoft FTP Service (FTPSVC)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FTPSVC:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Microsoft FTP Service
+```
+Setting: Not installed (Automatic when installed)
+<br></br>
+
+#### 5.12 (L2) Ensure 'Microsoft iSCSI Initiator Service (MSiSCSI)' is set to 'Disabled' (Automated)
+Audit Shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MSiSCSI:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Microsoft iSCSI Initiator Service
+```
+Setting: Manual
+<br></br>
+
+#### 5.13 (L1) Ensure 'OpenSSH SSH Server (sshd)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\sshd:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\OpenSSH SSH Server
+```
+Setting: Not installed (Manual when installed)
+<br></br>
+
+#### 5.14 (L2) Ensure 'Peer Name Resolution Protocol (PNRPsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PNRPsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Peer Name Resolution Protocol
+```
+Setting: Manual
+<br></br>
+
+#### 5.15 (L2) Ensure 'Peer Networking Grouping (p2psvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\p2psvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Peer Networking Grouping
+```
+Setting: Manual
+<br></br>
+
+#### 5.16 (L2) Ensure 'Peer Networking Identity Manager (p2pimsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\p2pimsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Peer Networking Identity Manager
+```
+Setting: Manual
+<br></br>
+
+#### 5.17 (L2) Ensure 'PNRP Machine Name Publication Service (PNRPAutoReg)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PNRPAutoReg:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\PNRP Machine Name Publication Service
+```
+Setting: Manual
+<br></br>
+
+#### 5.18 (L2) Ensure 'Print Spooler (Spooler)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Spooler:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Print Spooler
+```
+Setting: Automatic    
+Link: [1](https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527)
+<br></br>
+
+#### 5.19 (L2) Ensure 'Problem Reports and Solutions Control Panel Support (wercplsupport)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\wercplsupport:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Problem Reports and Solutions Control Panel Support
+```
+Setting: Manual
+<br></br>
+
+#### 5.20 (L2) Ensure 'Remote Access Auto Connection Manager (RasAuto)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\RasAuto:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Access Auto Connection Manager
+```
+Setting: Manual
+<br></br>
+
+#### 5.21 (L2) Ensure 'Remote Desktop Configuration (SessionEnv)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SessionEnv:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Desktop Configuration
+```
+Setting: Manual
+<br></br>
+
+#### 5.22 (L2) Ensure 'Remote Desktop Services (TermService)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TermService:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Desktop Services
+```
+Setting: Manual
+<br></br>
+
+#### 5.23 (L2) Ensure 'Remote Desktop Services UserMode Port Redirector (UmRdpService)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UmRdpService:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Desktop Services UserMode Port Redirector
+```
+Setting: Manual
+<br></br>
+
+#### 5.24 (L1) Ensure 'Remote Procedure Call (RPC) Locator (RpcLocator)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\RpcLocator:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Procedure Call (RPC) Locator
+```
+Setting: Manual
+<br></br>
+
+#### 5.25 (L2) Ensure 'Remote Registry (RemoteRegistry)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\RemoteRegistry:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Registry
+```
+Setting: Windows 7 - Manual, Windows 8.0 or newer - Disabled
+<br></br>
+
+#### 5.26 (L1) Ensure 'Routing and Remote Access (RemoteAccess)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\RemoteAccess:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Routing and Remote Access
+```
+Setting: Disabled
+<br></br>
+
+#### 5.27 (L2) Ensure 'Server (LanmanServer)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Server
+```
+Setting: Windows 7 through Windows 10 R1703 - Automatic, Windows 10 R1709 or newer - Automatic (Trigger Start)
+<br></br>
+
+#### 5.28 (L1) Ensure 'Simple TCP/IP Services (simptcp)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\simptcp:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Simple TCP/IP Services
+```
+Setting: Not installed (Automatic when installed)   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-r2-and-2008/cc725973(v=ws.10))
+<br></br>
+
+#### 5.29 (L2) Ensure 'SNMP Service (SNMP)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SNMP:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\SNMP Service
+```
+Setting: Not installed (Automatic when installed)
+<br></br>
+
+#### 5.30 (L1) Ensure 'Special Administration Console Helper (sacsvr)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\sacsvr:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Special Administration Console Helper
+```
+Setting: Not installed (Manual when installed)
+<br></br>
+
+#### 5.31 (L1) Ensure 'SSDP Discovery (SSDPSRV)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SSDPSRV:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\SSDP Discovery
+```
+Setting: Manual
+<br></br>
+
+#### 5.32 (L1) Ensure 'UPnP Device Host (upnphost)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\upnphost:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\UPnP Device Host
+```
+Setting: Manual
+<br></br>
+
+#### 5.33 (L1) Ensure 'Web Management Service (WMSvc)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WMSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Web Management Service
+```
+Setting: Not installed (Manual when installed)
+<br></br>
+
+#### 5.34 (L2) Ensure 'Windows Error Reporting Service (WerSvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WerSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Error Reporting Service
+```
+Setting: Windows 7 - Manual, Windows 8.0 or newer: Manual (Trigger start)
+<br></br>
+
+#### 5.35 (L2) Ensure 'Windows Event Collector (Wecsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wecsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Event Collector
+```
+Setting: Manual
+<br></br>
+
+#### 5.36 (L1) Ensure 'Windows Media Player Network Sharing Service (WMPNetworkSvc)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WMPNetworkSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Media Player Network Sharing Service
+```
+Setting: Manual
+<br></br>
+
+#### 5.37 (L1) Ensure 'Windows Mobile Hotspot Service (icssvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\icssvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Mobile Hotspot Service
+```
+Setting: Manual (Trigger start)
+<br></br>
+
+#### 5.38 (L2) Ensure 'Windows Push Notifications System Service (WpnService)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WpnService:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Push Notifications System Service
+```
+Setting: Automatic
+<br></br>
+
+#### 5.39 (L2) Ensure 'Windows PushToInstall Service (PushToInstall)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PushToInstall:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows PushToInstall Service (PushToInstall)
+```
+Setting: Manual (Trigger start)
+<br></br>
+
+#### 5.40 (L2) Ensure 'Windows Remote Management (WSManagement) (WinRM)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinRM:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Remote Management (WS-Management)
+```
+Setting: Manual
+<br></br>
+
+#### 5.41 (L1) Ensure 'World Wide Web Publishing Service (W3SVC)' 
+is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W3SVC:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\World Wide Web Publishing Service
+```
+Setting: Not installed (Automatic when installed)
+<br></br>
+
+#### 5.42 (L1) Ensure 'Xbox Accessory Management Service (XboxGipSvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XboxGipSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Xbox Accessory Management Service
+```
+Setting: Windows 10 R1703 - Manual, Windows 10 R1709 or newer - Manual (Trigger start)    
+Link: [1](https://www.cisecurity.org/insights/blog/update-cis-microsoft-windows-10-enterprise-release-1703-benchmark-v1-0-0)
+<br></br>
+
+#### 5.43 (L1) Ensure 'Xbox Live Auth Manager (XblAuthManager)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XblAuthManager:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Xbox Live Auth Manager
+```
+Setting: Manual    
+Link: [1](https://www.cisecurity.org/insights/blog/update-cis-microsoft-windows-10-enterprise-release-1703-benchmark-v1-0-0)
+<br></br>
+
+#### 5.44 (L1) Ensure 'Xbox Live Game Save (XblGameSave)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XblGameSave:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Xbox Live Game Save
+```
+Setting: Windows 10 R1507 and R1511 - Manual, Windows 10 R1607 or newer - Manual (Trigger start)
+Link: [1](https://www.cisecurity.org/insights/blog/update-cis-microsoft-windows-10-enterprise-release-1703-benchmark-v1-0-0)
+<br></br>
+
+#### 5.45 (L1) Ensure 'Xbox Live Networking Service (XboxNetApiSvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XboxNetApiSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Xbox Live Networking Service
+```
+Setting: Manual     
+Link: [1](https://www.cisecurity.org/insights/blog/update-cis-microsoft-windows-10-enterprise-release-1703-benchmark-v1-0-0)
+<br></br>
+
+### 6 Registry
+This section is intentionally blank and exists to ensure the structure of Windows benchmarks is consistent.
+
 ---
 
 ## 19. Administrative Templates (User) 
