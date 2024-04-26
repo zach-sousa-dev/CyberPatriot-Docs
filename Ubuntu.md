@@ -3605,7 +3605,6 @@ ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 	if `audit_backlog_limit` is not set, the system defaults to `audit_backlog_limit=64`   
 	   
 	<br>
-
 2. **Configure Data Retention**   
 	
 	**Ensure audit log storage size is configured (Automated)**
@@ -3737,6 +3736,8 @@ ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 
 	<br>
 
+3. Configure auditd rules  
+   
 	**Ensure changes to system administration scope (sudoers)is collected (Automated)**  
 
 	Description:  
@@ -4287,14 +4288,391 @@ ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 	required to load rules\n"; fi
 	```
 
+	<br>
+
 	***Ensure use of privileged commands are collected
 	(Automated)***
 
+	*Description:*  
+
+	Monitor privileged programs, those that have the `setuid` and/or `setgid` bit set on
+	execution, to determine if unprivileged users are running these commands.
+
+	Rationale:  
+
+	Execution of privileged commands by non-privileged users could be an indication of
+	someone trying to gain unauthorized access to the system.
 
 
+	Impact:  
 
+	Both the audit and remediation section of this recommendation will traverse all mounted
+	file systems that is not mounted with either `noexec` or `nosuid` mount options. If there are
+	large file systems without these mount options, **such traversal will be significantly
+	detrimental to the performance of the system**
 
-3. Configure auditd rules 
+	Before running either the audit or remediation section, inspect the output of the following
+	command to determine exactly which file systems will be traversed:
+	```
+	# findmnt -n -l -k -it $(awk '/nodev/ { print $2 }' /proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid"
+	```
+
+	To exclude a particular file system due to adverse performance impacts, update the
+	audit and remediation sections by adding a sufficiently unique string to the `grep`
+	statement. The above command can be used to test the modified exclusions.
+
+	**Audit:**  
+
+	*On disk configuration*  
+
+	Run the following command to check on disk rules:  
+	```
+	# for PARTITION in $(findmnt -n -l -k -it $(awk '/nodev/ { print $2 }'
+	/proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid" | awk '{print
+	$1}'); do for PRIVILEGED in $(find "${PARTITION}" -xdev -perm /6000 -type f); do grep -qr "${PRIVILEGED}" /etc/audit/rules.d && printf "OK: '${PRIVILEGED}' found in auditing rules.\n" || printf "Warning: '${PRIVILEGED}' not found in on disk configuration.\n" 
+		done 
+	done
+	```
+
+	Verify that all output is **OK**.
+
+	*Running configuration*
+
+	Run the following command to check loaded rules:  
+	```
+	 # { RUNNING=$(auditctl -l) 
+	 [ -n "${RUNNING}" ] && for PARTITION in $(findmnt -n -l -k -it $(awk 
+	 '/nodev/ { print $2 }' /proc/filesystems | paste -sd,) | grep -Pv 
+	 "noexec|nosuid" | awk '{print $1}'); do 
+	 for PRIVILEGED in $(find "${PARTITION}" -xdev -perm /6000 -type f); do 
+	 printf -- "${RUNNING}" | grep -q "${PRIVILEGED}" && printf "OK: 
+	 '${PRIVILEGED}' found in auditing rules.\n" || printf "Warning: 
+	 '${PRIVILEGED}' not found in running configuration.\n"
+	 	done 
+	done \ 
+	|| printf "ERROR: Variable 'RUNNING' is unset.\n"
+	}
+	```
+
+	Verify that all output is **OK**.  
+
+	*Special mount points* 
+
+	If there are any special mount points that are not visible by default from `findmnt` as per
+	the above audit, said file systems would have to be manually audited.
+
+	*Remediation:*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor the use of privileged commands.
+	Example:  
+
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	AUDIT_RULE_FILE="/etc/audit/rules.d/50-privileged.rules"
+	NEW_DATA=()
+	for PARTITION in $(findmnt -n -l -k -it $(awk '/nodev/ { print $2 }'
+	/proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid" | awk '{print
+	$1}'); do
+	readarray -t DATA < <(find "${PARTITION}" -xdev -perm /6000 -type f | awk
+	-v UID_MIN=${UID_MIN} '{print "-a always,exit -F path=" $1 " -F perm=x -F
+	auid>="UID_MIN" -F auid!=unset -k privileged" }')
+	for ENTRY in "${DATA[@]}"; do
+	NEW_DATA+=("${ENTRY}")
+	done
+	done
+	readarray &> /dev/null -t OLD_DATA < "${AUDIT_RULE_FILE}"
+	COMBINED_DATA=( "${OLD_DATA[@]}" "${NEW_DATA[@]}" )
+	printf '%s\n' "${COMBINED_DATA[@]}" | sort -u > "${AUDIT_RULE_FILE}"
+	}
+	```
+
+	Merge and load the rules into active configuration:  
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	*Special mount points*  
+
+	If there are any special mount points that are not visible by default from just scanning /,
+	change the `PARTITION` variable to the appropriate partition and re-run the remediation.
+
+	<br>
+
+	***4.1.3.7 Ensure unsuccessful file access attempts are collected
+	(Automated)***  
+
+	*Description:*
+
+	Monitor for unsuccessful attempts to access files. The following parameters are
+	associated with system calls that control files:
+
+	- creation - `creat`
+	- opening - `open` , `openat`
+	- truncation - `truncate` , `ftruncate`  
+	  
+	<br>
+
+	An audit log record will only be written if all of the following criteria is met for the user
+	when trying to access a file:
+
+	- a non-privileged user (auid>=UID_MIN)
+	- is not a Daemon event (auid=4294967295/unset/-1)
+	- if the system call returned EACCES (permission denied) or EPERM (some other permanent error associated with the specific system call)
+
+	*Rationale:*  
+
+	Failed attempts to open, create or truncate files could be an indication that an individual
+	or process is trying to gain unauthorized access to the system.
+
+	*Audit:*  
+
+	*64 Bit systems*  
+
+	**On disk configuration**
+
+	Run the following command to check the on disk rules:
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&/ -F *auid>=${UID_MIN}/ \
+	&&(/ -F *exit=-EACCES/||/ -F *exit=-EPERM/) \
+	&&/ -S/ \
+	&&/creat/ \
+	&&/open/ \
+	&&/truncate/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \
+	|| printf "ERROR: Variable 'UID_MIN' is unset.\n"
+	}
+	```
+
+	Verify the output includes:  
+	```
+	-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EACCES -F auid>=1000 -F auid!=unset -k access
+	-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EPERM -F auid>=1000 -F auid!=unset -k access
+	-a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EACCES -F auid>=1000 -F auid!=unset -k access
+	-a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EPERM -F auid>=1000 -F auid!=unset -k access
+	```
+
+	*Running configuration*
+
+	Run the following command to check loaded rules:
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&/ -F *auid>=${UID_MIN}/ \
+	&&(/ -F *exit=-EACCES/||/ -F *exit=-EPERM/) \
+	&&/ -S/ \
+	&&/creat/ \
+	&&/open/ \
+	&&/truncate/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \
+	|| printf "ERROR: Variable 'UID_MIN' is unset.\n"
+	}
+	```  
+
+	Verify the output includes:  
+	```
+	-a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat -F exit=-
+	EACCES -F auid>=1000 -F auid!=-1 -F key=access
+	-a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat -F exit=-
+	EPERM -F auid>=1000 -F auid!=-1 -F key=access
+	-a always,exit -F arch=b32 -S open,truncate,ftruncate,creat,openat -F exit=-
+	EACCES -F auid>=1000 -F auid!=-1 -F key=access
+	-a always,exit -F arch=b32 -S open,truncate,ftruncate,creat,openat -F exit=-
+	EPERM -F auid>=1000 -F auid!=-1 -F key=access
+	```
+
+	*Remediation:*  
+
+	*Create audit rules*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor unsuccessful file access attempts.  
+
+	*64 Bit systems*  
+
+	Example:  
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && printf "
+	-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EACCES -F auid>=${UID_MIN} -F auid!=unset -k access
+	-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EPERM -F auid>=${UID_MIN} -F auid!=unset -k access
+	-a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EACCES -F auid>=${UID_MIN} -F auid!=unset -k access
+	-a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EPERM -F auid>=${UID_MIN} -F auid!=unset -k access
+	" >> /etc/audit/rules.d/50-access.rules || printf "ERROR: Variable 'UID_MIN'
+	is unset.\n"
+	}
+	```	
+	Load audit rules  
+
+	Merge and load the rules into active configuration:
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.  
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+	<br>
+
+	***Ensure events that modify user/group information are
+	collected (Automated)***  
+
+	*Description:*  
+
+	Record events affecting the modification of user or group information, including that of
+	passwords and old passwords if in use.
+
+	- `/etc/group` - system groups
+	- `/etc/passwd` - system users
+	- `/etc/gshadow` - encrypted password for each group
+	- `/etc/shadow` - system user passwords
+	- `/etc/security/opasswd` - storage of old passwords if the relevant PAM module is in use
+
+	<br>
+
+	The parameters in this section will watch the files to see if they have been opened for
+	write or have had attribute changes (e.g. permissions) and tag them with the identifier
+	"identity" in the audit log file.
+
+	Rationale:
+	Unexpected changes to these files could be an indication that the system has been
+	compromised and that an unauthorized user is attempting to hide their activities or
+	compromise additional accounts.
+
+	*Audit:*  
+
+	*On disk configuration*  
+
+	Run the following command to check the on disk rules:
+
+	```
+	# awk '/^ *-w/ \
+	&&(/\/etc\/group/ \
+	||/\/etc\/passwd/ \
+	||/\/etc\/gshadow/ \
+	||/\/etc\/shadow/ \
+	||/\/etc\/security\/opasswd/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	```
+
+	Verify the output matches:  
+	```
+	-w /etc/group -p wa -k identity
+	-w /etc/passwd -p wa -k identity
+	-w /etc/gshadow -p wa -k identity
+	-w /etc/shadow -p wa -k identity
+	-w /etc/security/opasswd -p wa -k identity
+	```  
+
+	*Running configuration*
+
+	Run the following command to check loaded rules:
+	```
+	# auditctl -l | awk '/^ *-w/ \
+	&&(/\/etc\/group/ \
+	||/\/etc\/passwd/ \
+	||/\/etc\/gshadow/ \
+	||/\/etc\/shadow/ \
+	||/\/etc\/security\/opasswd/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	```  
+	Verify the output matches:
+
+	```
+	-w /etc/group -p wa -k identity
+	-w /etc/passwd -p wa -k identity
+	-w /etc/gshadow -p wa -k identity
+	-w /etc/shadow -p wa -k identity
+	-w /etc/security/opasswd -p wa -k identity
+	```  
+
+	*Remediation:*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor events that modify user/group information.
+	
+	Example:
+	```
+	# printf "
+	-w /etc/group -p wa -k identity
+	-w /etc/passwd -p wa -k identity
+	-w /etc/gshadow -p wa -k identity
+	-w /etc/shadow -p wa -k identity
+	-w /etc/security/opasswd -p wa -k identity
+	" >> /etc/audit/rules.d/50-identity.rules
+	```  
+
+	Merge and load the rules into active configuration:
+
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.  
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```  
+
+	<br>
+
+	**Ensure discretionary access control permission modification events are collected (Automated)**
+
+	*Description:*  
+
+	Monitor changes to file permissions, attributes, ownership and group. The parameters in
+	this section track changes for system calls that affect file permissions and attributes.
+	The following commands and system calls effect the permissions, ownership and
+	various attributes of files.  
+
+	- `chmod`
+	- `fchmod`
+	- `fchmodat`
+	- `chown`
+	- `fchown`
+	- `fchownat`
+	- `lchown`
+	- `setxattr`
+	- `lsetxattr`
+	- `fsetxattr`
+	- `removexattr`
+	- `lremovexattr`
+	- `fremovexattr`
+
+	<br>
+
+	In all cases, an audit record will only be written for non-system user ids and will ignore
+	Daemon events. All audit records will be tagged with the identifier "perm_mod."
+
+	
 
 4. Configure auditd file access  
 
