@@ -49,6 +49,17 @@
 		- [3 Network Parameters Host and Router](#3-network-parameters-host-and-router)
 		- [4 Uncommon Network Protocols](#4-uncommon-network-protocols)
 		- [5 Firewall Configuration](#5-firewall-configuration)
+			- [1 Disable unused network protocols and devices](#1-disable-unused-network-protocols-and-devices)
+			- [2 Network Parameters Host Only](#2-network-parameters-host-only)
+			- [3 Network Parameters Host and Router](#3-network-parameters-host-and-router)
+			- [4 Uncommon Network Protocols](#4-uncommon-network-protocols)
+			- [5 Firewall Configurations](#5-firewall-configurations)
+				- [1 Configure UncomplicatedFirewall](#1-configure-uncomplicatedfirewall)
+				- [2 Configure nftables](#2-configure-nftables)
+				- [3 Configure iptables](#3-configure-iptables)
+					- [1 Configure iptables software](#1-configure-iptables-software)
+					- [2 Configure IPV4 iptables](#2-configure-ipv4-iptables)
+					- [3 Configure IPV6 ip6tables](#3-configure-ipv6-ip6tables)
 	- [4 Logging and Auditing](#4-logging-and-auditing)
 		- [1 Configure System Accounting (auditd)](#1-configure-system-accounting-auditd)
 		- [2 Configure Logging](#2-configure-logging)
@@ -2860,46 +2871,178 @@ Run one of the following commands to remove `slapd`:
 
 6. Ensure NFS is not installed (Automated)
 
+Run the following command to verify `nfs` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nfs-kernel-server
+
+nfs-kernel-server unknown ok not-installed not-installed
+```
+
+Run the following command to remove `nfs`:
+
+`# apt purge nfs-kernel-server`
 
 7. Ensure DNS Server is not installed (Automated)
 
+Run the following command to verify `DNS server` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' bind9
+
+bind9 unknown ok not-installed not-installed
+```
+
+Run the following commands to disable `DNS server`:
+
+`# apt purge bind9`
 
 8. Ensure FTP Server is not installed (Automated)
 
+Run the following command to verify `vsftpd` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' vsftpd
+
+vsftpd unknown ok not-installed not-installed
+```
+
+Run the following command to remove `vsftpd`:
+
+`# apt purge vsftpd`
 
 9. Ensure HTTP server is not installed (Automated)
 
+Run the following command to verify `apache` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' apache2
+
+apache2 unknown ok not-installed not-installed
+```
+
+Run the following command to remove `apache`:
+
+`# apt purge apache2`
 
 10. Ensure IMAP and POP3 server are not installed (Automated)
 
+Run the following command to verify `dovecot-imapd` and `dovecot-pop3d` are not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' dovecot-imapd dovecot-pop3d
+
+dovecot-imapd unknown ok not-installed not-installed
+dovecot-pop3d unknown ok not-installed not-installed
+```
+
+Run one of the following commands to remove dovecot-imapd and `dovecot-pop3d`:
+
+`# apt purge dovecot-imapd dovecot-pop3d`
 
 11. Ensure Samba is not installed (Automated)
 
+Run the following command to verify `samba` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' 
+samba
+samba unknown ok not-installed not-installed
+```
+
+Run the following command to remove `samba`:
+
+`# apt purge samba`
 
 12. Ensure HTTP Proxy Server is not installed (Automated)
 
+Run the following command to verify `squid` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' 
+squid
+squid unknown ok not-installed not-installed
+```
+
+Run the following command to remove `squid`:
+
+`# apt purge squid`
 
 13. Ensure SNMP Server is not installed (Automated)
 
+Run the following command to verify `snmpd` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' snmp
+snmp unknown ok not-installed not-installed
+```
+
+Run the following command to remove `snmp`:
+`# apt purge snmp`
 
 14. Ensure NIS Server is not installed (Automated)
 
+Run the following command to verify `nis` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nis
+nis unknown ok not-installed not-installed
+```
+
+Run the following command to remove `nis`:
+
+`# apt purge nis`
 
 15. Ensure mail transfer agent is configured for local-only mode (Automated)
 
+Run the following command to verify that the MTA is not listening on any non-loopback address (`127.0.0.1` or `::1`).
 
+`# ss -lntu | grep -E ':25\s' | grep -E -v '\s(127.0.0.1|::1):25\s'`
+
+Nothing should be returned
+
+Edit `/etc/postfix/main.cf` and add the following line to the RECEIVING MAIL section.  
+If the line already exists, change it to look like the line below:
+
+`inet_interfaces = loopback-only`
+
+Run the following command to restart `postfix`:
+
+`# systemctl restart postfix`
 
 16. Ensure rsync service is either not installed or masked (Automated)
 
+Run the following command to verify `rsync` is not installed:
+
+```
+dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rsync
+
+rsync unknown ok not-installed not-installed
+```
+
+**OR**  
+Run the following commands to verify that rsync is inactive and masked:
+```
+# systemctl is-active rsync
+
+inactive
+
+# systemctl is-enabled rsync
+
+masked
+```
+
+Run the following command to remove `rsync`:
+
+`# apt purge rsync`
+
+**OR**  
+Run the following commands to stop and mask `rsync`:
+
+```
+# systemctl stop rsync
+# systemctl mask rsync
+```
 
 
 ### 3 Service Clients
@@ -3008,14 +3151,325 @@ Run the following command to stop and mask the service:
 
 ## 3 Network Configuration
 ### 1 Disable Unused Network Protocols and Devices
+1. Ensure system is checked to determine if IPv6 is enabled (Manual)
+
+
+
+2. Ensure wireless interfaces are disabled (Automated)
+
+
 
 ### 2 Network Parameters Host Only
+1. Ensure packet redirect sending is disabled (Automated)
+
+
+
+2. Ensure IP forwarding is disabled (Automated)
+
+
 
 ### 3 Network Parameters Host and Router
+1. Ensure source routed packets are not accepted (Automated)
+
+
+
+2. Ensure ICMP redirects are not accepted (Automated)
+
+
+
+3. Ensure secure ICMP redirects are not accepted (Automated)
+
+
+
+4. Ensure suspicious packets are logged (Automated)
+
+
+
+5. Ensure broadcast ICMP requests are ignored (Automated)
+
+
+
+6. Ensure bogus ICMP responses are ignored (Automated)
+
+
+
+7. Ensure Reverse Path Filtering is enabled (Automated)
+
+
+
+8. Ensure TCP SYN Cookies is enabled (Automated)
+
+
+
+9. Ensure IPv6 router advertisements are not accepted (Automated)
+
+
 
 ### 4 Uncommon Network Protocols
+1. Ensure DCCP is disabled (Automated)
+
+
+
+2. Ensure SCTP is disabled (Automated)
+
+
+
+3. Ensure RDS is disabled (Automated)
+
+
+
+4. Ensure TIPC is disabled (Automated)
+
+
 
 ### 5 Firewall Configuration
+#### 1 Configure UncomplicatedFirewall
+1. Ensure ufw is installed (Automated)
+
+Run the following command to verify that Uncomplicated Firewall (UFW) is installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' ufw
+
+ufw install ok installed installed
+```
+
+Run the following command to install Uncomplicated Firewall (UFW):
+
+`apt install ufw`
+
+
+2. Ensure iptables-persistent is not installed with ufw (Automated)
+
+
+
+3. Ensure ufw service is enabled (Automated)
+
+
+
+4. Ensure ufw loopback traffic is configured (Automated)
+
+
+
+5. Ensure ufw outbound connections are configured (Manual)
+
+
+
+6. Ensure ufw firewall rules exist for all open ports (Automated)
+
+
+
+7. Ensure ufw default deny firewall policy (Automated)
+
+
+
+#### 2 Configure nftables
+
+> The following will implement the firewall rules of this section and open ICMP, IGMP, and port 22(ssh) from anywhere. Opening the ports for ICMP, IGMP, and port 22(ssh) needs to be updated in accordance with local site policy. Allow port 22(ssh) needs to be updated to only allow systems requiring ssh connectivity to connect, as per site policy.
+
+Save the script below as `/etc/nftables.rules`
+
+``` bash
+#!/sbin/nft -f
+
+# This nftables.rules config should be saved as /etc/nftables.rules
+# flush nftables rulesset
+flush ruleset
+# Load nftables ruleset
+# nftables config with inet table named filter
+table inet filter {
+	# Base chain for input hook named input (Filters inbound network packets)
+	chain input {
+		type filter hook input priority 0; policy drop;
+		# Ensure loopback traffic is configured
+		iif "lo" accept
+		ip saddr 127.0.0.0/8 counter packets 0 bytes 0 drop
+		ip6 saddr ::1 counter packets 0 bytes 0 drop
+		# Ensure established connections are configured
+		ip protocol tcp ct state established accept
+		ip protocol udp ct state established accept
+		ip protocol icmp ct state established accept
+		# Accept port 22(SSH) traffic from anywhere
+		tcp dport ssh accept
+		# Accept ICMP and IGMP from anywhere
+		icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, mld-listener-query, mld-listener-report, mld-listener-done, nd-router-solicit, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, ind-neighbor-solicit, ind-neighbor-advert, mld2-listener-report } accept
+		icmp type { destination-unreachable, router-advertisement, router-solicitation, time-exceeded, parameter-problem } accept
+		ip protocol igmp accept
+	}
+	# Base chain for hook forward named forward (Filters forwarded network packets)
+	chain forward {
+		type filter hook forward priority 0; policy drop;
+	}
+	# Base chain for hook output named output (Filters outbount network packets)
+	chain output {
+		type filter hook output priority 0; policy drop;
+		# Ensure outbound and established connections are configured
+		ip protocol tcp ct state established,related,new accept
+		ip protocol udp ct state established,related,new accept
+		ip protocol icmp ct state established,related,new accept
+	}
+}
+```
+
+Run the following command to load the file into nftables
+
+`# nft -f /etc/nftables.rules`
+
+All changes in the nftables subsections are temporary.  
+To make these changes permanent:  
+Run the following command to create the `nftables.rules` file
+
+`nft list ruleset > /etc/nftables.rules`
+
+Add the following line to `/etc/nftables.conf`
+
+`include "/etc/nftables.rules"`
+
+
+1. Ensure nftables is installed (Automated)
+
+
+
+2. Ensure ufw is uninstalled or disabled with nftables (Automated)
+
+
+
+3. Ensure iptables are flushed with nftables (Manual)
+
+
+
+4. Ensure a nftables table exists (Automated)
+
+
+
+5. Ensure nftables base chains exist (Automated)
+
+
+
+6. Ensure nftables loopback traffic is configured (Automated)
+
+
+
+7. Ensure nftables outbound and established connections are configured (Manual)
+
+
+
+8. Ensure nftables default deny firewall policy (Automated)
+
+
+
+9. Ensure nftables service is enabled (Automated)
+
+
+
+10. Ensure nftables rules are permanent (Automated)
+
+
+
+#### 3 Configure iptables
+##### 1 Configure iptables software
+1. Ensure iptables packages are installed (Automated)
+
+
+
+2. Ensure nftables is not installed with iptables (Automated)
+
+
+
+3. Ensure ufw is uninstalled or disabled with iptables (Automated)
+
+
+
+##### 2 Configure IPV4 iptables
+
+> Note: This section broadly assumes starting with an empty IPtables firewall ruleset (established by flushing the rules with iptables -F). Remediation steps included only affect the live system, you will also need to configure your default firewall configuration to apply on boot. Configuration of a live systems firewall directly over a remote connection will often result in being locked out. It is advised to have a known good firewall configuration set to run on boot and to configure an entire firewall structure in a script that is then run and tested before saving to boot. 
+
+The following script will implement the firewall rules of this section and open port 22(ssh) from anywhere:
+
+``` bash
+#!/bin/bash
+# Flush IPtables rules
+iptables -F
+# Ensure default deny firewall policy
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+# Ensure loopback traffic is configured
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A INPUT -s 127.0.0.0/8 -j DROP
+# Ensure outbound and established connections are configured
+iptables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT
+# Open inbound ssh(tcp port 22) connections
+iptables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
+
+```
+
+1. Ensure iptables default deny firewall policy (Automated)
+
+
+
+2. Ensure iptables loopback traffic is configured (Automated)
+
+
+
+3. Ensure iptables outbound and established connections are configured (Manual)
+
+
+
+4. Ensure iptables firewall rules exist for all open ports (Automated)
+
+
+
+##### 3 Configure IPV6 ip6tables
+
+> If IPv6 in enabled on the system, the ip6tables should be configured
+
+The following script will implement the firewall rules of this section and open port 22(ssh) from anywhere:
+
+``` bash
+#!/bin/bash
+# Flush ip6tables rules
+ip6tables -F
+# Ensure default deny firewall policy
+ip6tables -P INPUT DROP
+ip6tables -P OUTPUT DROP
+ip6tables -P FORWARD DROP
+# Ensure loopback traffic is configured
+ip6tables -A INPUT -i lo -j ACCEPT
+ip6tables -A OUTPUT -o lo -j ACCEPT
+ip6tables -A INPUT -s ::1 -j DROP
+# Ensure outbound and established connections are configured
+ip6tables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT
+ip6tables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT
+ip6tables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT
+ip6tables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT
+ip6tables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT
+ip6tables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT
+# Open inbound ssh(tcp port 22) connections
+ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
+```
+
+1. Ensure ip6tables default deny firewall policy (Automated)
+
+
+
+2. Ensure ip6tables loopback traffic is configured (Automated)
+
+
+
+3. Ensure ip6tables outbound and established connections are configured (Manual)
+
+
+
+4. Ensure ip6tables firewall rules exist for all open ports (Automated)
+
+
 
 ---
 
