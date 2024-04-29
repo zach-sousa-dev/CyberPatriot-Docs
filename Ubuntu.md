@@ -3153,25 +3153,461 @@ Run the following command to stop and mask the service:
 ### 1 Disable Unused Network Protocols and Devices
 1. Ensure system is checked to determine if IPv6 is enabled (Manual)
 
+Run the following script to verify IPv6 status on the system:
 
+``` bash
+#!/usr/bin/env bash
+{
+	output=""
+	grubfile=$(find /boot -type f \( -name 'grubenv' -o -name 'grub.conf' -o -name 'grub.cfg' \) -exec grep -Pl -- '^\h*(kernelopts=|linux|kernel)' {} \;)
+	searchloc="/run/sysctl.d/*.conf /etc/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf"
+	if [ -s "$grubfile" ]; then
+		! grep -P -- "^\h*(kernelopts=|linux|kernel)" "$grubfile" | grep -vq --ipv6.disable=1 && output="IPv6 Disabled in \"$grubfile\""
+	fi
+	if grep -Pqs -- "^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" $searchloc && \
+		grep -Pqs --"^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$" $searchloc && \
+		sysctl net.ipv6.conf.all.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" && \
+		sysctl net.ipv6.conf.default.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$"; then
+		[ -n "$output" ] && output="$output, and in sysctl config" ||output="ipv6 disabled in sysctl config"
+	fi
+	[ -n "$output" ] && echo -e "\n$output\n" || echo -e "\nIPv6 is enabled on the system\n"
+}
+
+```
+
+It is recommended that IPv6 be enabled and configured in accordance with Benchmark 
+recommendations.
+
+**If** IPv6 is to be disabled, use one of the two following methods to disable IPv6 on the system:
+
+To disable IPv6 through the GRUB2 config, run the following command to add `ipv6.disable=1` to the `GRUB_CMDLINE_LINUX` parameters:
+
+Edit `/etc/default/grub` and add `ipv6.disable=1` to the `GRUB_CMDLINE_LINUX`parameters:  
+Example:
+
+`GRUB_CMDLINE_LINUX="ipv6.disable=1"`
+
+Run the following command to update the `grub2` configuration:
+
+`# update-grub`
+
+**OR** To disable IPv6 through sysctl settings, set the following parameters in `/etc/sysctl.conf` or a `/etc/sysctl.d/*` file:  
+Example:
+
+```
+# printf "
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+" >> /etc/sysctl.d/60-disable_ipv6.conf
+```
+
+Run the following command to set the active kernel parameters:
+
+```
+# {
+	sysctl -w net.ipv6.conf.all.disable_ipv6=1
+	sysctl -w net.ipv6.conf.default.disable_ipv6=1
+	sysctl -w net.ipv6.route.flush=1
+}
+```
 
 2. Ensure wireless interfaces are disabled (Automated)
 
+> Many if not all laptop workstations and some desktop workstations will connect via wireless requiring these interfaces be enabled.
 
+Run the following script to verify no wireless interfaces are active on the system:
+
+``` bash
+#!/bin/bash
+if command -v nmcli >/dev/null 2>&1 ; then
+	if nmcli radio all | grep -Eq '\s*\S+\s+disabled\s+\S+\s+disabled\b'; then
+		echo "Wireless is not enabled"
+	else 
+		nmcli radio all
+	fi
+elif [ -n "$(find /sys/class/net/*/ -type d -name wireless)" ]; then
+	t=0
+	mname=$(for driverdir in $(find /sys/class/net/*/ -type d -name wireless | xargs -0 dirname); do basename "$(readlink -f "$driverdir"/device/driver/module)";done | sort -u)
+	for dm in $mname; do
+		if grep -Eq "^\s*install\s+$dm\s+/bin/(true|false)" /etc/modprobe.d/*.conf; then
+			/bin/true
+		else
+			echo "$dm is not disabled"
+			t=1
+		fi
+	done
+	[ "$t" -eq 0 ] && echo "Wireless is not enabled"
+else
+	echo "Wireless is not enabled"
+fi
+```
+
+Output should be:  
+`Wireless is not enabled`
+
+Run the following script to disable any wireless interfaces:
+
+``` bash
+#!/bin/bash
+if command -v nmcli >/dev/null 2>&1 ; then
+	nmcli radio all off
+else
+	if [ -n "$(find /sys/class/net/*/ -type d -name wireless)" ]; then
+		mname=$(for driverdir in $(find /sys/class/net/*/ -type d -name wireless | xargs -0 dirname); do basename "$(readlink -f "$driverdir"/device/driver/module)";done | sort -u)
+		for dm in $mname; do
+			echo "install $dm /bin/true" >> /etc/modprobe.d/disable_wireless.conf
+		done
+	fi
+fi
+```
 
 ### 2 Network Parameters Host Only
+
+> The following network parameters are intended for use if the system is to act as a host only. A system is considered host only if the system has a single interface, or has multiple interfaces but will not be configured as a router
+
 1. Ensure packet redirect sending is disabled (Automated)
 
+Run the following script to verify:  
+- `net.ipv4.conf.all.send_redirects = 0`
+- `net.ipv4.conf.default.send_redirects = 0`
 
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_parlist="net.ipv4.conf.all.send_redirects=0 net.ipv4.conf.default.send_redirects=0"
+	l_searchloc="/run/sysctl.d/*.conf /etc/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf $([ -f /etc/default/ufw ] && awk -F= '/^\s*IPT_SYSCTL=/ {print $2}' /etc/default/ufw)"
+	KPC()
+	{ 
+	l_krp="$(sysctl "$l_kpname" | awk -F= '{print $2}' | xargs)"
+	l_pafile="$(grep -Psl -- "^\h*$l_kpname\h*=\h*$l_kpvalue\b\h*(#.*)?$" $l_searchloc)"
+	l_fafile="$(grep -s -- "^\s*$l_kpname" $l_searchloc | grep -Pv --"\h*=\h*$l_kpvalue\b\h*" | awk -F: '{print $1}')"
+	if [ "$l_krp" = "$l_kpvalue" ]; then
+		l_output="$l_output\n - \"$l_kpname\" is set to \"$l_kpvalue\" in the running configuration"
+	else
+		l_output2="$l_output2\n - \"$l_kpname\" is set to \"$l_krp\" in the running configuration"
+	fi
+	if [ -n "$l_pafile" ]; then
+		l_output="$l_output\n - \"$l_kpname\" is set to \"$l_kpvalue\" in \"$l_pafile\""
+	else
+		l_output2="$l_output2\n - \"$l_kpname = $l_kpvalue\" is not set in a kernel parameter configuration file"
+	fi
+	[ -n "$l_fafile" ] && l_output2="$l_output2\n - \"$l_kpname\" is set incorrectly in \"$l_fafile\""
+	}
+	for l_kpe in $l_parlist; do
+		l_kpname="$(awk -F= '{print $1}' <<< "$l_kpe")" 
+		l_kpvalue="$(awk -F= '{print $2}' <<< "$l_kpe")" 
+		KPC
+	done
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to set:  
+- `net.ipv4.conf.all.send_redirects = 0`
+- `net.ipv4.conf.default.send_redirects = 0`
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_parlist="net.ipv4.conf.all.send_redirects=0 net.ipv4.conf.default.send_redirects=0"
+	l_searchloc="/run/sysctl.d/*.conf /etc/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf $([ -f /etc/default/ufw ] && awk -F= '/^\s*IPT_SYSCTL=/ {print $2}' /etc/default/ufw)"
+	l_kpfile="/etc/sysctl.d/60-netipv4_sysctl.conf"
+	KPF()
+	{ 
+		# comment out incorrect parameter(s) in kernel parameter file(s)
+		l_fafile="$(grep -s -- "^\s*$l_kpname" $l_searchloc | grep -Pv --"\h*=\h*$l_kpvalue\b\h*" | awk -F: '{print $1}')"
+		for l_bkpf in $l_fafile; do
+			echo -e "\n - Commenting out \"$l_kpname\" in \"$l_bkpf\""
+			sed -ri "/$l_kpname/s/^/# /" "$l_bkpf"
+		done
+		# Set correct parameter in a kernel parameter file
+		if ! grep -Pslq -- "^\h*$l_kpname\h*=\h*$l_kpvalue\b\h*(#.*)?$" $l_searchloc; then
+			echo -e "\n - Setting \"$l_kpname\" to \"$l_kpvalue\" in \"$l_kpfile\""
+			echo "$l_kpname = $l_kpvalue" >> "$l_kpfile"
+		fi
+		# Set correct parameter in active kernel parameters
+		l_krp="$(sysctl "$l_kpname" | awk -F= '{print $2}' | xargs)"
+		if [ "$l_krp" != "$l_kpvalue" ]; then
+			echo -e "\n - Updating \"$l_kpname\" to \"$l_kpvalue\" in the active kernel parameters"
+			sysctl -w "$l_kpname=$l_kpvalue"
+			sysctl -w "$(awk -F'.' '{print $1"."$2".route.flush=1"}' <<< "$l_kpname")"
+		fi
+	}
+	for l_kpe in $l_parlist; do
+		l_kpname="$(awk -F= '{print $1}' <<< "$l_kpe")" 
+		l_kpvalue="$(awk -F= '{print $2}' <<< "$l_kpe")" 
+		KPF
+	done
+}
+```
 
 2. Ensure IP forwarding is disabled (Automated)
 
+Run the following script to verify:  
+- `net.ipv4.ip_forward = 0`
+- `net.ipv6.conf.all.forwarding = 0`
 
+```bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_parlist="net.ipv4.ip_forward=0 net.ipv6.conf.all.forwarding=0"
+	l_searchloc="/run/sysctl.d/*.conf /etc/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf $([ -f /etc/default/ufw ] && awk -F= '/^\s*IPT_SYSCTL=/ {print $2}' /etc/default/ufw)"
+	KPC()
+	{ 
+		l_krp="$(sysctl "$l_kpname" | awk -F= '{print $2}' | xargs)"
+		l_pafile="$(grep -Psl -- "^\h*$l_kpname\h*=\h*$l_kpvalue\b\h*(#.*)?$" $l_searchloc)"
+		l_fafile="$(grep -s -- "^\s*$l_kpname" $l_searchloc | grep -Pv --"\h*=\h*$l_kpvalue\b\h*" | awk -F: '{print $1}')"
+		if [ "$l_krp" = "$l_kpvalue" ]; then
+			l_output="$l_output\n - \"$l_kpname\" is set to \"$l_kpvalue\" in the running configuration"
+		else
+			l_output2="$l_output2\n - \"$l_kpname\" is set to \"$l_krp\" in the running configuration"
+		fi
+		if [ -n "$l_pafile" ]; then
+			l_output="$l_output\n - \"$l_kpname\" is set to \"$l_kpvalue\" in \"$l_pafile\""
+		else
+			l_output2="$l_output2\n - \"$l_kpname = $l_kpvalue\" is not set in a kernel parameter configuration file"
+		fi
+		[ -n "$l_fafile" ] && l_output2="$l_output2\n - \"$l_kpname\" is set incorrectly in \"$l_fafile\""
+	}
+	ipv6_chk()
+	{
+		l_ipv6s=""
+		grubfile=$(find /boot -type f \( -name 'grubenv' -o -name 'grub.conf' -o -name 'grub.cfg' \) -exec grep -Pl -- '^\h*(kernelopts=|linux|kernel)' {} \;)
+		if [ -s "$grubfile" ]; then
+			! grep -P -- "^\h*(kernelopts=|linux|kernel)" "$grubfile" | grep -vq -- ipv6.disable=1 && l_ipv6s="disabled"
+		fi
+		if grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" $l_searchloc && grep -Pqs -- "^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$" $l_searchloc && sysctl net.ipv6.conf.all.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" && sysctl net.ipv6.conf.default.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$"; then
+			l_ipv6s="disabled"
+		fi
+		if [ -n "$l_ipv6s" ]; then
+			l_output="$l_output\n - IPv6 is disabled on the system,\"$l_kpname\" is not applicable"
+		else
+			KPC
+		fi
+	}
+	for l_kpe in $l_parlist; do
+		l_kpname="$(awk -F= '{print $1}' <<< "$l_kpe")" 
+		l_kpvalue="$(awk -F= '{print $2}' <<< "$l_kpe")" 
+		if grep -q '^net.ipv6.' <<< "$l_kpe"; then
+			ipv6_chk
+		else
+			KPC
+		fi
+	done
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to set:
+- `net.ipv4.ip_forward = 0`
+- `net.ipv6.conf.all.forwarding = 0`
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_parlist="net.ipv4.ip_forward=0 net.ipv6.conf.all.forwarding=0"
+	l_searchloc="/run/sysctl.d/*.conf /etc/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf $([ -f /etc/default/ufw ] && awk -F= '/^\s*IPT_SYSCTL=/ {print $2}' /etc/default/ufw)"
+	KPF()
+	{ 
+		# comment out incorrect parameter(s) in kernel parameter file(s)
+		l_fafile="$(grep -s -- "^\s*$l_kpname" $l_searchloc | grep -Pv --"\h*=\h*$l_kpvalue\b\h*" | awk -F: '{print $1}')"
+		for l_bkpf in $l_fafile; do
+			echo -e "\n - Commenting out \"$l_kpname\" in \"$l_bkpf\""
+			sed -ri "/$l_kpname/s/^/# /" "$l_bkpf"
+		done
+		# Set correct parameter in a kernel parameter file
+		if ! grep -Pslq -- "^\h*$l_kpname\h*=\h*$l_kpvalue\b\h*(#.*)?$" $l_searchloc; then
+			echo -e "\n - Setting \"$l_kpname\" to \"$l_kpvalue\" in \"$l_kpfile\""
+			echo "$l_kpname = $l_kpvalue" >> "$l_kpfile"
+		fi
+		# Set correct parameter in active kernel parameters
+		l_krp="$(sysctl "$l_kpname" | awk -F= '{print $2}' | xargs)"
+		if [ "$l_krp" != "$l_kpvalue" ]; then
+			echo -e "\n - Updating \"$l_kpname\" to \"$l_kpvalue\" in the active kernel parameters"
+			sysctl -w "$l_kpname=$l_kpvalue"
+			sysctl -w "$(awk -F'.' '{print $1"."$2".route.flush=1"}' <<< "$l_kpname")"
+		fi
+	}
+	IPV6F_CHK()
+	{
+		l_ipv6s=""
+		grubfile=$(find /boot -type f \( -name 'grubenv' -o -name 'grub.conf' -o -name 'grub.cfg' \) -exec grep -Pl -- '^\h*(kernelopts=|linux|kernel)' {} \;)
+		if [ -s "$grubfile" ]; then
+			! grep -P -- "^\h*(kernelopts=|linux|kernel)" "$grubfile" | grep -vq -- ipv6.disable=1 && l_ipv6s="disabled"
+		fi
+		if grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" $l_searchloc && \
+			grep -Pqs --"^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$" $l_searchloc && \
+			sysctl net.ipv6.conf.all.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" && \
+			sysctl net.ipv6.conf.default.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$"; then
+			l_ipv6s="disabled"
+		fi
+		if [ -n "$l_ipv6s" ]; then
+			echo -e "\n - IPv6 is disabled on the system, \"$l_kpname\" is not applicable"
+		else
+			KPF
+		fi
+	}
+	for l_kpe in $l_parlist; do
+		l_kpname="$(awk -F= '{print $1}' <<< "$l_kpe")" 
+		l_kpvalue="$(awk -F= '{print $2}' <<< "$l_kpe")" 
+		if grep -q '^net.ipv6.' <<< "$l_kpe"; then
+			l_kpfile="/etc/sysctl.d/60-netipv6_sysctl.conf"
+			IPV6F_CHK
+		else
+			l_kpfile="/etc/sysctl.d/60-netipv4_sysctl.conf"
+			KPF
+		fi
+	done
+}
+```
 
 ### 3 Network Parameters Host and Router
+
+> The following network parameters are intended for use on both host only and router systems. A system acts as a router if it has at least two interfaces and is configured to perform routing functions.
+
 1. Ensure source routed packets are not accepted (Automated)
 
+Run the following script to verify:
+- `net.ipv4.conf.all.accept_source_route = 0`
+- `net.ipv4.conf.default.accept_source_route = 0`
+- `net.ipv6.conf.all.accept_source_route = 0`
+- `net.ipv6.conf.default.accept_source_route = 0`
 
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_parlist="net.ipv4.conf.all.accept_source_route=0 net.ipv4.conf.default.accept_source_route=0 net.ipv6.conf.all.accept_source_route=0 net.ipv6.conf.default.accept_source_route=0"
+	l_searchloc="/run/sysctl.d/*.conf /etc/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf $([ -f /etc/default/ufw ] && awk -F= '/^\s*IPT_SYSCTL=/ {print $2}' /etc/default/ufw)"
+	KPC()
+	{ 
+		l_krp="$(sysctl "$l_kpname" | awk -F= '{print $2}' | xargs)"
+		l_pafile="$(grep -Psl -- "^\h*$l_kpname\h*=\h*$l_kpvalue\b\h*(#.*)?$" $l_searchloc)"
+		l_fafile="$(grep -s -- "^\s*$l_kpname" $l_searchloc | grep -Pv --"\h*=\h*$l_kpvalue\b\h*" | awk -F: '{print $1}')"
+		if [ "$l_krp" = "$l_kpvalue" ]; then
+			l_output="$l_output\n - \"$l_kpname\" is set to \"$l_kpvalue\" in the running configuration"
+		else
+			l_output2="$l_output2\n - \"$l_kpname\" is set to \"$l_krp\" in the running configuration"
+		fi
+		if [ -n "$l_pafile" ]; then
+			l_output="$l_output\n - \"$l_kpname\" is set to \"$l_kpvalue\" in \"$l_pafile\""
+		else
+			l_output2="$l_output2\n - \"$l_kpname = $l_kpvalue\" is not set in a kernel parameter configuration file"
+		fi
+		[ -n "$l_fafile" ] && l_output2="$l_output2\n - \"$l_kpname\" is set incorrectly in \"$l_fafile\""
+	}
+	ipv6_chk()
+	{
+		l_ipv6s=""
+		grubfile=$(find /boot -type f \( -name 'grubenv' -o -name 'grub.conf' -o -name 'grub.cfg' \) -exec grep -Pl -- '^\h*(kernelopts=|linux|kernel)' {} \;)
+		if [ -s "$grubfile" ]; then
+			! grep -P -- "^\h*(kernelopts=|linux|kernel)" "$grubfile" | grep -vq -- ipv6.disable=1 && l_ipv6s="disabled"
+		fi
+		if grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" $l_searchloc && grep -Pqs -- "^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$" $l_searchloc && sysctl net.ipv6.conf.all.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" && sysctl net.ipv6.conf.default.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$"; then
+			l_ipv6s="disabled"
+		fi
+		if [ -n "$l_ipv6s" ]; then
+			l_output="$l_output\n - IPv6 is disabled on the system, \"$l_kpname\" is not applicable"
+		else
+			KPC
+		fi
+	}
+	for l_kpe in $l_parlist; do
+		l_kpname="$(awk -F= '{print $1}' <<< "$l_kpe")" 
+		l_kpvalue="$(awk -F= '{print $2}' <<< "$l_kpe")" 
+		if grep -q '^net.ipv6.' <<< "$l_kpe"; then
+			ipv6_chk
+		else
+			KPC
+		fi
+	done
+	if [ -z "$l_output2" ]; then
+		echo -e "\n- Audit Result:\n ** PASS **\n$l_output\n"
+	else
+		echo -e "\n- Audit Result:\n ** FAIL **\n - Reason(s) for audit failure:\n$l_output2\n"
+		[ -n "$l_output" ] && echo -e "\n- Correctly set:\n$l_output\n"
+	fi
+}
+```
+
+Run the following script to set:
+- net.ipv4.conf.all.accept_source_route = 0
+- net.ipv4.conf.default.accept_source_route = 0
+- net.ipv6.conf.all.accept_source_route = 0
+- net.ipv6.conf.default.accept_source_route = 0
+
+``` bash
+#!/usr/bin/env bash
+{
+	l_output="" l_output2=""
+	l_parlist="net.ipv4.conf.all.accept_source_route=0 net.ipv4.conf.default.accept_source_route=0 net.ipv6.conf.all.accept_source_route=0 net.ipv6.conf.default.accept_source_route=0" l_searchloc="/run/sysctl.d/*.conf /etc/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf $([ -f /etc/default/ufw ] && awk -F= '/^\s*IPT_SYSCTL=/ {print $2}' /etc/default/ufw)"
+	KPF()
+	{ 
+		# comment out incorrect parameter(s) in kernel parameter file(s)
+		l_fafile="$(grep -s -- "^\s*$l_kpname" $l_searchloc | grep -Pv --"\h*=\h*$l_kpvalue\b\h*" | awk -F: '{print $1}')"
+		for l_bkpf in $l_fafile; do
+			echo -e "\n - Commenting out \"$l_kpname\" in \"$l_bkpf\""
+			sed -ri "/$l_kpname/s/^/# /" "$l_bkpf"
+		done
+		# Set correct parameter in a kernel parameter file
+		if ! grep -Pslq -- "^\h*$l_kpname\h*=\h*$l_kpvalue\b\h*(#.*)?$" $l_searchloc; then
+			echo -e "\n - Setting \"$l_kpname\" to \"$l_kpvalue\" in\"$l_kpfile\""
+			echo "$l_kpname = $l_kpvalue" >> "$l_kpfile"
+		fi
+		# Set correct parameter in active kernel parameters
+		l_krp="$(sysctl "$l_kpname" | awk -F= '{print $2}' | xargs)"
+		if [ "$l_krp" != "$l_kpvalue" ]; then
+			echo -e "\n - Updating \"$l_kpname\" to \"$l_kpvalue\" in the active kernel parameters"
+			sysctl -w "$l_kpname=$l_kpvalue"
+			sysctl -w "$(awk -F'.' '{print $1"."$2".route.flush=1"}' <<< "$l_kpname")"
+		fi
+	}
+	IPV6F_CHK()
+	{
+		l_ipv6s=""
+		grubfile=$(find /boot -type f \( -name 'grubenv' -o -name 'grub.conf' -o -name 'grub.cfg' \) -exec grep -Pl -- '^\h*(kernelopts=|linux|kernel)' {} \;)
+		if [ -s "$grubfile" ]; then
+			! grep -P -- "^\h*(kernelopts=|linux|kernel)" "$grubfile" | grep -vq -- ipv6.disable=1 && l_ipv6s="disabled"
+		fi
+		if grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" $l_searchloc && \
+		grep -Pqs --"^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$" $l_searchloc && \
+		sysctl net.ipv6.conf.all.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.all\.disable_ipv6\h*=\h*1\h*(#.*)?$" && \
+		sysctl net.ipv6.conf.default.disable_ipv6 | grep -Pqs --"^\h*net\.ipv6\.conf\.default\.disable_ipv6\h*=\h*1\h*(#.*)?$"; then
+			l_ipv6s="disabled"
+		fi
+		if [ -n "$l_ipv6s" ]; then
+			echo -e "\n - IPv6 is disabled on the system, \"$l_kpname\" is not applicable"
+		else
+			KPF
+		fi
+	}
+	for l_kpe in $l_parlist; do
+		l_kpname="$(awk -F= '{print $1}' <<< "$l_kpe")" 
+		l_kpvalue="$(awk -F= '{print $2}' <<< "$l_kpe")" 
+		if grep -q '^net.ipv6.' <<< "$l_kpe"; then
+			l_kpfile="/etc/sysctl.d/60-netipv6_sysctl.conf"
+			IPV6F_CHK
+		else
+			l_kpfile="/etc/sysctl.d/60-netipv4_sysctl.conf"
+			KPF
+		fi
+	done
+}
+```
 
 2. Ensure ICMP redirects are not accepted (Automated)
 
