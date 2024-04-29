@@ -1525,13 +1525,11 @@ Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/win
 #### 2.3.11.9 (L1) Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) clients' is set to 'Require NTLMv2 session security, Require 128-bit encryption' (Automated)
 Audit shown below:
 ```
-
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0:NTLMinClientSec
 ```
 Remediation shown below:
 ```
-Computer Configuration\Policies\Windows Settings\Security Settings\Local 
-Policies\Security Options\Network security: Minimum session security for NTLM 
-SSP based (including secure RPC) clients
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network security: Minimum session security for NTLM SSP based (including secure RPC) clients
 ```
 Setting: Require 128-bit encryption   
 Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-minimum-session-security-for-ntlm-ssp-based-including-secure-rpc-clients)
@@ -1544,14 +1542,811 @@ HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0:NTLMMinServerSec
 ```
 Remediation shown below:
 ```
-Computer Configuration\Policies\Windows Settings\Security Settings\Local 
-Policies\Security Options\Network security: Minimum session security for NTLM 
-SSP based (including secure RPC) servers
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network security: Minimum session security for NTLM SSP based (including secure RPC) servers
 ```
 Setting: Require 128-bit encryption   
 Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-minimum-session-security-for-ntlm-ssp-based-including-secure-rpc-servers)
 <br></br>
 
+#### 2.3.12 Recovery console
+This section is intentionally blank and exists to ensure the structure of Windows benchmarks is consistent.
+<br></br>
+
+#### 2.3.13 Shutdown
+This section is intentionally blank and exists to ensure the structure of Windows benchmarks is consistent.
+<br></br>
+
+#### 2.3.14 System cryptography
+This section contains recommendations related to system cryptography
+<br></br>
+
+#### 2.3.14.1 (L2) Ensure 'System cryptography: Force strong key protection for user keys stored on the computer' is set to 'User is prompted when the key is first used' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Cryptography:ForceKeyProtection
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\System cryptography: Force strong key protection for user keys stored on the computer
+```
+Setting: User input is not required when new keys are stored and used   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/system-cryptography-force-strong-key-protection-for-user-keys-stored-on-the-computer)
+<br></br>
+
+### 2.3.15 System Objects
+This section contains recommendations related to system objects.
+<br></br>
+
+#### 2.3.15.1 (L1) Ensure 'System objects: Require case insensitivity for non-Windows subsystems' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel:ObCaseInsensitive
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\System objects: Require case insensitivity for non-Windows subsystems
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/system-objects-require-case-insensitivity-for-non-windows-subsystems)
+<br></br>
+
+#### 2.3.15.2 (L1) Ensure 'System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager:ProtectionMode
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\System objects: Strengthen default permissions of internal system objects (e.g. Symbolic Links)
+```
+Setting: Enabled    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/system-objects-strengthen-default-permissions-of-internal-system-objects)
+<br></br>
+
+#### 2.3.16 System settings
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+<br></br>
+
+#### 2.3.17 User Account Control
+This section contains recommendations related to User Account Control.
+<br></br>
+
+#### 2.3.17.1 (L1) Ensure 'User Account Control: Admin Approval Mode for the Built-in Administrator account' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:FilterAdministratorToken
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\User Account Control: Admin Approval Mode for the Built-in Administrator account
+```
+Setting: Disabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-admin-approval-mode-for-the-built-in-administrator-account)
+<br></br>
+
+#### 2.3.17.2 (L1) Ensure 'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' is set to 'Prompt for consent on the secure desktop' or higher (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:ConsentPromptBehaviorAdmin
+
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Behavior of the elevation 
+prompt for administrators in Admin Approval Mode
+```
+Setting: Prompt for consent for non-Windows binaries    
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-behavior-of-the-elevation-prompt-for-administrators-in-admin-approval-mode)
+<br></br>
+
+#### 2.3.17.3 (L1) Ensure 'User Account Control: Behavior of the elevation prompt for standard users' is set to 'Automatically deny elevation requests' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+ConsentPromptBehaviorUser
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Behavior of the elevation 
+prompt for standard users
+```
+Setting: Prompt for credentials     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-behavior-of-the-elevation-prompt-for-standard-users)
+<br></br>
+
+#### 2.3.17.4 (L1) Ensure 'User Account Control: Detect application installations and prompt for elevation' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+EnableInstallerDetection
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Detect application 
+installations and prompt for elevation
+```
+Setting: Disabled     
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-detect-application-installations-and-prompt-for-elevation)
+<br></br>
+
+#### 2.3.17.5 (L1) Ensure 'User Account Control: Only elevate UIAccess applications that are installed in secure locations' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+EnableSecureUIAPaths
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Only elevate UIAccess 
+applications that are installed in secure locations
+```
+Setting: Enabled       
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-only-elevate-uiaccess-applications-that-are-installed-in-secure-locations)
+<br></br>
+
+#### 2.3.17.6 (L1) Ensure 'User Account Control: Run all administrators in Admin Approval Mode' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+EnableLUA
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Run all administrators in 
+Admin Approval Mode
+```
+Setting: Enabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-run-all-administrators-in-admin-approval-mode)
+<br></br>
+
+#### 2.3.17.7 (L1) Ensure 'User Account Control: Switch to the secure desktop when prompting for elevation' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+PromptOnSecureDesktop
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Switch to the secure desktop 
+when prompting for elevation
+```
+Setting: Enabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-switch-to-the-secure-desktop-when-prompting-for-elevation)
+<br></br>
+
+#### 2.3.17.8 (L1) Ensure 'User Account Control: Virtualize file and registry write failures to per-user locations' is set to 'Enabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System:
+EnableVirtualization
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\Local 
+Policies\Security Options\User Account Control: Virtualize file and registry 
+write failures to per-user locations
+```
+Setting: Enabled   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-account-control-virtualize-file-and-registry-write-failures-to-per-user-locations)
+<br></br>
+
+### 3 Event Log
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+<br></br>
+
+### 4 Restricted Groups
+This section is intentionally blank and exists to ensure the structure of Windows 
+benchmarks is consistent.
+<br></br>
+
+### 5 System Services
+This section contains recommendations for system services.
+<br></br>
+
+#### 5.1 (L2) Ensure 'Bluetooth Audio Gateway Service (BTAGService)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\BTAGService:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Bluetooth Audio Gateway Service
+```
+Setting: Manual (Trigger Start)   
+<br></br>
+
+#### 5.2 (L2) Ensure 'Bluetooth Support Service (bthserv)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\bthserv:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Bluetooth Support Service
+```
+Setting: Windows 7 = Manual, Windows 8.0 or newer = Manual (Trigger Start)
+<br></br>
+
+#### 5.3 (L1) Ensure 'Computer Browser (Browser)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Browser:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Computer Browser
+```
+Setting: Windows 7 = Manual, Windows 8.0 through Windows 10 R1703 = Manual (Trigger Start), Windows 10 R1709 or newer = Not Installed (Manual (Trigger Start) when installed)   
+Link: [1](https://techcommunity.microsoft.com/t5/storage-at-microsoft/stop-using-smb1/ba-p/425858)
+<br></br>
+
+#### 5.4 (L2) Ensure 'Downloaded Maps Manager (MapsBroker)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MapsBroker:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Downloaded Maps Manager
+```
+Setting: Automatic (Delayed Start)
+<br></br>
+
+#### 5.5 (L2) Ensure 'Geolocation Service (lfsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Geolocation Service
+
+```
+Setting: Manual (Trigger Start)
+<br></br>
+
+#### 5.6 (L1) Ensure 'IIS Admin Service (IISADMIN)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\IISADMIN:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\IIS Admin Service
+```
+Setting: Not installed    
+<br></br>
+
+#### 5.7 (L1) Ensure 'Infrared monitor service (irmon)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\irmon:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Infrared monitor service
+```
+Setting: Windows 10 R1607 through Windows 10 R809 = Manual, Windows 10 R1903 or newer = Not installed     
+<br></br>
+
+#### 5.8 (L1) Ensure 'Internet Connection Sharing (ICS) (SharedAccess)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Internet Connection Sharing (ICS)
+```
+Setting: Windows 7 through Windows 8.1 = Disabled, Windows 10 R1507 and R1511 = Manual, Windows 10 1607 or newer = Manual (Trigger Start)
+<br></br>
+
+#### 5.9 (L2) Ensure 'Link-Layer Topology Discovery Mapper (lltdsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lltdsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Link-Layer Topology Discovery Mapper
+```
+Setting: Manual
+<br></br>
+
+#### 5.10 (L1) Ensure 'LxssManager (LxssManager)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LxssManager:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\LxssManager
+```
+Setting: Not installed (Manual when installed)
+<br></br>
+
+#### 5.11 (L1) Ensure 'Microsoft FTP Service (FTPSVC)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FTPSVC:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Microsoft FTP Service
+```
+Setting: Not installed (Automatic when installed)
+<br></br>
+
+#### 5.12 (L2) Ensure 'Microsoft iSCSI Initiator Service (MSiSCSI)' is set to 'Disabled' (Automated)
+Audit Shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MSiSCSI:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Microsoft iSCSI Initiator Service
+```
+Setting: Manual
+<br></br>
+
+#### 5.13 (L1) Ensure 'OpenSSH SSH Server (sshd)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\sshd:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\OpenSSH SSH Server
+```
+Setting: Not installed (Manual when installed)
+<br></br>
+
+#### 5.14 (L2) Ensure 'Peer Name Resolution Protocol (PNRPsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PNRPsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Peer Name Resolution Protocol
+```
+Setting: Manual
+<br></br>
+
+#### 5.15 (L2) Ensure 'Peer Networking Grouping (p2psvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\p2psvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Peer Networking Grouping
+```
+Setting: Manual
+<br></br>
+
+#### 5.16 (L2) Ensure 'Peer Networking Identity Manager (p2pimsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\p2pimsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Peer Networking Identity Manager
+```
+Setting: Manual
+<br></br>
+
+#### 5.17 (L2) Ensure 'PNRP Machine Name Publication Service (PNRPAutoReg)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PNRPAutoReg:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\PNRP Machine Name Publication Service
+```
+Setting: Manual
+<br></br>
+
+#### 5.18 (L2) Ensure 'Print Spooler (Spooler)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Spooler:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Print Spooler
+```
+Setting: Automatic    
+Link: [1](https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527)
+<br></br>
+
+#### 5.19 (L2) Ensure 'Problem Reports and Solutions Control Panel Support (wercplsupport)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\wercplsupport:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Problem Reports and Solutions Control Panel Support
+```
+Setting: Manual
+<br></br>
+
+#### 5.20 (L2) Ensure 'Remote Access Auto Connection Manager (RasAuto)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\RasAuto:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Access Auto Connection Manager
+```
+Setting: Manual
+<br></br>
+
+#### 5.21 (L2) Ensure 'Remote Desktop Configuration (SessionEnv)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SessionEnv:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Desktop Configuration
+```
+Setting: Manual
+<br></br>
+
+#### 5.22 (L2) Ensure 'Remote Desktop Services (TermService)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TermService:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Desktop Services
+```
+Setting: Manual
+<br></br>
+
+#### 5.23 (L2) Ensure 'Remote Desktop Services UserMode Port Redirector (UmRdpService)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UmRdpService:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Desktop Services UserMode Port Redirector
+```
+Setting: Manual
+<br></br>
+
+#### 5.24 (L1) Ensure 'Remote Procedure Call (RPC) Locator (RpcLocator)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\RpcLocator:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Procedure Call (RPC) Locator
+```
+Setting: Manual
+<br></br>
+
+#### 5.25 (L2) Ensure 'Remote Registry (RemoteRegistry)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\RemoteRegistry:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Remote Registry
+```
+Setting: Windows 7 - Manual, Windows 8.0 or newer - Disabled
+<br></br>
+
+#### 5.26 (L1) Ensure 'Routing and Remote Access (RemoteAccess)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\RemoteAccess:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Routing and Remote Access
+```
+Setting: Disabled
+<br></br>
+
+#### 5.27 (L2) Ensure 'Server (LanmanServer)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Server
+```
+Setting: Windows 7 through Windows 10 R1703 - Automatic, Windows 10 R1709 or newer - Automatic (Trigger Start)
+<br></br>
+
+#### 5.28 (L1) Ensure 'Simple TCP/IP Services (simptcp)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\simptcp:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Simple TCP/IP Services
+```
+Setting: Not installed (Automatic when installed)   
+Link: [1](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-r2-and-2008/cc725973(v=ws.10))
+<br></br>
+
+#### 5.29 (L2) Ensure 'SNMP Service (SNMP)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SNMP:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\SNMP Service
+```
+Setting: Not installed (Automatic when installed)
+<br></br>
+
+#### 5.30 (L1) Ensure 'Special Administration Console Helper (sacsvr)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\sacsvr:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Special Administration Console Helper
+```
+Setting: Not installed (Manual when installed)
+<br></br>
+
+#### 5.31 (L1) Ensure 'SSDP Discovery (SSDPSRV)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SSDPSRV:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\SSDP Discovery
+```
+Setting: Manual
+<br></br>
+
+#### 5.32 (L1) Ensure 'UPnP Device Host (upnphost)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\upnphost:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\UPnP Device Host
+```
+Setting: Manual
+<br></br>
+
+#### 5.33 (L1) Ensure 'Web Management Service (WMSvc)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WMSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Web Management Service
+```
+Setting: Not installed (Manual when installed)
+<br></br>
+
+#### 5.34 (L2) Ensure 'Windows Error Reporting Service (WerSvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WerSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Error Reporting Service
+```
+Setting: Windows 7 - Manual, Windows 8.0 or newer: Manual (Trigger start)
+<br></br>
+
+#### 5.35 (L2) Ensure 'Windows Event Collector (Wecsvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wecsvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Event Collector
+```
+Setting: Manual
+<br></br>
+
+#### 5.36 (L1) Ensure 'Windows Media Player Network Sharing Service (WMPNetworkSvc)' is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WMPNetworkSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Media Player Network Sharing Service
+```
+Setting: Manual
+<br></br>
+
+#### 5.37 (L1) Ensure 'Windows Mobile Hotspot Service (icssvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\icssvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Mobile Hotspot Service
+```
+Setting: Manual (Trigger start)
+<br></br>
+
+#### 5.38 (L2) Ensure 'Windows Push Notifications System Service (WpnService)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WpnService:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Push Notifications System Service
+```
+Setting: Automatic
+<br></br>
+
+#### 5.39 (L2) Ensure 'Windows PushToInstall Service (PushToInstall)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PushToInstall:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows PushToInstall Service (PushToInstall)
+```
+Setting: Manual (Trigger start)
+<br></br>
+
+#### 5.40 (L2) Ensure 'Windows Remote Management (WSManagement) (WinRM)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinRM:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Windows Remote Management (WS-Management)
+```
+Setting: Manual
+<br></br>
+
+#### 5.41 (L1) Ensure 'World Wide Web Publishing Service (W3SVC)' 
+is set to 'Disabled' or 'Not Installed' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W3SVC:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\World Wide Web Publishing Service
+```
+Setting: Not installed (Automatic when installed)
+<br></br>
+
+#### 5.42 (L1) Ensure 'Xbox Accessory Management Service (XboxGipSvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XboxGipSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Xbox Accessory Management Service
+```
+Setting: Windows 10 R1703 - Manual, Windows 10 R1709 or newer - Manual (Trigger start)    
+Link: [1](https://www.cisecurity.org/insights/blog/update-cis-microsoft-windows-10-enterprise-release-1703-benchmark-v1-0-0)
+<br></br>
+
+#### 5.43 (L1) Ensure 'Xbox Live Auth Manager (XblAuthManager)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XblAuthManager:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Xbox Live Auth Manager
+```
+Setting: Manual    
+Link: [1](https://www.cisecurity.org/insights/blog/update-cis-microsoft-windows-10-enterprise-release-1703-benchmark-v1-0-0)
+<br></br>
+
+#### 5.44 (L1) Ensure 'Xbox Live Game Save (XblGameSave)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XblGameSave:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Xbox Live Game Save
+```
+Setting: Windows 10 R1507 and R1511 - Manual, Windows 10 R1607 or newer - Manual (Trigger start)
+Link: [1](https://www.cisecurity.org/insights/blog/update-cis-microsoft-windows-10-enterprise-release-1703-benchmark-v1-0-0)
+<br></br>
+
+#### 5.45 (L1) Ensure 'Xbox Live Networking Service (XboxNetApiSvc)' is set to 'Disabled' (Automated)
+Audit shown below:
+```
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XboxNetApiSvc:Start
+```
+Remediation shown below:
+```
+Computer Configuration\Policies\Windows Settings\Security Settings\System 
+Services\Xbox Live Networking Service
+```
+Setting: Manual     
+Link: [1](https://www.cisecurity.org/insights/blog/update-cis-microsoft-windows-10-enterprise-release-1703-benchmark-v1-0-0)
+<br></br>
+
+### 6 Registry
+This section is intentionally blank and exists to ensure the structure of Windows benchmarks is consistent.
 
 ---
 

@@ -36,7 +36,7 @@
 		- [9 Ensure updates patches and additional security software are installed](#9-ensure-updates-patches-and-additional-security-software-are-installed)
 	- [2 Services](#2-services)
 		- [1 Configure Time Synchronization](#1-configure-time-synchronization)
-			- [1 Ensure Time Synchronization is in use](#1-ensure-time-synchronization)
+			- [1 Ensure Time Synchronization is in use](#1-ensure-time-synchronization-is-in-use)
 			- [2 Configure chrony](#2-configure-chrony)
 			- [3 Configure systemd-timesyncd](#3-configure-systemd-timesyncd)
 			- [4 Configure ntp](#4-configure-ntp)
@@ -49,6 +49,17 @@
 		- [3 Network Parameters Host and Router](#3-network-parameters-host-and-router)
 		- [4 Uncommon Network Protocols](#4-uncommon-network-protocols)
 		- [5 Firewall Configuration](#5-firewall-configuration)
+			- [1 Disable unused network protocols and devices](#1-disable-unused-network-protocols-and-devices)
+			- [2 Network Parameters Host Only](#2-network-parameters-host-only)
+			- [3 Network Parameters Host and Router](#3-network-parameters-host-and-router)
+			- [4 Uncommon Network Protocols](#4-uncommon-network-protocols)
+			- [5 Firewall Configurations](#5-firewall-configurations)
+				- [1 Configure UncomplicatedFirewall](#1-configure-uncomplicatedfirewall)
+				- [2 Configure nftables](#2-configure-nftables)
+				- [3 Configure iptables](#3-configure-iptables)
+					- [1 Configure iptables software](#1-configure-iptables-software)
+					- [2 Configure IPV4 iptables](#2-configure-ipv4-iptables)
+					- [3 Configure IPV6 ip6tables](#3-configure-ipv6-ip6tables)
 	- [4 Logging and Auditing](#4-logging-and-auditing)
 		- [1 Configure System Accounting (auditd)](#1-configure-system-accounting-auditd)
 		- [2 Configure Logging](#2-configure-logging)
@@ -2389,152 +2400,1076 @@ Run the following commands:
 ### 1 Configure Time Synchronization
 #### 1 Ensure Time Synchronization is in use
 
+> Only one time synchronization method should be in use on the system. Configuring multiple time synchronization methods could lead to unexpected or unreliable results
 
+On physical systems, and virtual systems where host based time synchronization is not available.  
+**One** of the three time synchronization daemons should be available; `chrony`, `systemd-timesyncd`, or `ntp`  
+Run the following script to verify that a single time synchronization daemon is available on the system:
+
+``` bash
+#!/usr/bin/env bash
+{
+	output="" l_tsd="" l_sdtd="" chrony="" l_ntp=""
+	dpkg-query -W chrony > /dev/null 2>&1 && l_chrony="y"
+	dpkg-query -W ntp > /dev/null 2>&1 && l_ntp="y" || l_ntp=""
+	systemctl list-units --all --type=service | grep -q 'systemdtimesyncd.service' && systemctl is-enabled systemd-timesyncd.service | grep -q 'enabled' && l_sdtd="y"# ! systemctl is-enabled systemd-timesyncd.service | grep -q 'enabled' && l_nsdtd="y" || l_nsdtd=""
+	if [[ "$l_chrony" = "y" && "$l_ntp" != "y" && "$l_sdtd" != "y" ]]; then
+		l_tsd="chrony"
+		output="$output\n- chrony is in use on the system"
+	elif [[ "$l_chrony" != "y" && "$l_ntp" = "y" && "$l_sdtd" != "y" ]]; then
+		l_tsd="ntp"
+		output="$output\n- ntp is in use on the system"
+	elif [[ "$l_chrony" != "y" && "$l_ntp" != "y" ]]; then
+		if systemctl list-units --all --type=service | grep -q 'systemdtimesyncd.service' && systemctl is-enabled systemd-timesyncd.service | grep -Eq '(enabled|disabled|masked)'; then
+			l_tsd="sdtd"
+			output="$output\n- systemd-timesyncd is in use on the system"
+		fi
+	else
+		[[ "$l_chrony" = "y" && "$l_ntp" = "y" ]] && output="$output\n- both chrony and ntp are in use on the system"
+		[[ "$l_chrony" = "y" && "$l_sdtd" = "y" ]] && output="$output\n- both chrony and systemd-timesyncd are in use on the system"
+		[[ "$l_ntp" = "y" && "$l_sdtd" = "y" ]] && output="$output\n- both ntp and systemd-timesyncd are in use on the system"
+	fi
+	if [ -n "$l_tsd" ]; then
+		echo -e "\n- PASS:\n$output\n"
+	else
+		echo -e "\n- FAIL:\n$output\n"
+	fi
+}
+```
+
+On physical systems, and virtual systems where host based time synchronization is not 
+available.
+Select one of the three time synchronization daemons; `chrony(1)`, `systemd-timesyncd (2)`, or `ntp (3)`, and following the remediation procedure for the selected daemon.
+> Note: enabling more than one synchronization daemon could lead to unexpected or unreliable results:
+
+1. `chrony`
+
+Run the following command to install `chrony`:
+
+`# apt install chrony`
+
+Run the following commands to stop and mask the `systemd-timesyncd` daemon:
+
+``` 
+# systemctl stop systemd-timesyncd.service
+# systemctl --now mask systemd-timesyncd.service
+```
+
+Run the following command to remove the `ntp` package:
+
+`# apt purge ntp`
+
+> Subsection: `Configure chrony` should be followed  
+> Subsections: `Configure systemd-timesyncd` and `Configure ntp` should be skipped
+
+2. `systemd-timesync`
+
+Run the following command to remove the `chrony` package:
+
+`# apt purge chrony`
+
+Run the following command to remove the `ntp` package:
+
+`# apt purge ntp`
+
+> Subsection: `Configure systemd-timesyncshould` be followed  
+> Subsections: `Configure chrony` and `Configure ntp` should be skipped
+
+3. `ntp`
+
+Run the following command to install `ntp`:
+
+`# apt install ntp`
+
+Run the following commands to stop and mask the `systemd-timesyncd` daemon:
+
+``` 
+# systemctl stop systemd-timesyncd.service
+# systemctl --now mask systemd-timesyncd.service
+```
+
+Run the following command to remove the `chrony` package:
+
+`# apt purge chrony`
+
+> Subsection: `Configure ntp` should be followed  
+> Subsections: `Configure systemd-timesyncd` and `Configure chrony` should be skipped
 
 #### 2 Configure chrony
-1. 
+1. Ensure chrony is configured with authorized timeserver (Manual)
 
+**IF** `chrony` is in use on the system, run the following command to display the server and/or pool directive:
 
+`# grep -Pr --include=*.{sources,conf} '^\h*(server|pool)\h+\H+' /etc/chrony/`
 
-2. 
+Verify that at least one `pool` line and/or at least three `server` lines are returned, and the timeserver on the returned lines follows local site policy  
+Output examples:  
 
+`pool` directive:
 
+```
+pool time.nist.gov iburst maxsources 4 #The maxsources option is unique to the pool directive
+```
 
-3. 
+`server` directive:
 
+```
+server time-a-g.nist.gov iburst
+server 132.163.97.3 iburst
+server time-d-b.nist.gov iburst
+```
 
+Edit `/etc/chrony/chrony.conf` or a file ending in `.sources` in `/etc/chrony/sources.d/` and add or edit server or pool lines as appropriate according to local site policy:
+
+`<[server|pool]> <[remote-server|remote-pool]>`
+
+Examples:  
+
+`pool` directive:
+
+```
+pool time.nist.gov iburst maxsources 4 #The maxsources option is unique to the pool directive
+```
+
+`server` directive:
+
+```
+server time-a-g.nist.gov iburst
+server 132.163.97.3 iburst
+server time-d-b.nist.gov iburst
+```
+
+Run one of the following commands to load the updated time sources into `chronyd` running config:
+
+```
+# systemctl restart chronyd
+- OR if sources are in a .sources file -
+# chronyc reload sources
+```
+
+If pool and/or server directive(s) are set in a sources file in `/etc/chrony/sources.d`, the line:
+
+`sourcedir /etc/chrony/sources.d`
+
+must be present in `/etc/chrony/chrony.conf`
+
+2. Ensure chrony is running as user _chrony (Automated)
+
+**IF** chrony is in use on the system, run the following command to verify the chronydservice is being run as the _chrony user:  
+`# ps -ef | awk '(/[c]hronyd/ && $1!="_chrony") { print $1 }'`  
+Nothing should be returned
+
+Add or edit the user line to `/etc/chrony/chrony.conf` or a file ending in `.conf` in `/etc/chrony/conf.d/`:
+
+`user _chrony`
+
+3. Ensure chrony is enabled and running (Automated)
+
+**IF** `chrony` is in use on the system, run the following commands:
+Run the following command to verify that the `chrony` service is enabled:
+
+```
+# systemctl is-enabled chrony.service
+enabled
+```
+Run the following command to verify that the `chrony` service is active:
+
+```
+# systemctl is-active chrony.service
+active
+```
+
+In order to start `chrony`:
+
+Run the following command to unmask `chrony.service`:
+
+`# systemctl unmask chrony.service`
+
+Run the following command to enable and start `chrony.service`:
+
+`# systemctl --now enable chrony.service`
 
 #### 3 Configure systemd-timesyncd
-1. 
+1. Ensure systemd-timesyncd configured with authorized timeserver (Manual)
 
+**IF** `systemd-timesyncd` is in use on the system, run the following command:
 
+`# find /etc/systemd -type f -name '*.conf' -exec grep -Ph '^\h*(NTP|FallbackNTP)=\H+' {} +`
 
-2. 
+Verify that `NPT=<space_seporated_list_of_servers>` and/or `FallbackNTP=<space_seporated_list_of_servers>` is returned and that the time server(s) shown follows local site policy  
+Example Output:
 
+```
+/etc/systemd/timesyncd.conf.d/50-timesyncd.conf:NTP=time.nist.gov
+/etc/systemd/timesyncd.conf.d/50-timesyncd.conf:FallbackNTP=time-a-g.nist.gov 
+time-b-g.nist.gov time-c-g.nist.gov
+```
+
+Edit or create a file in `/etc/systemd/timesyncd.conf.d `ending in `.conf` and add the `NTP=` and/or `FallbackNTP=` lines to the `[Time]` section:  
+Example:
+
+```
+[Time]
+NTP=time.nist.gov # Uses the generic name for NIST's time servers 
+-AND/ORFallbackNTP=time-a-g.nist.gov time-b-g.nist.gov time-c-g.nist.gov # Space 
+separated list of NIST time servers
+```
+
+> Servers added to these line(s) should follow local site policy. NIST servers are for example. The `timesyncd.conf.d `directory may need to be created
+
+Example script: The following example script will create the `systemd-timesyncd` drop-in configuration snippet:
+
+``` bash
+#!/usr/bin/env bash
+ntp_ts="time.nist.gov"
+ntp_fb="time-a-g.nist.gov time-b-g.nist.gov time-c-g.nist.gov"
+disfile="/etc/systemd/timesyncd.conf.d/50-timesyncd.conf"
+if ! find /etc/systemd -type f -name '*.conf' -exec grep -Ph '^\h*NTP=\H+' {} +; then
+	[ ! -d /etc/systemd/timesyncd.conf.d ] && mkdir /etc/systemd/timesyncd.conf.d
+	! grep -Pqs '^\h*\[Time\]' "$disfile" && echo "[Time]" >> "$disfile"
+	echo "NTP=$ntp_ts" >> "$disfile"
+fi
+if ! find /etc/systemd -type f -name '*.conf' -exec grep -Ph '^\h*FallbackNTP=\H+' {} +; then
+	[ ! -d /etc/systemd/timesyncd.conf.d ] && mkdir /etc/systemd/timesyncd.conf.d
+	! grep -Pqs '^\h*\[Time\]' "$disfile" && echo "[Time]" >> "$disfile"
+	echo "FallbackNTP=$ntp_fb" >> "$disfile"
+fi
+```
+
+Run the following command to reload the `systemd-timesyncd ` configuration:
+
+`# systemctl try-reload-or-restart systemd-timesyncd`
+
+2. Ensure systemd-timesyncd is enabled and running (Automated)
+
+**IF** `systemd-timesyncd` is in use on the system, run the following commands:
+
+Run the following command to verify that the `systemd-timesyncd` service is enabled:  
+```
+# systemctl is-enabled systemd-timesyncd.service
+enabled
+```
+
+Run the following command to verify that the `systemd-timesyncd` service is active:  
+```
+# systemctl is-active systemd-timesyncd.service
+active
+```
+
+In order to start `systemd-timesync`:
+
+Run the following command to unmask `systemd-timesyncd.service`:
+
+`# systemctl unmask systemd-timesyncd.service`
+
+Run the following command to enable and start `systemd-timesyncd.service`:
+
+`# systemctl --now enable systemd-timesyncd.service`
 
 
 #### 4 Configure ntp
+1. Ensure ntp access control is configured (Automated)
 
-1. 
+**IF** `ntp` is in use on the system, run the following command to verify the `restrict` lines:
 
+```
+# grep -P -- '^\h*restrict\h+((-4\h+)?|-6\h+)default\h+(?:[^#\n\r]+\h+)*(?!(?:\2|\3|\4|\5))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h+(?:[^#\n\r]+\h+)*(?!(?:\1|\3|\4|\5))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h+(?:[^#\n\r]+\h+)*(?!(?:\1|\2|\4|\5))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h+(?:[^#\n\r]+\h+)*(?!(?:\1|\2|\3|\5))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h+(?:[^#\n\r]+\h+)*(?!(?:\1|\2|\3|\4))(\h*\bkod\b\h*|\h*\bnomodify\b\h*|\h*\bnotrap\b\h*|\h*\bnopeer\b\h*|\h*\bnoquery\b\h*)\h*(?:\h+\H+\h*)*(?:\h+#.*)?$' /etc/ntp.conf
+```
 
+Output should be similar to:
 
-2. 
+```
+restrict -4 default kod notrap nomodify nopeer noquery
+restrict -6 default kod notrap nomodify nopeer noquery
+```
 
+Verify that the output includes two lines, and both lines include: `default`, `kod`, `nomodify`, `notrap`, `nopeer` and `noquery`.
 
+Add or edit restrict lines in `/etc/ntp.conf` to match the following:
 
-3. 
+```
+restrict -4 default kod notrap nomodify nopeer noquery
+restrict -6 default kod notrap nomodify nopeer noquery
+```
 
+2. Ensure ntp is configured with authorized timeserver (Manual)
 
+**IF** `ntp` is in use on the system, run the following command to display the server and/or pool mode:
 
-4. 
+`# grep -P -- '^\h*(server|pool)\h+\H+' /etc/ntp.conf`
 
+Verify that at least one `pool` line and/or at least three `server` lines are returned, and the timeserver on the returned lines follows local site policy  
+Output examples:  
 
+`pool` mode:
+
+```
+pool time.nist.gov iburst maxsources 4 #The maxsources option is unique to the pool directive
+```
+
+`server` mode:
+
+```
+server time-a-g.nist.gov iburst
+server 132.163.97.3 iburst
+server time-d-b.nist.gov iburst
+```
+
+Edit `/etc/ntp.conf` and add or edit `server` or `pool` lines as appropriate according to local site policy:
+
+`<[server|pool]> <[remote-server|remote-pool]>`
+
+Examples:
+
+`pool` mode:
+
+```
+pool time.nist.gov iburst maxsources 4 #The maxsources option is unique to the pool directive
+```
+
+`server` mode:
+
+```
+server time-a-g.nist.gov iburst
+server 132.163.97.3 iburst
+server time-d-b.nist.gov iburst
+```
+
+Run the following command to load the updated time sources into `ntp` running config:
+
+`# systemctl restart ntp`
+
+3. Ensure ntp is running as user ntp (Automated)
+
+**IF** `ntp` is in use on the system run the following command to verify the `ntpd` daemon is being run as the user `ntp`:
+
+`# ps -ef | awk '(/[n]tpd/ && $1!="ntp") { print $1 }'`  
+Nothing should be returned
+
+Run the following command to verify the `RUNASUSER=` is set to `ntp` in `/etc/init.d/ntp`:
+
+```
+# grep -P -- '^\h*RUNASUSER=' /etc/init.d/ntp
+
+RUNASUSER=ntp
+```
+
+Add or edit the following line in `/etc/init.d/ntp`:
+
+`RUNASUSER=ntp`
+
+Run the following command to restart `ntp.servocee`:
+
+`# systemctl restart ntp.service`
+
+4. Ensure ntp is enabled and running (Automated)
+
+**IF** `ntp` is in use on the system, run the following commands:  
+Run the following command to verify that the `ntp` service is enabled:
+
+```
+# systemctl is-enabled ntp.service
+
+enabled
+```
+
+Run the following command to verify that the `ntp` service is active:
+
+```
+# systemctl is-active ntp.service
+
+active
+```
+
+**IF** `ntp` is in use on the system, run the following commands:  
+Run the following command to unmask `ntp.service`:
+
+`# systemctl unmask ntp.service`
+
+Run the following command to enable and start `ntp.service`:
+
+`# systemctl --now enable ntp.service`
 
 ### 2 Special Purpose Services
-1. 
+
+> This section describes services that are installed on systems that specifically need to run these services. If any of these services are not required, it is recommended that they be deleted from the system to reduce the potential attack surface. If a package is required as a dependency, and the service is not required, the service should be stopped and masked.
+
+`# systemctl --now mask <service_name>`
+
+> If any of the following services are required **DO NOT** delete them
+
+1. Ensure X Window System is not installed (Automated)
+
+> Many Linux systems run applications which require a Java runtime. Some Linux Java packages have a dependency on specific X Windows xorg-x11-fonts. One workaround to avoid this dependency is to use the "headless" Java packages for your specific Java runtime, if provided by your distribution.
+
+Verify X Windows System is not installed:
+
+`dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' xserver-xorg* | grep -Pi '\h+installed\b'`
+
+Nothing should be returned
+
+Remove the X Windows System packages:
+
+`apt purge xserver-xorg*`
 
 
+2. Ensure Avahi Server is not installed (Automated)
 
-2. 
+Run the following command to verify `avahi-daemon` is not installed:
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' avahi-daemon
 
+avahi-daemon unknown ok not-installed not-installed
+```
 
+Run the following commands to remove `avahi-daemon`:
 
-3. 
+```
+# systemctl stop avahi-daaemon.service
+# systemctl stop avahi-daemon.socket
+# apt purge avahi-daemon
+```
 
+3. Ensure CUPS is not installed (Automated)
 
+Run the following command to verify `cups` is not Installed:
 
-4. 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' cups
 
+cups unknown ok not-installed not-installed
+```
 
+Run one of the following commands to remove `cups`:
 
-5. 
+`# apt purge cups`
 
+4. Ensure DHCP Server is not installed (Automated)
 
+Run the following commands to verify `isc-dhcp-server` is not installed:
 
-6. 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' iscdhcp-server
+isc-dhcp-server unknown ok not-installed not-installed
+```
 
+Run the following command to remove `isc-dhcp-server`:
+`# apt purge isc-dhcp-server`
 
+5. Ensure LDAP server is not installed (Automated)
 
-7. 
+Run the following command to verify `slapd` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' slapd
 
+slapd unknown ok not-installed not-installed
+```
 
-8. 
+Run one of the following commands to remove `slapd`:
+`# apt purge slapd`
 
+6. Ensure NFS is not installed (Automated)
 
+Run the following command to verify `nfs` is not installed:
 
-9. 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nfs-kernel-server
 
+nfs-kernel-server unknown ok not-installed not-installed
+```
 
+Run the following command to remove `nfs`:
 
-10. 
+`# apt purge nfs-kernel-server`
 
+7. Ensure DNS Server is not installed (Automated)
 
+Run the following command to verify `DNS server` is not installed:
 
-11. 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' bind9
 
+bind9 unknown ok not-installed not-installed
+```
 
+Run the following commands to disable `DNS server`:
 
-12. 
+`# apt purge bind9`
 
+8. Ensure FTP Server is not installed (Automated)
 
+Run the following command to verify `vsftpd` is not installed:
 
-13. 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' vsftpd
 
+vsftpd unknown ok not-installed not-installed
+```
 
+Run the following command to remove `vsftpd`:
 
-14. 
+`# apt purge vsftpd`
 
+9. Ensure HTTP server is not installed (Automated)
 
+Run the following command to verify `apache` is not installed:
 
-15. 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' apache2
 
+apache2 unknown ok not-installed not-installed
+```
 
+Run the following command to remove `apache`:
 
-16. 
+`# apt purge apache2`
 
+10. Ensure IMAP and POP3 server are not installed (Automated)
+
+Run the following command to verify `dovecot-imapd` and `dovecot-pop3d` are not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' dovecot-imapd dovecot-pop3d
+
+dovecot-imapd unknown ok not-installed not-installed
+dovecot-pop3d unknown ok not-installed not-installed
+```
+
+Run one of the following commands to remove dovecot-imapd and `dovecot-pop3d`:
+
+`# apt purge dovecot-imapd dovecot-pop3d`
+
+11. Ensure Samba is not installed (Automated)
+
+Run the following command to verify `samba` is not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' 
+samba
+samba unknown ok not-installed not-installed
+```
+
+Run the following command to remove `samba`:
+
+`# apt purge samba`
+
+12. Ensure HTTP Proxy Server is not installed (Automated)
+
+Run the following command to verify `squid` is not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' 
+squid
+squid unknown ok not-installed not-installed
+```
+
+Run the following command to remove `squid`:
+
+`# apt purge squid`
+
+13. Ensure SNMP Server is not installed (Automated)
+
+Run the following command to verify `snmpd` is not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' snmp
+snmp unknown ok not-installed not-installed
+```
+
+Run the following command to remove `snmp`:
+`# apt purge snmp`
+
+14. Ensure NIS Server is not installed (Automated)
+
+Run the following command to verify `nis` is not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nis
+nis unknown ok not-installed not-installed
+```
+
+Run the following command to remove `nis`:
+
+`# apt purge nis`
+
+15. Ensure mail transfer agent is configured for local-only mode (Automated)
+
+Run the following command to verify that the MTA is not listening on any non-loopback address (`127.0.0.1` or `::1`).
+
+`# ss -lntu | grep -E ':25\s' | grep -E -v '\s(127.0.0.1|::1):25\s'`
+
+Nothing should be returned
+
+Edit `/etc/postfix/main.cf` and add the following line to the RECEIVING MAIL section.  
+If the line already exists, change it to look like the line below:
+
+`inet_interfaces = loopback-only`
+
+Run the following command to restart `postfix`:
+
+`# systemctl restart postfix`
+
+16. Ensure rsync service is either not installed or masked (Automated)
+
+Run the following command to verify `rsync` is not installed:
+
+```
+dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rsync
+
+rsync unknown ok not-installed not-installed
+```
+
+**OR**  
+Run the following commands to verify that rsync is inactive and masked:
+```
+# systemctl is-active rsync
+
+inactive
+
+# systemctl is-enabled rsync
+
+masked
+```
+
+Run the following command to remove `rsync`:
+
+`# apt purge rsync`
+
+**OR**  
+Run the following commands to stop and mask `rsync`:
+
+```
+# systemctl stop rsync
+# systemctl mask rsync
+```
 
 
 ### 3 Service Clients
-1. 
+1. Ensure NIS Client is not installed (Automated)
 
+Verify `nis` is not installed. Use the following command to provide the needed 
+information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nis
 
-2. 
+nis unknown ok not-installed not-installed
+```
 
+Uninstall `nis`:
 
+`# apt purge nis`
 
-3. 
+2. Ensure rsh client is not installed (Automated)
 
+Verify `rsh` is not installed. Use the following command to provide the needed 
+information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rsh-client
 
-4. 
+rsh-client unknown ok not-installed not-installed
+```
 
+Uninstall `rsh`:
 
+`# apt purge rsh`
 
-5. 
+3. Ensure talk client is not installed (Automated)
 
+Verify `talk` is not installed. The following command may provide the needed information:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' talk
 
-6. 
+talk unknown ok not-installed not-installed
+```
 
+Uninstall `talk`:
 
+`# apt purge talk`
+
+4. Ensure telnet client is not installed (Automated)
+
+Verify `telnet` is not installed. The following command may provide the needed information:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' telnet
+
+telnet unknown ok not-installed not-installed
+```
+
+Uninstall `telnet`:
+
+`# apt purge telnet`
+
+5. Ensure LDAP client is not installed (Automated)
+
+Verify `ldap-utils` is not installed. The following command may provide the needed information:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' ldap-utils
+
+ldap-utils unknown ok not-installed not-installed
+```
+
+Uninstall `ldap-utils`:
+
+`# apt purge ldap-utils`
+
+6. Ensure RPC is not installed (Automated)
+
+Verify `rpcbind` is not installed. The following command may provide the needed information:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rpcbind
+
+rpcbind unknown ok not-installed not-installed
+```
+
+Uninstall `rpcbind`:
+
+`# apt purge rpcbind`
 
 ### 4 Ensure Nonessential Services are Removed or Masked
+
+Run the following command:  
+`# lsof -i -P -n | grep -v "(ESTABLISHED)"`  
+Review the output to ensure that all services listed are required on the system. If a listed service is not required, remove the package containing the service. If the package containing a non-essential service is required, stop and mask the non-essential service.
+
+Run the following command to remove the package containing the service:
+
+`# apt purge <package_name>`
+
+**OR** If required packages have a dependency:  
+Run the following command to stop and mask the service:
+
+`# systemctl --now mask <service_name>`
 
 ---
 
 ## 3 Network Configuration
 ### 1 Disable Unused Network Protocols and Devices
+1. Ensure system is checked to determine if IPv6 is enabled (Manual)
+
+
+
+2. Ensure wireless interfaces are disabled (Automated)
+
+
 
 ### 2 Network Parameters Host Only
+1. Ensure packet redirect sending is disabled (Automated)
+
+
+
+2. Ensure IP forwarding is disabled (Automated)
+
+
 
 ### 3 Network Parameters Host and Router
+1. Ensure source routed packets are not accepted (Automated)
+
+
+
+2. Ensure ICMP redirects are not accepted (Automated)
+
+
+
+3. Ensure secure ICMP redirects are not accepted (Automated)
+
+
+
+4. Ensure suspicious packets are logged (Automated)
+
+
+
+5. Ensure broadcast ICMP requests are ignored (Automated)
+
+
+
+6. Ensure bogus ICMP responses are ignored (Automated)
+
+
+
+7. Ensure Reverse Path Filtering is enabled (Automated)
+
+
+
+8. Ensure TCP SYN Cookies is enabled (Automated)
+
+
+
+9. Ensure IPv6 router advertisements are not accepted (Automated)
+
+
 
 ### 4 Uncommon Network Protocols
+1. Ensure DCCP is disabled (Automated)
+
+
+
+2. Ensure SCTP is disabled (Automated)
+
+
+
+3. Ensure RDS is disabled (Automated)
+
+
+
+4. Ensure TIPC is disabled (Automated)
+
+
 
 ### 5 Firewall Configuration
+#### 1 Configure UncomplicatedFirewall
+1. Ensure ufw is installed (Automated)
+
+Run the following command to verify that Uncomplicated Firewall (UFW) is installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' ufw
+
+ufw install ok installed installed
+```
+
+Run the following command to install Uncomplicated Firewall (UFW):
+
+`apt install ufw`
+
+
+2. Ensure iptables-persistent is not installed with ufw (Automated)
+
+
+
+3. Ensure ufw service is enabled (Automated)
+
+
+
+4. Ensure ufw loopback traffic is configured (Automated)
+
+
+
+5. Ensure ufw outbound connections are configured (Manual)
+
+
+
+6. Ensure ufw firewall rules exist for all open ports (Automated)
+
+
+
+7. Ensure ufw default deny firewall policy (Automated)
+
+
+
+#### 2 Configure nftables
+
+> The following will implement the firewall rules of this section and open ICMP, IGMP, and port 22(ssh) from anywhere. Opening the ports for ICMP, IGMP, and port 22(ssh) needs to be updated in accordance with local site policy. Allow port 22(ssh) needs to be updated to only allow systems requiring ssh connectivity to connect, as per site policy.
+
+Save the script below as `/etc/nftables.rules`
+
+``` bash
+#!/sbin/nft -f
+
+# This nftables.rules config should be saved as /etc/nftables.rules
+# flush nftables rulesset
+flush ruleset
+# Load nftables ruleset
+# nftables config with inet table named filter
+table inet filter {
+	# Base chain for input hook named input (Filters inbound network packets)
+	chain input {
+		type filter hook input priority 0; policy drop;
+		# Ensure loopback traffic is configured
+		iif "lo" accept
+		ip saddr 127.0.0.0/8 counter packets 0 bytes 0 drop
+		ip6 saddr ::1 counter packets 0 bytes 0 drop
+		# Ensure established connections are configured
+		ip protocol tcp ct state established accept
+		ip protocol udp ct state established accept
+		ip protocol icmp ct state established accept
+		# Accept port 22(SSH) traffic from anywhere
+		tcp dport ssh accept
+		# Accept ICMP and IGMP from anywhere
+		icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, mld-listener-query, mld-listener-report, mld-listener-done, nd-router-solicit, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, ind-neighbor-solicit, ind-neighbor-advert, mld2-listener-report } accept
+		icmp type { destination-unreachable, router-advertisement, router-solicitation, time-exceeded, parameter-problem } accept
+		ip protocol igmp accept
+	}
+	# Base chain for hook forward named forward (Filters forwarded network packets)
+	chain forward {
+		type filter hook forward priority 0; policy drop;
+	}
+	# Base chain for hook output named output (Filters outbount network packets)
+	chain output {
+		type filter hook output priority 0; policy drop;
+		# Ensure outbound and established connections are configured
+		ip protocol tcp ct state established,related,new accept
+		ip protocol udp ct state established,related,new accept
+		ip protocol icmp ct state established,related,new accept
+	}
+}
+```
+
+Run the following command to load the file into nftables
+
+`# nft -f /etc/nftables.rules`
+
+All changes in the nftables subsections are temporary.  
+To make these changes permanent:  
+Run the following command to create the `nftables.rules` file
+
+`nft list ruleset > /etc/nftables.rules`
+
+Add the following line to `/etc/nftables.conf`
+
+`include "/etc/nftables.rules"`
+
+
+1. Ensure nftables is installed (Automated)
+
+
+
+2. Ensure ufw is uninstalled or disabled with nftables (Automated)
+
+
+
+3. Ensure iptables are flushed with nftables (Manual)
+
+
+
+4. Ensure a nftables table exists (Automated)
+
+
+
+5. Ensure nftables base chains exist (Automated)
+
+
+
+6. Ensure nftables loopback traffic is configured (Automated)
+
+
+
+7. Ensure nftables outbound and established connections are configured (Manual)
+
+
+
+8. Ensure nftables default deny firewall policy (Automated)
+
+
+
+9. Ensure nftables service is enabled (Automated)
+
+
+
+10. Ensure nftables rules are permanent (Automated)
+
+
+
+#### 3 Configure iptables
+##### 1 Configure iptables software
+1. Ensure iptables packages are installed (Automated)
+
+
+
+2. Ensure nftables is not installed with iptables (Automated)
+
+
+
+3. Ensure ufw is uninstalled or disabled with iptables (Automated)
+
+
+
+##### 2 Configure IPV4 iptables
+
+> Note: This section broadly assumes starting with an empty IPtables firewall ruleset (established by flushing the rules with iptables -F). Remediation steps included only affect the live system, you will also need to configure your default firewall configuration to apply on boot. Configuration of a live systems firewall directly over a remote connection will often result in being locked out. It is advised to have a known good firewall configuration set to run on boot and to configure an entire firewall structure in a script that is then run and tested before saving to boot. 
+
+The following script will implement the firewall rules of this section and open port 22(ssh) from anywhere:
+
+``` bash
+#!/bin/bash
+# Flush IPtables rules
+iptables -F
+# Ensure default deny firewall policy
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+# Ensure loopback traffic is configured
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A INPUT -s 127.0.0.0/8 -j DROP
+# Ensure outbound and established connections are configured
+iptables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT
+# Open inbound ssh(tcp port 22) connections
+iptables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
+
+```
+
+1. Ensure iptables default deny firewall policy (Automated)
+
+
+
+2. Ensure iptables loopback traffic is configured (Automated)
+
+
+
+3. Ensure iptables outbound and established connections are configured (Manual)
+
+
+
+4. Ensure iptables firewall rules exist for all open ports (Automated)
+
+
+
+##### 3 Configure IPV6 ip6tables
+
+> If IPv6 in enabled on the system, the ip6tables should be configured
+
+The following script will implement the firewall rules of this section and open port 22(ssh) from anywhere:
+
+``` bash
+#!/bin/bash
+# Flush ip6tables rules
+ip6tables -F
+# Ensure default deny firewall policy
+ip6tables -P INPUT DROP
+ip6tables -P OUTPUT DROP
+ip6tables -P FORWARD DROP
+# Ensure loopback traffic is configured
+ip6tables -A INPUT -i lo -j ACCEPT
+ip6tables -A OUTPUT -o lo -j ACCEPT
+ip6tables -A INPUT -s ::1 -j DROP
+# Ensure outbound and established connections are configured
+ip6tables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT
+ip6tables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT
+ip6tables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT
+ip6tables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT
+ip6tables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT
+ip6tables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT
+# Open inbound ssh(tcp port 22) connections
+ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
+```
+
+1. Ensure ip6tables default deny firewall policy (Automated)
+
+
+
+2. Ensure ip6tables loopback traffic is configured (Automated)
+
+
+
+3. Ensure ip6tables outbound and established connections are configured (Manual)
+
+
+
+4. Ensure ip6tables firewall rules exist for all open ports (Automated)
+
+
 
 ---
 
@@ -2670,7 +3605,6 @@ Run the following commands:
 	if `audit_backlog_limit` is not set, the system defaults to `audit_backlog_limit=64`   
 	   
 	<br>
-
 2. **Configure Data Retention**   
 	
 	**Ensure audit log storage size is configured (Automated)**
@@ -2802,6 +3736,8 @@ Run the following commands:
 
 	<br>
 
+3. Configure auditd rules  
+   
 	**Ensure changes to system administration scope (sudoers)is collected (Automated)**  
 
 	Description:  
@@ -3009,9 +3945,734 @@ Run the following commands:
 	other combination. This is important to understand for both the auditing and remediation
 	sections as the examples given are optimized for performance as per the man page.  
 
-	
+	**Ensure events that modify the sudo log file are collected
+	(Automated)**
 
-3. Configure auditd rules 
+	***Description:***
+
+	Monitor the sudo log file. If the system has been properly configured to disable the use
+	of the su command and force all administrators to have to log in first and then use sudo
+	to execute privileged commands, then all administrator commands will be logged to
+	/var/log/sudo.log . Any time a command is executed, an audit event will be triggered
+	as the /var/log/sudo.log file will be opened for write and the executed administration
+	command will be written to the log.
+
+	***Rationale:***
+	
+	Changes in `/var/log/sudo.log` indicate that an administrator has executed a command
+	or the log file itself has been tampered with. Administrators will want to correlate the
+	events written to the audit trail with the records written to `/var/log/sudo.log` to verify if
+	unauthorized commands have been executed.
+
+	***Audit:***  
+	<br>
+	On disk configuration
+	Run the following command to check the on disk rules:
+	```
+	# {
+	SUDO_LOG_FILE_ESCAPED=$(grep -r logfile /etc/sudoers* | sed -e
+	's/.*logfile=//;s/,? .*//' -e 's/"//g' -e 's|/|\\/|g')
+	[ -n "${SUDO_LOG_FILE_ESCAPED}" ] && awk "/^ *-w/ \
+	&&/"${SUDO_LOG_FILE_ESCAPED}"/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \
+	|| printf "ERROR: Variable 'SUDO_LOG_FILE_ESCAPED' is unset.\n"
+	}
+	```
+
+	Verify output of matches:
+	```
+	-w /var/log/sudo.log -p wa -k sudo_log_file
+	```
+
+	*Running configuration*
+
+	Run the following command to check loaded rules:
+	```
+	# {
+	SUDO_LOG_FILE_ESCAPED=$(grep -r logfile /etc/sudoers* | sed -e
+	's/.*logfile=//;s/,? .*//' -e 's/"//g' -e 's|/|\\/|g')
+	[ -n "${SUDO_LOG_FILE_ESCAPED}" ] && auditctl -l | awk "/^ *-w/ \
+	&&/"${SUDO_LOG_FILE_ESCAPED}"/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \
+	|| printf "ERROR: Variable 'SUDO_LOG_FILE_ESCAPED' is unset.\n"
+	}
+	```
+
+	Verify output matches:
+	```
+	-w /var/log/sudo.log -p wa -k sudo_log_file
+	```
+
+	Remediation:  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in .rules extension,
+	with the relevant rules to monitor events that modify the sudo log file.
+	Example:  
+
+	```
+	# {
+	SUDO_LOG_FILE=$(grep -r logfile /etc/sudoers* | sed -e 's/.*logfile=//;s/,?
+	.*//' -e 's/"//g')
+	[ -n "${SUDO_LOG_FILE}" ] && printf "
+	-w ${SUDO_LOG_FILE} -p wa -k sudo_log_file
+	" >> /etc/audit/rules.d/50-sudo.rules || printf "ERROR: Variable
+	'SUDO_LOG_FILE_ESCAPED' is unset.\n"
+	}
+	```
+
+	Merge and load the rules into active configuration:  
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.  
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	Additional Information:  
+
+	*Potential reboot required*   
+
+	If the auditing configuration is locked (`-e 2`), then `augenrules` will not warn in any way
+	that rules could not be loaded into the running configuration. A system reboot will be
+	required to load the rules into the running configuration.
+
+	*System call structure*
+
+	For performance (`man 7 audit.rules`) reasons it is preferable to have all the system
+	calls on one line. However, your configuration may have them on one line each or some
+	other combination. This is important to understand for both the auditing and remediation
+	sections as the examples given are optimized for performance as per the man page.
+
+	**Ensure events that modify date and time information are
+	collected (Automated)**  
+
+	*Description:*
+
+	Capture events where the system date and/or time has been modified. The parameters
+	in this section are set to determine if the;
+
+   * `adjtimex` - tune kernel clock
+   * `settimeofday` - set time using `timeval` and `timezone` structures
+   * `stime` - using seconds since 1/1/1970
+   * `clock_settime` - allows for the setting of several internal clocks and timers
+
+
+
+	system calls have been executed. Further, ensure to write an audit record to the
+	configured audit log file upon exit, tagging the records with a unique identifier such as
+	"time-change".
+
+
+	**On disk configuration**
+	Run the following command to check the on disk rules:  
+
+	```
+	# {
+	awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&/ -S/ \
+	&&(/adjtimex/ \
+	||/settimeofday/ \
+	||/clock_settime/ ) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	awk '/^ *-w/ \
+	&&/\/etc\/localtime/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	}
+	```  
+
+	Verify output of matches:  
+	```
+	-a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k timechange
+	-a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -k timechange
+	-w /etc/localtime -p wa -k time-change
+	```
+
+	**Running configuration**  
+
+	Run the following command to check loaded rules:
+
+	```
+	# {
+	auditctl -l | awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&/ -S/ \
+	&&(/adjtimex/ \
+	||/settimeofday/ \
+	||/clock_settime/ ) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	auditctl -l | awk '/^ *-w/ \
+	&&/\/etc\/localtime/ \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	}
+	```
+
+	Verify the output includes:
+	```
+	a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -F
+	key=time-change
+	-a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -F
+	key=time-change
+	-w /etc/localtime -p wa -k time-change
+	```
+
+	Remediation:  
+
+	Create audit rules
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor events that modify date and time information.
+
+	**64 Bit systems**
+
+	Example:
+	```
+	# printf "
+	-a always,exit -F arch=b64 -S adjtimex,settimeofday,clock_settime -k timechange
+	-a always,exit -F arch=b32 -S adjtimex,settimeofday,clock_settime -k timechange
+	-w /etc/localtime -p wa -k time-change
+	" >> /etc/audit/rules.d/50-time-change.rules
+	```
+
+	*Load audit rules*
+
+	<br>
+
+	Merge and load the rules into active configuration:
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	**Ensure events that modify the system's network
+	environment are collected (Automated)**
+
+
+	*Description:*
+
+	Record changes to network environment files or system calls. The below parameters
+	monitors the following system calls, and wr
+
+	- sethostname - set the systems host name
+	- setdomainname - set the systems domain name
+
+	The files being monitored are:
+
+	- `/etc/issue` and `/etc/issue.net` - messages displayed pre-login
+	- `/etc/hosts` - file containing host names and associated IP addresses
+	- `/etc/networks` - symbolic names for networks
+	- `/etc/network/` - directory containing network interface scripts and configurations files  
+	
+	<br>
+
+	*Rationale:*  
+
+	Monitoring `sethostname` and `setdomainname` will identify potential unauthorized changes
+	to host and domainname of a system. The changing of these names could potentially
+	break security parameters that are set based on those names. The `/etc/hosts` file is
+	monitored for changes that can indicate an unauthorized intruder is trying to change
+	machine associations with IP addresses and trick users and processes into connecting
+	to unintended machines. Monitoring `/etc/issue` and `/etc/issue.net` is important, as
+	intruders could put disinformation into those files and trick users into providing
+	information to the intruder. Monitoring `/etc/network` is important as it can show if
+	network interfaces or scripts are being modified in a way that can lead to the machine
+	becoming unavailable or compromised. All audit records should have a relevant tag
+	associated with them.
+
+	<br>
+
+	*Audit:*  
+
+	64 Bit systems  
+
+	<br>
+
+	*On disk configuration* 
+
+	Run the following commands to check the on disk rules:
+	```
+	# awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b(32|64)/ \
+	&&/ -S/ \
+	&&(/sethostname/ \
+	||/setdomainname/) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	# awk '/^ *-w/ \
+	&&(/\/etc\/issue/ \
+	||/\/etc\/issue.net/ \
+	||/\/etc\/hosts/ \
+	||/\/etc\/network/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	```
+
+	Verify the output matches:  
+	```
+	-a always,exit -F arch=b64 -S sethostname,setdomainname -k system-locale
+	-a always,exit -F arch=b32 -S sethostname,setdomainname -k system-locale
+	-w /etc/issue -p wa -k system-locale
+	-w /etc/issue.net -p wa -k system-locale
+	-w /etc/hosts -p wa -k system-locale
+	-w /etc/networks -p wa -k system-locale
+	```
+	*Running configuration*  
+	Run the following command to check loaded rules:
+	```
+	# auditctl -l | awk '/^ *-a *always,exit/ \
+	&&/ -F *arch=b(32|64)/ \
+	&&/ -S/ \
+	&&(/sethostname/ \
+	||/setdomainname/) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	# auditctl -l | awk '/^ *-w/ \
+	&&(/\/etc\/issue/ \
+	||/\/etc\/issue.net/ \
+	||/\/etc\/hosts/ \
+	||/\/etc\/network/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	```
+	Verify the output includes:  
+	```
+	-a always,exit -F arch=b64 -S sethostname,setdomainname -F key=system-locale
+	-a always,exit -F arch=b32 -S sethostname,setdomainname -F key=system-locale
+	-w /etc/issue -p wa -k system-locale
+	-w /etc/issue.net -p wa -k system-locale
+	-w /etc/hosts -p wa -k system-locale
+	-w /etc/networks -p wa -k system-locale
+	-w /etc/network/ -p wa -k system-locale
+	```
+
+	*Remediation:*  
+		
+	*Create audit rules*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor events that modify the system's network environment.
+
+	*64 Bit systems*
+
+	Example:  
+	```
+	# printf "
+	-a always,exit -F arch=b64 -S sethostname,setdomainname -k system-locale
+	-a always,exit -F arch=b32 -S sethostname,setdomainname -k system-locale
+	-w /etc/issue -p wa -k system-locale
+	-w /etc/issue.net -p wa -k system-locale
+	-w /etc/hosts -p wa -k system-locale
+	-w /etc/networks -p wa -k system-locale
+	-w /etc/network/ -p wa -k system-locale
+	" >> /etc/audit/rules.d/50-system_local.rules
+	```  
+	*Load audit rules*  
+
+	Merge and load the rules into active configuration:
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	<br>
+
+	***Ensure use of privileged commands are collected
+	(Automated)***
+
+	*Description:*  
+
+	Monitor privileged programs, those that have the `setuid` and/or `setgid` bit set on
+	execution, to determine if unprivileged users are running these commands.
+
+	Rationale:  
+
+	Execution of privileged commands by non-privileged users could be an indication of
+	someone trying to gain unauthorized access to the system.
+
+
+	Impact:  
+
+	Both the audit and remediation section of this recommendation will traverse all mounted
+	file systems that is not mounted with either `noexec` or `nosuid` mount options. If there are
+	large file systems without these mount options, **such traversal will be significantly
+	detrimental to the performance of the system**
+
+	Before running either the audit or remediation section, inspect the output of the following
+	command to determine exactly which file systems will be traversed:
+	```
+	# findmnt -n -l -k -it $(awk '/nodev/ { print $2 }' /proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid"
+	```
+
+	To exclude a particular file system due to adverse performance impacts, update the
+	audit and remediation sections by adding a sufficiently unique string to the `grep`
+	statement. The above command can be used to test the modified exclusions.
+
+	**Audit:**  
+
+	*On disk configuration*  
+
+	Run the following command to check on disk rules:  
+	```
+	# for PARTITION in $(findmnt -n -l -k -it $(awk '/nodev/ { print $2 }'
+	/proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid" | awk '{print
+	$1}'); do for PRIVILEGED in $(find "${PARTITION}" -xdev -perm /6000 -type f); do grep -qr "${PRIVILEGED}" /etc/audit/rules.d && printf "OK: '${PRIVILEGED}' found in auditing rules.\n" || printf "Warning: '${PRIVILEGED}' not found in on disk configuration.\n" 
+		done 
+	done
+	```
+
+	Verify that all output is **OK**.
+
+	*Running configuration*
+
+	Run the following command to check loaded rules:  
+	```
+	 # { RUNNING=$(auditctl -l) 
+	 [ -n "${RUNNING}" ] && for PARTITION in $(findmnt -n -l -k -it $(awk 
+	 '/nodev/ { print $2 }' /proc/filesystems | paste -sd,) | grep -Pv 
+	 "noexec|nosuid" | awk '{print $1}'); do 
+	 for PRIVILEGED in $(find "${PARTITION}" -xdev -perm /6000 -type f); do 
+	 printf -- "${RUNNING}" | grep -q "${PRIVILEGED}" && printf "OK: 
+	 '${PRIVILEGED}' found in auditing rules.\n" || printf "Warning: 
+	 '${PRIVILEGED}' not found in running configuration.\n"
+	 	done 
+	done \ 
+	|| printf "ERROR: Variable 'RUNNING' is unset.\n"
+	}
+	```
+
+	Verify that all output is **OK**.  
+
+	*Special mount points* 
+
+	If there are any special mount points that are not visible by default from `findmnt` as per
+	the above audit, said file systems would have to be manually audited.
+
+	*Remediation:*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor the use of privileged commands.
+	Example:  
+
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	AUDIT_RULE_FILE="/etc/audit/rules.d/50-privileged.rules"
+	NEW_DATA=()
+	for PARTITION in $(findmnt -n -l -k -it $(awk '/nodev/ { print $2 }'
+	/proc/filesystems | paste -sd,) | grep -Pv "noexec|nosuid" | awk '{print
+	$1}'); do
+	readarray -t DATA < <(find "${PARTITION}" -xdev -perm /6000 -type f | awk
+	-v UID_MIN=${UID_MIN} '{print "-a always,exit -F path=" $1 " -F perm=x -F
+	auid>="UID_MIN" -F auid!=unset -k privileged" }')
+	for ENTRY in "${DATA[@]}"; do
+	NEW_DATA+=("${ENTRY}")
+	done
+	done
+	readarray &> /dev/null -t OLD_DATA < "${AUDIT_RULE_FILE}"
+	COMBINED_DATA=( "${OLD_DATA[@]}" "${NEW_DATA[@]}" )
+	printf '%s\n' "${COMBINED_DATA[@]}" | sort -u > "${AUDIT_RULE_FILE}"
+	}
+	```
+
+	Merge and load the rules into active configuration:  
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	*Special mount points*  
+
+	If there are any special mount points that are not visible by default from just scanning /,
+	change the `PARTITION` variable to the appropriate partition and re-run the remediation.
+
+	<br>
+
+	***4.1.3.7 Ensure unsuccessful file access attempts are collected
+	(Automated)***  
+
+	*Description:*
+
+	Monitor for unsuccessful attempts to access files. The following parameters are
+	associated with system calls that control files:
+
+	- creation - `creat`
+	- opening - `open` , `openat`
+	- truncation - `truncate` , `ftruncate`  
+	  
+	<br>
+
+	An audit log record will only be written if all of the following criteria is met for the user
+	when trying to access a file:
+
+	- a non-privileged user (auid>=UID_MIN)
+	- is not a Daemon event (auid=4294967295/unset/-1)
+	- if the system call returned EACCES (permission denied) or EPERM (some other permanent error associated with the specific system call)
+
+	*Rationale:*  
+
+	Failed attempts to open, create or truncate files could be an indication that an individual
+	or process is trying to gain unauthorized access to the system.
+
+	*Audit:*  
+
+	*64 Bit systems*  
+
+	**On disk configuration**
+
+	Run the following command to check the on disk rules:
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&/ -F *auid>=${UID_MIN}/ \
+	&&(/ -F *exit=-EACCES/||/ -F *exit=-EPERM/) \
+	&&/ -S/ \
+	&&/creat/ \
+	&&/open/ \
+	&&/truncate/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \
+	|| printf "ERROR: Variable 'UID_MIN' is unset.\n"
+	}
+	```
+
+	Verify the output includes:  
+	```
+	-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EACCES -F auid>=1000 -F auid!=unset -k access
+	-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EPERM -F auid>=1000 -F auid!=unset -k access
+	-a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EACCES -F auid>=1000 -F auid!=unset -k access
+	-a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EPERM -F auid>=1000 -F auid!=unset -k access
+	```
+
+	*Running configuration*
+
+	Run the following command to check loaded rules:
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&/ -F *auid>=${UID_MIN}/ \
+	&&(/ -F *exit=-EACCES/||/ -F *exit=-EPERM/) \
+	&&/ -S/ \
+	&&/creat/ \
+	&&/open/ \
+	&&/truncate/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \
+	|| printf "ERROR: Variable 'UID_MIN' is unset.\n"
+	}
+	```  
+
+	Verify the output includes:  
+	```
+	-a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat -F exit=-
+	EACCES -F auid>=1000 -F auid!=-1 -F key=access
+	-a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat -F exit=-
+	EPERM -F auid>=1000 -F auid!=-1 -F key=access
+	-a always,exit -F arch=b32 -S open,truncate,ftruncate,creat,openat -F exit=-
+	EACCES -F auid>=1000 -F auid!=-1 -F key=access
+	-a always,exit -F arch=b32 -S open,truncate,ftruncate,creat,openat -F exit=-
+	EPERM -F auid>=1000 -F auid!=-1 -F key=access
+	```
+
+	*Remediation:*  
+
+	*Create audit rules*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor unsuccessful file access attempts.  
+
+	*64 Bit systems*  
+
+	Example:  
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && printf "
+	-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EACCES -F auid>=${UID_MIN} -F auid!=unset -k access
+	-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EPERM -F auid>=${UID_MIN} -F auid!=unset -k access
+	-a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EACCES -F auid>=${UID_MIN} -F auid!=unset -k access
+	-a always,exit -F arch=b32 -S creat,open,openat,truncate,ftruncate -F exit=-
+	EPERM -F auid>=${UID_MIN} -F auid!=unset -k access
+	" >> /etc/audit/rules.d/50-access.rules || printf "ERROR: Variable 'UID_MIN'
+	is unset.\n"
+	}
+	```	
+	Load audit rules  
+
+	Merge and load the rules into active configuration:
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.  
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+	<br>
+
+	***Ensure events that modify user/group information are
+	collected (Automated)***  
+
+	*Description:*  
+
+	Record events affecting the modification of user or group information, including that of
+	passwords and old passwords if in use.
+
+	- `/etc/group` - system groups
+	- `/etc/passwd` - system users
+	- `/etc/gshadow` - encrypted password for each group
+	- `/etc/shadow` - system user passwords
+	- `/etc/security/opasswd` - storage of old passwords if the relevant PAM module is in use
+
+	<br>
+
+	The parameters in this section will watch the files to see if they have been opened for
+	write or have had attribute changes (e.g. permissions) and tag them with the identifier
+	"identity" in the audit log file.
+
+	Rationale:
+	Unexpected changes to these files could be an indication that the system has been
+	compromised and that an unauthorized user is attempting to hide their activities or
+	compromise additional accounts.
+
+	*Audit:*  
+
+	*On disk configuration*  
+
+	Run the following command to check the on disk rules:
+
+	```
+	# awk '/^ *-w/ \
+	&&(/\/etc\/group/ \
+	||/\/etc\/passwd/ \
+	||/\/etc\/gshadow/ \
+	||/\/etc\/shadow/ \
+	||/\/etc\/security\/opasswd/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	```
+
+	Verify the output matches:  
+	```
+	-w /etc/group -p wa -k identity
+	-w /etc/passwd -p wa -k identity
+	-w /etc/gshadow -p wa -k identity
+	-w /etc/shadow -p wa -k identity
+	-w /etc/security/opasswd -p wa -k identity
+	```  
+
+	*Running configuration*
+
+	Run the following command to check loaded rules:
+	```
+	# auditctl -l | awk '/^ *-w/ \
+	&&(/\/etc\/group/ \
+	||/\/etc\/passwd/ \
+	||/\/etc\/gshadow/ \
+	||/\/etc\/shadow/ \
+	||/\/etc\/security\/opasswd/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	```  
+	Verify the output matches:
+
+	```
+	-w /etc/group -p wa -k identity
+	-w /etc/passwd -p wa -k identity
+	-w /etc/gshadow -p wa -k identity
+	-w /etc/shadow -p wa -k identity
+	-w /etc/security/opasswd -p wa -k identity
+	```  
+
+	*Remediation:*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor events that modify user/group information.
+	
+	Example:
+	```
+	# printf "
+	-w /etc/group -p wa -k identity
+	-w /etc/passwd -p wa -k identity
+	-w /etc/gshadow -p wa -k identity
+	-w /etc/shadow -p wa -k identity
+	-w /etc/security/opasswd -p wa -k identity
+	" >> /etc/audit/rules.d/50-identity.rules
+	```  
+
+	Merge and load the rules into active configuration:
+
+	```
+	# augenrules --load
+	```
+
+	Check if reboot is required.  
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```  
+
+	<br>
+
+	**Ensure discretionary access control permission modification events are collected (Automated)**
+
+	*Description:*  
+
+	Monitor changes to file permissions, attributes, ownership and group. The parameters in
+	this section track changes for system calls that affect file permissions and attributes.
+	The following commands and system calls effect the permissions, ownership and
+	various attributes of files.  
+
+	- `chmod`
+	- `fchmod`
+	- `fchmodat`
+	- `chown`
+	- `fchown`
+	- `fchownat`
+	- `lchown`
+	- `setxattr`
+	- `lsetxattr`
+	- `fsetxattr`
+	- `removexattr`
+	- `lremovexattr`
+	- `fremovexattr`
+
+	<br>
+
+	In all cases, an audit record will only be written for non-system user ids and will ignore
+	Daemon events. All audit records will be tagged with the identifier "perm_mod."
+
+	
 
 4. Configure auditd file access  
 

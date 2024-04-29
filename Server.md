@@ -10,6 +10,8 @@
 
 >:page_with_curl: This documentation is being swiftly written in preparation for the CyberPatriot Nationals. Basically, it might be a little messy.
 
+>:page_with_curl: You will need to install GPMC! Refer to: [Link](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn265969(v=ws.11)) and you will need a domain user account: [Link](https://learn.microsoft.com/en-us/microsoft-desktop-optimization-pack/medv-v1/how-to-configure-a-domain-user-or-groupmedvv2)
+
 - ## 1. Account Policies
     - ### 1.1 Password Policies
         - #### 1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Automated)
@@ -736,7 +738,7 @@
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\WindowsDefender Firewall with Advanced Security\Window Defender Firewall with Advanced Security\Windows Firewall Properties\Private Profile\Settings Customize\Display a notification
         ```
-        Default Value: **Yes**
+        Defalut Value: **Yes**<br></br>
         ***Recommended Value: **no** ***
     - #### 9.2.5 Ensure 'Windows Firewall: Private: Logging: Name' is set to '%SystemTooy%\System32\logfiles\firewall\Privatefw.log'(Automated)
         To establish the recommended configuration via GP, set the following UI path to ***%SystemRoot%\System32\logfiles\firewall\privatefw.log***:
@@ -751,21 +753,21 @@
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Windows Firewall Properties\Private Profile\Logging Customize\Size limit (KB)
         ```
-        Default Value: **4,096 KB**
-        ***Recommended Value: **16,384 KB' or greater** ***
+        Defalut Value: **4,096 KB**
+        ***Recommended Value: 16,384 KB' or greater ***
     - #### 9.2.7 Ensure 'Windows Firewall: Private: Log dropped packets' is set to 'Yes' (Automated)
         To establish the recommended configuration via GP, set the following UI path to ***Yes***:
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Windows Firewall Properties\Private Profile\Logging Customize\Log dropped packets
         ```
-        Default Value: **No**
+        Defalut Value: **No**<br></br>
         ***Recommended Value: **Yes** ***
     - #### 9.2.8 Ensure 'Windows Firewall: Private: Log successful connections' is set to 'Yes' (Automated)
         To establish the recommended configuration via GP, set the following UI path to ***Yes***:
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Windows Firewall Properties\Private Profile\Logging Customize\Log successful connections
         ```
-        Default Value: **No**
+        Defalut Value: **No**<br></br>
         ***Recommended Value: **Yes** ***
 - #### 9.3 Public Profile
  - #### 9.3.1 (L1) Ensure 'Windows Firewall: Public: Firewall state' is set to 'On (recommended)' (Automated)
@@ -791,21 +793,21 @@
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Windows Firewall Properties\Public Profile\Settings Customize\Display a notification
         ```
-        Default Value: **Yes**
+        Defalut Value: **Yes**<br></br>
         ***Recommended Value: **No** *** 
     - #### 9.3.5 (L1) Ensure 'Windows Firewall: Public: Settings: Apply local firewall rules' is set to 'No' (Automated)   
         To establish the recommended configuration via GP, set the following UI path to ***No***:
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Windows Firewall Properties\Public Profile\Settings Customize\Apply local firewall rules
         ```
-        Default Value: **Yes**
+        Defalut Value: **Yes**<br></br>
         ***Recommended Value: **No** ***     
     - #### 9.3.6 (L1) Ensure 'Windows Firewall: Public: Settings: Apply local connection security rules' is set to 'No' (Automated)
         To establish the recommended configuration via GP, set the following UI path to ***No***:
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Windows Firewall Properties\Public Profile\Settings Customize\Apply local connection security rules
         ```
-        Default Value: **Yes**
+        Defalut Value: **Yes**<br></br>
         ***Recommended Value: **No** *** 
     - #### 9.3.7 (L1) Ensure 'Windows Firewall: Public: Logging: Name' is set to '%SystemRoot%\System32\logfiles\firewall\publicfw.log'(Automated)
         To establish the recommended configuration via GP, set the following UI path to ***%SystemRoot%\System32\logfiles\firewall\publicfw.log***:
@@ -818,25 +820,246 @@
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Windows Firewall Properties\Public Profile\Logging Customize\Size limit (KB)
         ```
-        Default Value: **4,096 KB**
+        Default Value: **4,096 KB**<br></br>
         ***Recommended Value: **16,384 KB or greater** *** 
     - #### 9.3.9 (L1) Ensure 'Windows Firewall: Public: Logging: Log dropped packets' is set to 'Yes' (Automated)
         To establish the recommended configuration via GP, set the following UI path to ***Yes***:
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Public Profile\Logging Customize\Log dropped packets
         ```
-        Default Value: **No**
+        Default Value: **No**<br></br>
         ***Recommended Value: **Yes** *** 
     - #### 9.3.10 (L1) Ensure 'Windows Firewall: Public: Logging: Log successful connections' is set to 'Yes' (Automated)
         To establish the recommended configuration via GP, set the following UI path to ***Yes***:
         ```
         Computer Configuration\Policies\Windows Settings\Security Settings\Windows Defender Firewall with Advanced Security\Windows Defender Firewall with Advanced Security\Windows Firewall Properties\Public Profile\Logging Customize\Log successful connections
         ```
-        Default Value: **No**
+        Default Value: **No**<br></br>
         ***Recommended Value: **Yes** *** 
 - ## 17 Advanced Audit Policy Configuration
     This section contains recommendations for configuring the Windows audit facilities.
     - ### 17.1 Account Logon
+        - #### 17.1.1 (L1) Ensure 'Audit Credential Validation' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to Success and Failure:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Logon\Audit Credential Validation
+        '''
+        - #### 17.1.2 (L1) Ensure 'Audit Kerberos Authentication Service' is set to 'Success and Failure' (DC Only) (Automated)
+        To establish the recommended configuration via GP, set the following UI path to Success and Failure:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Logon\Audit Kerberos Authentication Service
+        '''
+
+        - #### 17.1.3 (L1) Ensure 'Audit Kerberos Service Ticket Operations' is set to 'Success and Failure' (DC Only) (Automated)
+        To establish the recommended configuration via GP, set the following UI path to Success and Failure:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Logon\Audit Kerberos Service Ticket Operations
+        '''
+    - ### 17.2 Account Management
+        - #### 17.2.1 (L1) Ensure 'Audit Application Group Management' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to Success and Failure:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Management\Audit Application Group Management
+        '''
+        - #### 17.2.2 (L1) Ensure 'Audit Computer Account Management' is set to include 'Success' (DC only) (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Management\Audit Computer Account Management
+        '''
+        - #### 17.2.3 (L1) Ensure 'Audit Distribution Group Management' is set to include 'Success' (DC only) (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Management\Audit Distribution Group Management
+        '''
+        - #### 17.2.4 (L1) Ensure 'Audit Other Account Management Events' is set to include 'Success' (DC only) (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Management\Audit Other Account Management Events
+        '''
+        - #### 17.2.5 (L1) Ensure 'Audit Security Group Management' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Management\Audit Security Group Management
+        '''
+        - #### 17.2.6 (L1) Ensure 'Audit User Account Management' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Management\Audit User Account Management
+        '''
+    - ### 17.3 Detailed Tracking 
+        - #### 17.3.1 (L1) Ensure 'Audit PNP Activity' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Detailed Tracking\Audit PNP Activity
+        '''
+        - #### 17.3.2 (L1) Ensure 'Audit Process Creation' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Detailed Tracking\Audit Process Creation
+        '''
+    - ### 17.4 DS Access
+        - #### 17.4.1 (L1) Ensure 'Audit Directory Service Access' is set to include 'Failure' (DC only) (Automated) 
+        To establish the recommended configuration via GP, set the following UI path to include ***Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\DS Access\Audit Directory Service Access
+        '''
+        - #### 17.4.2 (L1) Ensure 'Audit Directory Service Changes' is set to include 'Success' (DC only) (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\DS Access\Audit Directory Service Changes
+        '''
+    - ### 17.5 Logon/Logoff 
+        - #### 17.5.1 (L1) Ensure 'Audit Account Lockout' is set to include 'Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Logon/Logoff\Audit Account Lockout
+        '''
+        - #### 17.5.2 (L1) Ensure 'Audit Group Membership' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Logon/Logoff\Audit Group Membership
+        '''
+        - #### 17.5.3 (L1) Ensure 'Audit Logoff' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+        
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Logon/Logoff\Audit Logoff
+        '''
+        - #### 17.5.4 (L1) Ensure 'Audit Logon' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Logon/Logoff\Audit Logon
+        '''
+        - #### 17.5.5 (L1) Ensure 'Audit Other Logon/Logoff Events' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Logon/Logoff\Audit Other Logon/Logoff Events
+        '''
+        - #### 17.5.6 (L1) Ensure 'Audit Special Logon' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Logon/Logoff\Audit Special Logon
+        '''
+    - ### 17.6 Object Access
+        - #### 17.6.1 (L1) Ensure 'Audit Detailed File Share' is set to include 'Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Object Access\Audit Detailed File Share
+        '''
+        - #### 17.6.2 (L1) Ensure 'Audit File Share' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Object Access\Audit File Share
+        '''
+        - #### 17.6.3 (L1) Ensure 'Audit Other Object Access Events' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Object Access\Audit Other Object Access Events
+        '''
+        - #### 17.6.4 (L1) Ensure 'Audit Removable Storage' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Object Access\Audit Removable Storage
+        '''
+    - ### 17.7 Policy Change
+        - #### 17.7.1 (L1) Ensure 'Audit Audit Policy Change' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Policy Change\Audit Audit Policy Change
+        '''
+        - #### 17.7.2 (L1) Ensure 'Audit Authentication Policy Change' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Policy Change\Audit Authentication Policy Change
+        '''
+        - #### 17.7.3 (L1) Ensure 'Audit Authorization Policy Change' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Policy Change\Audit Authorization Policy Change
+        '''
+        - #### 17.7.4 (L1) Ensure 'Audit MPSSVC Rule-Level Policy Change' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Policy Change\Audit MPSSVC Rule-Level Policy Change
+        '''
+        - #### 17.7.5 (L1) Ensure 'Audit Other Policy Change Events' is set to include 'Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Policy Change\Audit Other Policy Change Events
+        '''
+    - ### 17.8 Privilege Use
+        - #### 17.8.1 (L1) Ensure 'Audit Sensitive Privilege Use' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Privilege Use\Audit Sensitive Privilege Use
+        '''
+    - ### 17.9 System
+        - #### 17.9.1 (L1) Ensure 'Audit IPsec Driver' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\System\Audit IPsec Driver
+        '''
+        - #### 17.9.2 (L1) Ensure 'Audit Other System Events' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\System\Audit Other System Events
+        '''
+        - #### 17.9.3 (L1) Ensure 'Audit Security State Change' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\System\Audit Security State Change
+        '''
+        - #### 17.9.4 (L1) Ensure 'Audit Security System Extension' is set to include 'Success' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to include ***Success***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\System\Audit Security System Extension
+        '''
+        - #### 17.9.5 (L1) Ensure 'Audit System Integrity' is set to 'Success and Failure' (Automated)
+        To establish the recommended configuration via GP, set the following UI path to ***Success and Failure***:
+
+        '''
+        Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\System\Audit System Integrity
+        '''
+    - ### 18.1 Control Panel
+        - #### 18.1.1.1 (L1) Ensure 'Prevent enabling lock screen camera' is set to 'Enabled' (Automated) 
+        To establish the recommended configuration via GP, set the following UI path to ***Enabled***:
+
+        '''
+        Computer Configuration\Policies\Administrative Templates\Control Panel\Personalization\Prevent enabling lock screen camera
+        '''
+        - #### 18.1.1.2 (L1) Ensure 'Prevent enabling lock screen slide show' is set to 'Enabled' (Automated)
 
 <br><br>
 
