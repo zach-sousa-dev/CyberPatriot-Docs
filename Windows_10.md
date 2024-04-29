@@ -2046,18 +2046,6 @@ This section is intentionally blank and exists to ensure the structure of Window
 
 ---
 
-## 17. Advanced Audit Policy Configuration
-### 17.1. Account Logon
-#### 17.1.1.  Ensure 'Audit Credential Validation' is set to 'Success 
-and Failure' (Automated)
-
-<br></br>
-  
-
-
-
----
-
 ## Windows Defender Firewall with Advanced Security
 
 ### Private Profile
@@ -2285,6 +2273,16 @@ Customize\Log successful connections
 
 
 ---
+
+
+## 17. Advanced Audit Policy Configuration
+### 17.1. Account Logon
+#### 17.1.1.  Ensure 'Audit Credential Validation' is set to 'Success and Failure' (Automated)
+
+<br></br>
+
+---
+
 
 ## 19. Administrative Templates (User) 
 ### 19.1 Control Panel
