@@ -62,6 +62,7 @@
 					- [3 Configure IPV6 ip6tables](#3-configure-ipv6-ip6tables)
 	- [4 Logging and Auditing](#4-logging-and-auditing)
 		- [1 Configure System Accounting (auditd)](#1-configure-system-accounting-auditd)
+    		- [1 Configure System Accounting auditd](#1-configure-system-accounting-auditd)
 		- [2 Configure Logging](#2-configure-logging)
 	- [5 Access Authentication and Authorization](#5-access-authentication-and-authorization)
 		- [1 Configure time-based job schedulers](#1-configure-time-based-job-schedulers)
@@ -4038,7 +4039,7 @@ ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 
 ## 4 Logging and Auditing
 
-###  1 Configure System Accounting (auditd)
+###  1 Configure System Accounting auditd
 
 1. **Ensure auditing is enabled**
 
@@ -5235,7 +5236,463 @@ ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 	In all cases, an audit record will only be written for non-system user ids and will ignore
 	Daemon events. All audit records will be tagged with the identifier "perm_mod."
 
+	In all cases, an audit record will only be written for non-system user ids and will ignore
+	Daemon events. All audit records will be tagged with the identifier "perm_mod."
+
+	*Rationale:*  
+
+	Monitoring for changes in file attributes could alert a system administrator to activity that
+	could indicate intruder activity or policy violation.  
+
+	*Audit:*  
+
+	*64 Bit systems*  
+
+	*On disk configuration*  
+
+	Run the following command to check the on disk rules:
+
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&/ -S/ \
+	&&/ -F *auid>=${UID_MIN}/ \
+	&&(/chmod/||/fchmod/||/fchmodat/ \
+	||/chown/||/fchown/||/fchownat/||/lchown/ \
+	||/setxattr/||/lsetxattr/||/fsetxattr/ \
+	||/removexattr/||/lremovexattr/||/fremovexattr/) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \
+	|| printf "ERROR: Variable 'UID_MIN' is unset.\n"
+	}
+	```
+
+	Verify the output matches:  
+
+	```
+	-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F
+	auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=1000 -F
+	auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>=1000 -F
+	auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b32 -S lchown,fchown,chown,fchownat -F auid>=1000 -F
+	auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b64 -S
+	setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F
+	auid>=1000 -F auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b32 -S
+	setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F
+	auid>=1000 -F auid!=unset -F key=perm_mod
+	```  
+
+	*Running configuration*  
+
+	Run the following command to check loaded rules:  
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&/ -S/ \
+	&&/ -F *auid>=${UID_MIN}/ \
+	&&(/chmod/||/fchmod/||/fchmodat/ \
+	||/chown/||/fchown/||/fchownat/||/lchown/ \
+	||/setxattr/||/lsetxattr/||/fsetxattr/ \
+	||/removexattr/||/lremovexattr/||/fremovexattr/) \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \
+	|| printf "ERROR: Variable 'UID_MIN' is unset.\n"
+	}
+
+	```
+
+	Verify the output matches:  
+
+	```
+	-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=-1
+	-F key=perm_mod
+	-a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F auid>=1000 -F
+	auid!=-1 -F key=perm_mod
+	-a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=-1
+	-F key=perm_mod
+	-a always,exit -F arch=b32 -S lchown,fchown,chown,fchownat -F auid>=1000 -F
+	auid!=-1 -F key=perm_mod
+	-a always,exit -F arch=b64 -S
+	setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F
+	auid>=1000 -F auid!=-1 -F key=perm_mod
+	-a always,exit -F arch=b32 -S
+	setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F
+	auid>=1000 -F auid!=-1 -F key=perm_mod
+	```  
+
+	*32 Bit systems*
+
+	Follow the same procedures as for 64 bit systems and ignore any entries with `b64`.  
+
+	Remediation:  
+
+	Create audit rules
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor discretionary access control permission modification
+	events.  
+
+	*64 Bit systems*  
+
+	Example:  
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && printf "
+	-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=${UID_MIN} -F
+	auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b64 -S chown,fchown,lchown,fchownat -F
+	auid>=${UID_MIN} -F auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>=${UID_MIN} -F
+	auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b32 -S lchown,fchown,chown,fchownat -F
+	auid>=${UID_MIN} -F auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b64 -S
+	setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F
+	auid>=${UID_MIN} -F auid!=unset -F key=perm_mod
+	-a always,exit -F arch=b32 -S
+	setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F
+	auid>=${UID_MIN} -F auid!=unset -F key=perm_mod
+	" >> /etc/audit/rules.d/50-perm_mod.rules || printf "ERROR: Variable
+	'UI
+	```
 	
+		
+	*Load audit rules*  
+
+	Merge and load the rules into active configuration:
+
+	```
+	#  augenrules --load
+	```  
+
+	Check if reboot is required
+
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```  
+
+	Ensure successful file system mounts are collected
+	(Automated)  
+
+	*Description:*  
+
+	Monitor the use of the `mount` system call. The `mount` (and `umount` ) system call controls
+	the mounting and unmounting of file systems. The parameters below configure the
+	system to create an audit record when the mount system call is used by a nonprivileged user  
+
+	Rationale:  
+
+	It is highly unusual for a non privileged user to `mount` file systems to the system. While
+	tracking `mount` commands gives the system administrator evidence that external media
+	may have been mounted (based on a review of the source of the mount and confirming
+	it's an external media type), it does not conclusively indicate that data was exported to
+	the media. System administrators who wish to determine if data were exported, would
+	also have to track successful `open`, `creat` and `truncate` system calls requiring write
+	access to a file under the mount point of the external media file system. This could give
+	a fair indication that a write occurred. The only way to truly prove it, would be to track
+	successful writes to the external media. Tracking write system calls could quickly fill up
+	the audit log and is not recommended. Recommendations on configuration options to
+	track data export to media is beyond the scope of this document.  
+
+
+	*Audit:*  
+
+	*64 Bit systems*  
+
+	*On disk configuration*  
+
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && awk "/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&/ -F *auid>=${UID_MIN}/ \
+	&&/ -S/ \
+	&&/mount/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" /etc/audit/rules.d/*.rules \
+	|| printf "ERROR: Variable 'UID_MIN' is unset.\n"
+	}
+	```  
+
+	Verify the output matches:
+	```
+	-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=unset -k mounts
+	-a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=unset -k mounts
+	```  
+
+	*Running configuration*  
+
+	Run the following command to check loaded rules:
+
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && auditctl -l | awk "/^ *-a *always,exit/ \
+	&&/ -F *arch=b[2346]{2}/ \
+	&&(/ -F *auid!=unset/||/ -F *auid!=-1/||/ -F *auid!=4294967295/) \
+	&&/ -F *auid>=${UID_MIN}/ \
+	&&/ -S/ \
+	&&/mount/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)" \
+	|| printf "ERROR: Variable 'UID_MIN' is unset.\n"
+	}
+	```  
+
+	Verify the output matches:  
+
+	```
+	-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=-1 -F key=mounts
+	-a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=-1 -F key=mounts
+	```
+
+	*32 Bit systems*
+
+	Follow the same procedures as for 64 bit systems and ignore any entries with `b64`.  
+
+	*Remediation:*  
+
+	Create audit rules
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor discretionary access control permission modification
+	events.  
+
+	*64 bit systems*  
+
+	Example:  
+	```
+	# {
+	UID_MIN=$(awk '/^\s*UID_MIN/{print $2}' /etc/login.defs)
+	[ -n "${UID_MIN}" ] && printf "
+	-a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=unset -k mounts
+	-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=unset -k mounts
+	" >> /etc/audit/rules.d/50-mounts.rules || printf "ERROR: Variable 'UID_MIN'
+	is unset.\n"
+	}
+	```  
+
+	Load audit rules  
+	
+	Merge and load the rules into active configuration:
+	```
+	# augenrules --load
+	```  
+	Check if reboot is required.
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	<br>
+
+	**Ensure session initiation information is collected
+	(Automated)**
+
+	*Description:*  
+
+	Monitor session initiation events. The parameters in this section track changes to the
+	files associated with session events
+
+	- `/var/run/utmp` - tracks all currently logged in users.
+	- `/var/log/wtmp` - file tracks logins, logouts, shutdown, and reboot events.
+	- `/var/log/btmp` - keeps track of failed login attempts and can be read by entering
+		the command `/usr/bin/last` -f `/var/log/btmp`.
+
+	All audit records will be tagged with the identifier "session."  
+
+	*Rationale:*
+
+	Monitoring these files for changes could alert a system administrator to logins occurring
+	at unusual hours, which could indicate intruder activity (i.e. a user logging in at a time
+	when they do not normally log in).  
+
+	*Audit:*  
+
+	*On disk configuration*  
+
+	Run the following command to check the on disk rules:  
+
+	```
+	# awk '/^ *-w/ \
+	&&(/\/var\/run\/utmp/ \
+	||/\/var\/log\/wtmp/ \
+	||/\/var\/log\/btmp/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	```
+
+	Verify the output matches: 
+
+	```
+	-w /var/run/utmp -p wa -k session
+	-w /var/log/wtmp -p wa -k session
+	-w /var/log/btmp -p wa -k session
+	```  
+
+	*Running configuration*  
+
+	Run the following command to check loaded rules:
+
+	```
+	# auditctl -l | awk '/^ *-w/ \
+	&&(/\/var\/run\/utmp/ \
+	||/\/var\/log\/wtmp/ \
+	||/\/var\/log\/btmp/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+
+	``` 
+
+	Verify the output matches:  
+
+	```
+	-w /var/run/utmp -p wa -k session
+	-w /var/log/wtmp -p wa -k session
+	-w /var/log/btmp -p wa -k session
+	```  
+
+	*Remediation:*  
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor session initiation information.
+
+	*Example:*  
+
+	```
+	# printf "
+	-w /var/run/utmp -p wa -k session
+	-w /var/log/wtmp -p wa -k session
+	-w /var/log/btmp -p wa -k session
+	" >> /etc/audit/rules.d/50-session.rules
+	```  
+	Merge and load the rules into active configuration:  
+
+	```
+	# augenrules --load
+	```  
+	Check if reboot is required.  
+
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```  
+
+	**Ensure login and logout events are collected
+	(Automated)**  
+
+	*Description:*  
+
+	Monitor login and logout events. The parameters below track changes to files
+	associated with login/logout events.
+
+	- `/var/log/lastlog` - maintain records of the last time a user successfully logged
+		in.
+	- `/var/run/faillock` - directory maintains records of login failures via the
+		`pam_faillock` module.  
+
+	*Rationale:*  
+
+	Monitoring login/logout events could provide a system administrator with information
+	associated with brute force attacks against user logins.  
+
+	*Audit:*  
+
+	*64 Bit systems*  
+
+	*On disk configuration*  
+
+	```
+	# awk '/^ *-w/ \
+	&&(/\/var\/log\/lastlog/ \
+	||/\/var\/run\/faillock/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)' /etc/audit/rules.d/*.rules
+	```
+
+	Verify the output matches:
+
+	```
+	w /var/log/lastlog -p wa -k logins
+	-w /var/run/faillock -p wa -k logins
+	```
+
+	*Running configuration*  
+
+	Run the following command to check loaded rules:  
+
+	```
+	# auditctl -l | awk '/^ *-w/ \
+	&&(/\/var\/log\/lastlog/ \
+	||/\/var\/run\/faillock/) \
+	&&/ +-p *wa/ \
+	&&(/ key= *[!-~]* *$/||/ -k *[!-~]* *$/)'
+	```  
+
+	Verify the output matches:  
+
+	```
+	-w /var/log/lastlog -p wa -k logins
+	-w /var/run/faillock -p wa -k logins
+	```
+
+	*Remediation:*
+
+	Edit or create a file in the `/etc/audit/rules.d/` directory, ending in `.rules` extension,
+	with the relevant rules to monitor login and logout events.
+
+	*Example:*
+	```
+	# printf "
+	-w /var/log/lastlog -p wa -k logins
+	-w /var/run/faillock -p wa -k logins
+	" >> /etc/audit/rules.d/50-login.rules
+	```  
+
+	Merge and load the rules into active configuration:
+
+	Check if reboot is required.  
+
+	```
+	# augenrules --load
+	```
+
+	```
+	# if [[ $(auditctl -s | grep "enabled") =~ "2" ]]; then printf "Reboot
+	required to load rules\n"; fi
+	```
+
+	<br>
+
+	**Ensure file deletion events by users are collected
+	(Automated)**  
+
+	*Description:*  
+
+	Monitor the use of system calls associated with the deletion or renaming of files and file
+	attributes. This configuration statement sets up monitoring for: 
+
+	- `unlink` - remove a file
+	- `unlinkat` - remove a file attribute
+	- `rename` - rename a file
+	- `renameat` rename a file attribute system calls and tags them with the identifier
+		"delete".
+
+	*Rationale:*  
+
+	Monitoring these calls from non-privileged users could provide a system administrator
+	with evidence that inappropriate removal of files and file attributes associated with
+	protected files is occurring. While this audit option will look at all events, system
+	administrators will want to look for specific privileged files that are being deleted or
+	altered
 
 4. Configure auditd file access  
 
