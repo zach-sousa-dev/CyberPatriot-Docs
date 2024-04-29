@@ -705,4 +705,237 @@ computer is locked
 **REMIDIATION** To establish the recommended configuration via GP, set the following UI path to 
 Enabled
 
-### 18.10.10
+### 18.10.10.1 (L2) Ensure 'Allow Use of Camera' is set to 'Disabled' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Camera\Allow Use of Camera
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to 
+Disabled
+
+---
+
+### 18.10.12.1 (L1) Ensure 'Turn off cloud consumer account state content' is set to 'Enabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Cloud Content\Turn off cloud consumer account state content
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to 
+Enabled:
+
+---
+
+### 18.10.12.2 (L2) Ensure 'Turn off cloud optimized content' is set to 'Enabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Cloud Content\Turn off cloud optimized content
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Enabled
+
+---
+
+### 18.10.12.3 (L1) Ensure 'Turn off Microsoft consumer experiences' is set to 'Enabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Cloud Content\Turn off Microsoft consumer experiences
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to 
+Enabled:
+
+---
+
+### 18.10.13.1 (L1) Ensure 'Require pin for pairing' is set to 'Enabled: First Time' OR 'Enabled: Always' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Connect\Require pin for pairin
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to 
+Enabled: First Time OR Enabled: Always
+
+---
+
+### 18.10.14.1 (L1) Ensure 'Do not display the password reveal button' is set to 'Enabled' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Credential User Interface\Do not display the password reveal 
+button
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to 
+Enabled
+
+---
+
+### 18.10.14.2 (L1) Ensure 'Enumerate administrator accounts on elevation' is set to 'Disabled' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Credential User Interface\Enumerate administrator accounts on 
+elevation
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Disabled:
+
+---
+
+### 18.10.14.3 (L1) Ensure 'Prevent the use of security questions for local accounts' is set to 'Enabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Credential 
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to 
+Enabled:
+
+---
+
+
+### 18.10.15.1 (L1) Ensure 'Allow Diagnostic Data' is set to 'Enabled: Diagnostic data off (not recommended)' or 'Enabled: Send required diagnostic data' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Data Collection and Preview Builds\Allow Diagnostic Data
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Enabled: Diagnostic data off (not recommended) or Enabled: Send required 
+diagnostic data
+
+---
+
+### 18.10.15.2 (L2) Ensure 'Configure Authenticated Proxy usage for the Connected User Experience and Telemetry service' is set to 'Enabled: Disable Authenticated Proxy usage' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Data Collection and Preview Builds\Configure Authenticated Proxy 
+usage for the Connected User Experience and Telemetry service
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Enabled: Disable Authenticated Proxy usage
+
+---
+
+### 18.10.15.3 (L1) Ensure 'Disable OneSettings Downloads' is set to 'Enabled' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Data Collection and Preview Builds\Disable OneSettings Downloads
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Enabled
+
+---
+
+### 18.10.15.4 (L1) Ensure 'Do not show feedback notifications' is set to 'Enabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Data Collection and Preview Builds\Do not show feedback 
+notifications
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Enabled:
+
+---
+
+### 18.10.15.5 (L1) Ensure 'Enable OneSettings Auditing' is set to 'Enabled' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Data Collection and Preview Builds\Enable OneSettings Auditing
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Enabled
+
+---
+
+
+### 18.10.15.6 (L1) Ensure 'Limit Diagnostic Log Collection' is set to 'Enabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Data Collection and Preview Builds\Limit Diagnostic Log Collection
+```
+
+**REMEDIATION** To establish the recommended configuration via GP, set the following UI path to 
+Enabled:
+
+---
+
+### 18.10.15.7 (L1) Ensure 'Limit Dump Collection' is set to 'Enabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows
+Components\Data Collection and Preview Builds\Limit Dump Collection
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Enabled
+
+---
+
+### 18.10.15.8 (L1) Ensure 'Toggle user control over Insider builds' is set to 'Disabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Data Collection and Preview Builds\Toggle user control over 
+Insider build
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Disabled
+
+---
+
+### 18.10.16.1 (L1) Ensure 'Download Mode' is NOT set to 'Enabled: Internet' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Delivery Optimization\Download Mode
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to any value other than Enabled: Internet (3)
+
+---
+
+### 18.10.17.1 (L1) Ensure 'Enable App Installer' is set to 'Disabled' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Desktop App Installer\Enable App Installer
+```
+
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to 
+Disabled:
+
+---
+
+### 18.10.17.2 (L1) Ensure 'Enable App Installer Experimental Features' is set to 'Disabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Desktop App Installer\Enable App Installer Experimental Features
+```
+
+**REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Disabled
+
+
+
