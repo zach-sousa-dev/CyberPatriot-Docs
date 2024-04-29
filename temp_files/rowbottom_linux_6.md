@@ -17,7 +17,7 @@ Run the following command to set permissions on /etc/passwd:
 # chown root:root /etc/passwd
 # chmod u-x,go-wx /etc/passwd
 ```
-
+---
 2. Ensure permissions on /etc/passwd- are configured (Automated)   
 
 #### Description:   
@@ -37,7 +37,7 @@ Run the following command to set permissions on /etc/passwd- :
 # chown root:root /etc/passwd-
 # chmod u-x,go-wx /etc/passwd-
 ```
-
+---
 3. Ensure permissions on /etc/group are configured 
 (Automated)   
 #### Description:
@@ -59,6 +59,7 @@ Run the following command to set permissions on /etc/group :
 # chown root:root /etc/group
 # chmod u-x,go-wx /etc/group
 ```
+---
 4. Ensure permissions on /etc/group- are configured 
 (Automated)  
 #### Description:
@@ -79,7 +80,7 @@ Run the following command to set permissions on /etc/group- :
 # chown root:root /etc/group-
 # chmod u-x,go-wx /etc/group-
 ```
-
+---
 5. Ensure permissions on /etc/shadow are configured 
 (Automated)  
 #### Description:
@@ -110,35 +111,95 @@ Run the following command to remove excess permissions form /etc/shadow:
 ```
 # chmod u-x,g-wx,o-rwx /etc/shadow
 ```
+---
 6. Ensure permissions on /etc/shadow- are configured 
 (Automated)  
 
 #### Description:
-The /etc/shadow- file is used to store backup information about user accounts that is 
-critical to the security of those accounts, such as the hashed password and other 
-security information.
+The /etc/shadow- file is used to store backup information about user accounts that is critical to the security of those accounts, such as the hashed password and other security information.
 #### Rationale:
-It is critical to ensure that the /etc/shadow- file is protected from unauthorized access. 
-Although it is protected by default, the file permissions could be changed either 
-inadvertently or through malicious actions.
+It is critical to ensure that the /etc/shadow- file is protected from  unauthorized access. 
+Although it is protected by default, the file permissions could be changed either  inadvertently or through malicious actions.
 #### Audit:
-Run the following command and verify verify Uid is 0/root, Gid is 0/root or 
-\<gid>/shadow, and Access is 640 or more restrictive:
+Run the following command and verify verify `Uid` is `0/root`, `Gid` is `0/root` or 
+`\<gid>/shadow`, and `Access` is `640` or more restrictive:
 ```
 # stat /etc/shadowAccess: (0640/-rw-r-----) Uid: ( 0/ root) Gid: ( 42/ shadow)
 ```
 #### Remediation:
-Run one of the following commands to set ownership of /etc/shadow- to root and 
-group to either root or shadow:
+Run one of the following commands to set ownership of `/etc/shadow-` to `root` and 
+group to either `root` or `shadow`:
 ```
 # chown root:root /etc/shadow-
 # chown root:shadow /etc/shadow-
 ```
-Run the following command to remove excess permissions form /etc/shadow-:
+Run the following command to remove excess permissions form `/etc/shadow-:`
 ```
-# chmod u-x,g-wx,o-rwx /etc/shadow
+# chmod u-x,g-wx,o-rwx /etc/shadow-
 ```
+---
+7. Ensure permissions on /etc/gshadow are configured (Automated)
+
+#### Description:
+The /etc/gshadow file is used to store the information about groups that is critical to the security of those accounts, such as the hashed password and other security information.
+
+#### Rationale:
+If attackers can gain read access to the /etc/gshadow file, they can easily run a 
+password cracking program against the hashed password to break it. Other security 
+information that is stored in the `/etc/gshadow` file (such as group administrators) could also be useful to subvert the group.
+
+#### Audit:
+Run the following command and verify `Uid` is `0/root`, `Gid` is `0/root` or `<gid>/shadow`,
+and `Access` is `640` or more restrictive:
+```
+# stat /etc/gshadow
+Access: (0640/-rw-r-----) Uid: ( 0/ root) Gid: ( 42/ shadow)
+```
+Remediation:
+Run one of the following commands to set ownership of `/etc/gshadow` to `root` and 
+group to either `root` or `shadow`:
+```
+# chown root:root /etc/gshadow
+# chown root:shadow /etc/gshadow
+```
+
+Run the following command to remove excess permissions form `/etc/gshadow`:
+```
+# chmod u-x,g-wx,o-rwx /etc/gshadow
+```
+---
+8. Ensure permissions on /etc/gshadow- are configured 
+(Automated)
+#### Description:
+The /etc/gshadow- file is used to store backup information about groups that is critical 
+to the security of those accounts, such as the hashed password and other security 
+information.
+#### Rationale:
+It is critical to ensure that the `/etc/gshadow-` file is protected from unauthorized access. 
+Although it is protected by default, the file permissions could be changed either 
+inadvertently or through malicious actions.
+#### Audit:
+Run the following command and verify `Uid` is `0/root`, `Gid` is `0/root` or `<gid>/shadow`,
+and `Access` is `640` or more restrictive:
+```
+# stat /etc/gshadowAccess: (0640/-rw-r-----) Uid: ( 0/ root) Gid: ( 42/ shadow)
+```
+Remediation:
+Run one of the following commands to set ownership of `/etc/gshadow-` to `root` and 
+group to either `root` or `shadow`:
+```
+# chown root:root /etc/gshadow-
+# chown root:shadow /etc/gshadow-
+```
+Run the following command to remove excess permissions form `/etc/gshadow-`:
+```
+# chmod u-x,g-wx,o-rwx /etc/gshadow-
+```
+---
+
 ### 2
+
+
 
 ### 3
  
