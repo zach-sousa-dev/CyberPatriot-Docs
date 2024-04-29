@@ -938,4 +938,55 @@ Components\Desktop App Installer\Enable App Installer Experimental Features
 **REMIDIATION** To establish the recommended configuration via GP, set the following UI path to Disabled
 
 
+---
 
+### 18.10.17.3 (L1) Ensure 'Enable App Installer Hash Override' is set to 'Disabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Desktop App Installer\Enable App Installer Hash Override
+```
+
+---
+
+### 18.10.17.4 (L1) Ensure 'Enable App Installer ms-appinstaller protocol' is set to 'Disabled' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Desktop App Installer\Enable App Installer ms-appinstaller 
+protocol
+```
+
+---
+
+### 18.10.26.1.1 (L1) Ensure 'Application: Control Event Log behavior when the log file reaches its maximum size' is set to 'Disabled' (Automated)
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Event Log Service\Application\Control Event Log behavior when the 
+log file reaches its maximum size
+```
+
+---
+
+
+### 18.10.26.1.2 (L1) Ensure 'Application: Specify the maximum log file size (KB)' is set to 'Enabled: 32,768 or greater' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Event Log Service\Application\Specify the maximum log file size 
+(KB)
+```
+
+---
+
+### 18.10.26.2.1 (L1) Ensure 'Security: Control Event Log behavior when the log file reaches its maximum size' is set to 'Disabled' (Automated)
+
+
+```
+Computer Configuration\Policies\Administrative Templates\Windows 
+Components\Event Log Service\Security\Control Event Log behavior when the log 
+file reaches its maximum size
+```
