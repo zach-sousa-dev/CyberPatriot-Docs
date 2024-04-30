@@ -283,7 +283,7 @@ boot time.
 
 > **More Information**
 > 
-> ![Additional tmp information](images/ubuntu/1-1-2-1.png)
+> ![Additional tmp information](images/linux/1-1-2-1.png)
 
 [\[1\]](https://www.freedesktop.org/wiki/Software/systemd/APIFileSystems/)
 [\[2\]](https://www.freedesktop.org/software/systemd/man/latest/systemd-fstab-generator.html)
@@ -4620,27 +4620,152 @@ Run the following command to install Uncomplicated Firewall (UFW):
 
 2. Ensure iptables-persistent is not installed with ufw (Automated)
 
+Run the following command to verify that the `iptables-persistent` package is not installed:
 
+```
+dpkg-query -s iptables-persistent
+
+package 'iptables-persistent' is not installed and no information is available
+```
+
+Run the following command to remove the iptables-persistent package: 
+
+`# apt purge iptables-persistent`
 
 3. Ensure ufw service is enabled (Automated)
 
+> When running ufw enable or starting ufw via its initscript, ufw will flush its chains. 
 
+> This is required so ufw can maintain a consistent state, but it may drop existing connections (eg ssh). ufw does support adding rules before enabling the firewall.
+
+Run the following command before running ufw enable.
+
+`# ufw allow proto tcp from any to any port 22`
+
+> The rules will still be flushed, but the ssh port will be open after enabling the firewall. Please note that once ufw is 'enabled', ufw will not flush the chains when adding or removing rules (but will when modifying a rule or changing the default policy)
+
+> By default, ufw will prompt when enabling the firewall while running under ssh. This can be disabled by using ufw --force enable
+
+Run the following command to verify that the `ufw` daemon is enabled:
+
+```
+# systemctl is-enabled ufw.service
+enabled
+```
+
+Run the following command to verify that the `ufw` daemon is active:
+
+```
+# systemctl is-active ufw
+active
+```
+
+Run the following command to verify `ufw` is active
+
+```
+# ufw status
+
+Status: active
+```
+
+Run the following command to unmask the `ufw` daemon:
+
+`# systemctl unmask ufw.service`
+
+Run the following command to enable and start the `ufw` daemon:
+
+```
+# systemctl --now enable ufw.service
+
+active
+```
+
+Run the following command to enable `ufw`:
+
+`# ufw enable`
 
 4. Ensure ufw loopback traffic is configured (Automated)
 
+Run the following commands and verify output includes the listed rules in order:
 
+```
+# ufw status verbose
+To                    Action      From
+--                    ------      ----
+Anywhere on lo        ALLOW IN    Anywhere 
+Anywhere DENY         IN          127.0.0.0/8 
+Anywhere (v6) on lo   ALLOW IN    Anywhere (v6) 
+Anywhere (v6)         DENY IN     ::1 
+
+Anywhere              ALLOW OUT   Anywhere on lo 
+Anywhere (v6)         ALLOW OUT   Anywhere (v6) on lo
+```
+
+Run the following commands to implement the loopback rules:
+
+```
+# ufw allow in on lo
+# ufw allow out on lo
+# ufw deny in from 127.0.0.0/8
+# ufw deny in from ::1
+```
 
 5. Ensure ufw outbound connections are configured (Manual)
 
+Run the following command and verify all rules for new outbound connections match site policy:
 
+`# ufw status numbered`
+
+Configure ufw in accordance with site policy. The following command will implement a policy to allow all outbound connections on all interfaces:
+
+`# ufw allow out on all`
 
 6. Ensure ufw firewall rules exist for all open ports (Automated)
 
+Run the following script to verify a firewall rule exists for all open ports:
 
+``` bash
+#!/usr/bin/env bash
+ufw_out="$(ufw status verbose)"
+ss -tuln | awk '($5!~/%lo:/ && $5!~/127.0.0.1:/ && $5!~/::1/) {split($5, a, ":"); print a[2]}' | sort | uniq | while read -r lpn; do
+	! grep -Pq "^\h*$lpn\b" <<< "$ufw_out" && echo "- Port: \"$lpn\" is missing a firewall rule"
+done
+```
+
+For each port identified in the audit which does not have a firewall rule, add rule for accepting or denying inbound connections:  
+Example:
+
+`# ufw allow in <port>/<tcp or udp protocol>`
 
 7. Ensure ufw default deny firewall policy (Automated)
 
+Any port and protocol not explicitly allowed will be blocked. The following rules should be considered before applying the default deny.
 
+```
+ufw allow git
+ufw allow in http
+ufw allow out http <- required for apt to connect to repository 
+ufw allow in https
+ufw allow out https 
+ufw allow out 53
+ufw logging on
+```
+
+Run the following command and verify that the default policy for **incoming**, **outgoing**, and routed directions is **deny**, **reject**, or **disabled**:
+
+`# ufw status verbose | grep Default:`
+
+Example output:
+
+`Default: deny (incoming), deny (outgoing), disabled (routed)`
+
+Run the following commands to implement a default deny policy:
+
+```
+# ufw default deny incoming
+# ufw default deny outgoing
+# ufw default deny routed
+```
 
 #### 2 Configure nftables
 

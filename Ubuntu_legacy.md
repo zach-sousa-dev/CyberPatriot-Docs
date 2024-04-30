@@ -207,19 +207,19 @@
 
 	1. Open "Software and Updates"
 
-	![Software and Updates](images/ubuntu/legacy/softwareandupdates.png "Launching Software and Updates")
+	![Software and Updates](images/linux/legacy/softwareandupdates.png "Launching Software and Updates")
 
 	2. Navigate to the "Updates" tab
 
-	![Updates](images/legacy/ubuntu/updates.png "Navigating to Updates")
+	![Updates](images/legacy/linux/updates.png "Navigating to Updates")
 
 	3. Select the dropdown menu next to "Automatically check for updates" and select daily
 
-	![Daily](images/legacy/ubuntu/daily.png "Selecting Daily from drop down")
+	![Daily](images/legacy/linux/daily.png "Selecting Daily from drop down")
 
 	4. Enter the password for your user account, if prompted
 
-	![Authenticate](images/legacy/ubuntu/auth.png "Entering password")
+	![Authenticate](images/legacy/linux/auth.png "Entering password")
 
 	5. Press "Authenticate"
 
