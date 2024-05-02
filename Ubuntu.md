@@ -4603,6 +4603,9 @@ Run the following script to disable `tipc`:
 
 ### 5 Firewall Configuration
 #### 1 Configure UncomplicatedFirewall
+
+> If nftables or iptables are being used in your environment, please follow the guidance in their respective section and pass-over the guidance in this section.
+
 1. Ensure ufw is installed (Automated)
 
 Run the following command to verify that Uncomplicated Firewall (UFW) is installed:
@@ -4769,6 +4772,8 @@ Run the following commands to implement a default deny policy:
 
 #### 2 Configure nftables
 
+> If Uncomplicated Firewall (UFW) or iptables are being used in your environment, please follow the guidance in their respective section and pass-over the guidance in this section.
+
 > The following will implement the firewall rules of this section and open ICMP, IGMP, and port 22(ssh) from anywhere. Opening the ports for ICMP, IGMP, and port 22(ssh) needs to be updated in accordance with local site policy. Allow port 22(ssh) needs to be updated to only allow systems requiring ssh connectivity to connect, as per site policy.
 
 Save the script below as `/etc/nftables.rules`
@@ -4832,23 +4837,135 @@ Add the following line to `/etc/nftables.conf`
 
 1. Ensure nftables is installed (Automated)
 
+Run the following command to verify that `nftables` is installed:
+
+```
+# dpkg-query -s nftables | grep 'Status: install ok installed'
+Status: install ok installed
+```
+
+Run the following command to install `nftables`:
+
+`# apt install nftables`
 
 
 2. Ensure ufw is uninstalled or disabled with nftables (Automated)
 
+Run the following commands to verify that `ufw` is either not installed or disabled. Only one of the following needs to pass.
 
+Run the following command to verify that `ufw` is not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' ufw
+ufw unknown ok not-installed not-installed
+```
+
+Run the following command to verify `ufw` is disabled:
+
+```
+# ufw status
+Status: inactive
+```
+
+Run the following commands to verify that the `ufw` service is masked:
+
+```
+# systemctl is-enabled ufw
+
+masked
+```
 
 3. Ensure iptables are flushed with nftables (Manual)
 
+Run the following commands to ensure no iptables rules exist
+For `iptables`:
 
+`# iptables -L`
+
+No rules should be returned
+
+For `ip6tables`:
+
+`# ip6tables -L`
+
+No rules should be returned
+
+Run the following commands to flush iptables:
+
+For `iptables`:
+
+`# iptables -F`
+
+For `ip6tables`:
+
+`# ip6tables -F`
 
 4. Ensure a nftables table exists (Automated)
 
+Run the following command to verify that a `nftables` table exists:
+
+`# nft list tables`
+
+Return should include a list of `nftables`:  
+Example:
+
+`table inet filter`
+
+Run the following command to create a table in `nftables`
+
+`# nft create table inet <table name>`
+
+Example:
+
+`# nft create table inet filter`
 
 
 5. Ensure nftables base chains exist (Automated)
 
+> If configuring nftables over ssh, creating a base chain with a policy of drop will cause loss of connectivity.
 
+> Ensure that a rule allowing ssh has been added to the base chain prior to setting the base chain's policy to drop
+
+Run the following commands and verify that base chains exist for `INPUT`.
+
+```
+# nft list ruleset | grep 'hook input'
+
+type filter hook input priority 0;
+```
+
+Run the following commands and verify that base chains exist for `FORWARD`.
+
+```
+# nft list ruleset | grep 'hook forward'
+
+type filter hook forward priority 0;
+```
+
+Run the following commands and verify that base chains exist for `OUTPUT`.
+
+```
+# nft list ruleset | grep 'hook output'
+
+type filter hook output priority 0;
+```
+
+Run the following command to create the base chains:
+
+```
+# nft create chain inet <table name> <base chain name> { type filter hook 
+<(input|forward|output)> priority 0 \; }
+```
+
+Example:
+
+```
+# nft create chain inet filter input { type filter hook input priority 0 \; }
+# nft create chain inet filter forward { type filter hook forward priority 0 
+\; }
+# nft create chain inet filter output { type filter hook output priority 0 \; 
+}
+```
 
 6. Ensure nftables loopback traffic is configured (Automated)
 
@@ -4871,18 +4988,78 @@ Add the following line to `/etc/nftables.conf`
 
 
 #### 3 Configure iptables
+> If Uncomplicated Firewall (UFW) or nftables are being used in your environment, please follow the guidance in their respective section and pass-over the guidance in this section.
+
 ##### 1 Configure iptables software
 1. Ensure iptables packages are installed (Automated)
 
+Run the following command to verify that `iptables` and `iptables-persistent` are installed:
+
+```
+# apt list iptables iptables-persistent | grep installed
+iptables-persistent/<version> [installed,automatic]
+iptables/<version> [installed,automatic]
+```
+
+Run the following command to install `iptables` and `iptables-persistent`
+
+`# apt install iptables iptables-persistent`
 
 
 2. Ensure nftables is not installed with iptables (Automated)
 
+Run the following commend to verify that `nftables` is not installed:
 
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nftables
+
+nftables unknown ok not-installed not-installed
+```
+
+Run the following command to remove `nftables`:
+
+`# apt purge nftables`
 
 3. Ensure ufw is uninstalled or disabled with iptables (Automated)
 
+Run the following commands to verify that `ufw` is either not installed or disabled. Only one of the following needs to pass.
 
+Run the following command to verify that `ufw` is not installed:
+
+```
+# dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' ufw
+ufw unknown ok not-installed not-installed
+```
+
+Run the following command to verify `ufw` is disabled:
+
+```
+# ufw status
+Status: inactive
+```
+
+Run the following commands to verify that the `ufw` service is masked:
+
+```
+# systemctl is-enabled ufw
+
+masked
+```
+
+Run one of the following commands to either remove `ufw` or stop and mask `ufw`
+
+Run the following command to remove `ufw`:
+
+`# apt purge ufw`
+
+**OR**  
+Run the following commands to disable `ufw`:
+
+```
+# ufw disable
+# systemctl stop ufw
+# systemctl mask ufw
+```
 
 ##### 2 Configure IPV4 iptables
 
@@ -4911,7 +5088,6 @@ iptables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT
 iptables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT
 # Open inbound ssh(tcp port 22) connections
 iptables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
-
 ```
 
 1. Ensure iptables default deny firewall policy (Automated)
