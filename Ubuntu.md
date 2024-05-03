@@ -4969,23 +4969,202 @@ Example:
 
 6. Ensure nftables loopback traffic is configured (Automated)
 
+Run the following commands to verify that the loopback interface is configured:
 
+```
+# nft list ruleset | awk '/hook input/,/}/' | grep 'iif "lo" accept'
+
+iif "lo" accept
+# nft list ruleset | awk '/hook input/,/}/' | grep 'ip saddr'
+
+ip saddr 127.0.0.0/8 counter packets 0 bytes 0 drop
+```
+
+IF IPv6 is enabled on the system:  
+Run the following command to verify that the IPv6 loopback interface is configured:
+
+```
+# nft list ruleset | awk '/hook input/,/}/' | grep 'ip6 saddr'
+
+ip6 saddr ::1 counter packets 0 bytes 0 drop
+```
+
+Run the following commands to implement the loopback rules:
+
+```
+# nft add rule inet filter input iif lo accept
+# nft create rule inet filter input ip saddr 127.0.0.0/8 counter drop
+```
+
+IF IPv6 is enabled on the system:  
+Run the following command to implement the IPv6 loopback rule:
+
+`# nft add rule inet filter input ip6 saddr ::1 counter drop`
 
 7. Ensure nftables outbound and established connections are configured (Manual)
 
+Run the following commands and verify all rules for established incoming connections match site policy: site policy:
 
+```
+# nft list ruleset | awk '/hook input/,/}/' | grep -E 'ip protocol 
+(tcp|udp|icmp) ct state'
+```
+
+Output should be similar to:
+
+```
+ip protocol tcp ct state established accept
+ip protocol udp ct state established accept
+ip protocol icmp ct state established accept
+```
+
+Run the folllowing command and verify all rules for new and established outbound connections match site policy
+
+```
+# nft list ruleset | awk '/hook output/,/}/' | grep -E 'ip protocol 
+(tcp|udp|icmp) ct state'
+```
+
+Output should be similar to:
+
+```
+ip protocol tcp ct state established,related,new accept
+ip protocol udp ct state established,related,new accept
+ip protocol icmp ct state established,related,new accept
+```
+
+Configure nftables in accordance with site policy. The following commands will implement a policy to allow all outbound connections and all established connections:
+
+```
+# nft add rule inet filter input ip protocol tcp ct state established accept
+
+# nft add rule inet filter input ip protocol udp ct state established accept
+
+# nft add rule inet filter input ip protocol icmp ct state established accept
+
+# nft add rule inet filter output ip protocol tcp ct state new,related,established accept
+
+# nft add rule inet filter output ip protocol udp ct state new,related,established accept
+
+# nft add rule inet filter output ip protocol icmp ct state new,related,established accept
+```
 
 8. Ensure nftables default deny firewall policy (Automated)
 
+Run the following commands and verify that base chains contain a policy of `DROP`.
 
+```
+# nft list ruleset | grep 'hook input'
+
+type filter hook input priority 0; policy drop;
+# nft list ruleset | grep 'hook forward'
+
+type filter hook forward priority 0; policy drop;
+# nft list ruleset | grep 'hook output'
+
+type filter hook output priority 0; policy drop;
+```
+
+Run the following command for the base chains with the input, forward, and output hooks to implement a default DROP policy:
+
+`# nft chain <table family> <table name> <chain name> { policy drop \; }`
+
+Example:
+
+```
+# nft chain inet filter input { policy drop \; }
+
+# nft chain inet filter forward { policy drop \; }
+
+# nft chain inet filter output { policy drop \; }
+```
 
 9. Ensure nftables service is enabled (Automated)
 
+Run the following command and verify that the nftables service is enabled:
 
+```
+# systemctl is-enabled nftables
+
+enabled
+```
+
+Run the following command to enable the nftables service:
+
+`# systemctl enable nftables`
 
 10. Ensure nftables rules are permanent (Automated)
 
+Run the following commands to verify that input, forward, and output base chains are configured to be applied to a nftables ruleset on boot:  
+Run the following command to verify the input base chain:
 
+`# [ -n "$(grep -E '^\s*include' /etc/nftables.conf)" ] && awk '/hook input/,/}/' $(awk '$1 ~ /^\s*include/ { gsub("\"","",$2);print $2 }' /etc/nftables.conf)`
+
+Output should be similar to:
+
+```
+type filter hook input priority 0; policy drop;
+
+# Ensure loopback traffic is configured
+iif "lo" accept
+ip saddr 127.0.0.0/8 counter packets 0 bytes 0 drop
+ip6 saddr ::1 counter packets 0 bytes 0 drop
+
+# Ensure established connections are configured
+ip protocol tcp ct state established accept
+ip protocol udp ct state established accept
+ip protocol icmp ct state established accept
+
+# Accept port 22(SSH) traffic from anywhere
+tcp dport ssh accept
+
+# Accept ICMP and IGMP from anywhere
+icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, mld-listener-query, mld-listener-report, mld-listener-done, nd-router-solicit, nd-router-advert, nd-neighbor-solicit, ndneighbor-advert, ind-neighbor-solicit, ind-neighbor-advert, mld2-listener-report } accept
+```
+
+Review the input base chain to ensure that it follows local site policy
+Run the following command to verify the forward base chain:
+
+`# [ -n "$(grep -E '^\s*include' /etc/nftables.conf)" ] && awk '/hook forward/,/}/' $(awk '$1 ~ /^\s*include/ { gsub("\"","",$2);print $2 }' /etc/nftables.conf)`
+
+Output should be similar to:
+
+```
+# Base chain for hook forward named forward (Filters forwarded network packets)
+chain forward {
+	type filter hook forward priority 0; policy drop;
+}
+```
+
+Review the forward base chain to ensure that it follows local site policy.  
+Run the following command to verify the forward base chain:
+
+`# [ -n "$(grep -E '^\s*include' /etc/nftables.conf)" ] && awk '/hook output/,/}/' $(awk '$1 ~ /^\s*include/ { gsub("\"","",$2);print $2 }' /etc/nftables.conf)`
+
+Output should be similar to:
+
+```
+# Base chain for hook output named output (Filters outbound network packets)
+chain output {
+	type filter hook output priority 0; policy drop;
+	# Ensure outbound and established connections are configured
+	ip protocol tcp ct state established,related,new accept
+	ip protocol tcp ct state established,related,new accept
+	ip protocol udp ct state established,related,new accept
+	ip protocol icmp ct state established,related,new accept
+}
+```
+
+Review the output base chain to ensure that it follows local site policy.
+
+Edit the `/etc/nftables.conf` file and un-comment or add a line with include `<Absolute path to nftables rules file>` for each nftables file you want included in the nftables ruleset on boot  
+Example:
+
+`# vi /etc/nftables.conf`
+
+Add the line:
+
+`include "/etc/nftables.rules"`
 
 #### 3 Configure iptables
 > If Uncomplicated Firewall (UFW) or nftables are being used in your environment, please follow the guidance in their respective section and pass-over the guidance in this section.
