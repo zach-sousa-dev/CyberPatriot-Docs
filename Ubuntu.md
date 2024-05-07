@@ -5271,19 +5271,102 @@ iptables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 
 1. Ensure iptables default deny firewall policy (Automated)
 
+Run the following command and verify that the policy for the `INPUT`, `OUTPUT`, and `FORWARD` chains is `DROP` or `REJECT`:
 
+```
+# iptables -L
+Chain INPUT (policy DROP)
+Chain FORWARD (policy DROP)
+Chain OUTPUT (policy DROP)
+```
+
+Run the following commands to implement a default `DROP` policy:
+
+```
+# iptables -P INPUT DROP
+# iptables -P OUTPUT DROP
+# iptables -P FORWARD DROP
+```
 
 2. Ensure iptables loopback traffic is configured (Automated)
 
+Run the following commands and verify output includes the listed rules in order (packet and byte counts may differ):
 
+```
+# iptables -L INPUT -v -n
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+	pkts bytes target prot opt in out source destination
+	0 0 ACCEPT all -- lo * 0.0.0.0/0 0.0.0.0/0
+	0 0 DROP all -- * * 127.0.0.0/8 0.0.0.0/0
+
+# iptables -L OUTPUT -v -n
+Chain OUTPUT (policy DROP 0 packets, 0 bytes)
+	pkts bytes target prot opt in out source destination
+	0 0 ACCEPT all -- * lo 0.0.0.0/0 0.0.0.0/0
+```
+
+Run the following commands to implement the loopback rules:
+
+```
+# iptables -A INPUT -i lo -j ACCEPT
+# iptables -A OUTPUT -o lo -j ACCEPT
+# iptables -A INPUT -s 127.0.0.0/8 -j DROP
+```
 
 3. Ensure iptables outbound and established connections are configured (Manual)
 
+Run the following command and verify all rules for new outbound, and established connections match site policy:
 
+`# iptables -L -v -n`
+
+Configure iptables in accordance with site policy. The following commands will implement a policy to allow all outbound connections and all established connections:
+
+```
+# iptables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT
+# iptables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT
+# iptables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT
+```
 
 4. Ensure iptables firewall rules exist for all open ports (Automated)
 
+Run the following command to determine open ports:
 
+```
+# ss -4tuln
+Netid State Recv-Q Send-Q Local Address:Port Peer 
+Address:Port
+udp UNCONN 0 0 *:68 
+*:*
+udp UNCONN 0 0 *:123 
+*:*
+tcp LISTEN 0 128 *:22 
+*:*
+```
+
+Run the following command to determine firewall rules:
+
+```
+# iptables -L INPUT -v -n
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+pkts bytes target prot opt in out source 
+destination
+ 0 0 ACCEPT all -- lo * 0.0.0.0/0 0.0.0.0/0
+ 0 0 DROP all -- * * 127.0.0.0/8 0.0.0.0/0
+ 0 0 ACCEPT tcp -- * * 0.0.0.0/0 0.0.0.0/0 
+tcp dpt:22 state NEW
+```
+
+Verify all open ports listening on non-localhost addresses have at least one firewall rule.The last line identified by the "tcp dpt:22 state NEW" identifies it as a firewall rule for new connections on tcp port 22.
+
+For each port identified in the audit which does not have a firewall rule establish a proper rule for accepting inbound connections:
+
+```
+# iptables -A INPUT -p <protocol> --dport <port> -m state --state NEW -j 
+ACCEPT
+```
 
 ##### 3 Configure IPV6 ip6tables
 
@@ -5316,19 +5399,182 @@ ip6tables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
 
 1. Ensure ip6tables default deny firewall policy (Automated)
 
+Run the following command and verify that the policy for the `INPUT`, `OUTPUT`, and `FORWARD` chains is `DROP` or `REJECT`:
 
+```
+# ip6tables -L
+Chain INPUT (policy DROP)
+Chain FORWARD (policy DROP)
+Chain OUTPUT (policy DROP)
+```
+
+**OR** verify IPv6 is disabled:  
+Run the following script. Output will confirm if IPv6 is disabled on the system.
+
+``` bash
+#!/usr/bin/bash
+output=""
+grubfile="$(find -L /boot -name 'grub.cfg' -type f)"
+[ -f "$grubfile" ] && ! grep "^\s*linux" "$grubfile" | grep -vq ipv6.disable=1 && output="ipv6 disabled in grub config"
+grep -Eqs "^\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1\b" /etc/sysctl.conf /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf \
+/run/sysctl.d/*.conf && grep -Eqs 
+"^\s*net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1\b" /etc/sysctl.conf /etc/sysctl.d/*.conf \
+/usr/lib/sysctl.d/*.conf /run/sysctl.d/*.conf && sysctl 
+net.ipv6.conf.all.disable_ipv6 | grep -Eq \
+"^\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1\b" && sysctl 
+net.ipv6.conf.default.disable_ipv6 | \
+grep -Eq "^\s*net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1\b" && 
+output="ipv6 disabled in sysctl config"
+[ -n "$output" ] && echo -e "\n$output" || echo -e "\n*** IPv6 is enabled on the system ***"
+```
+
+Run the following commands to implement a default DROP policy:
+
+```
+# ip6tables -P INPUT DROP
+# ip6tables -P OUTPUT DROP
+# ip6tables -P FORWARD DROP
+```
 
 2. Ensure ip6tables loopback traffic is configured (Automated)
 
+Run the following commands and verify output includes the listed rules in order (packet and byte counts may differ):
 
+```
+# ip6tables -L INPUT -v -n
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+	pkts bytes target prot opt in out source destination
+	0 0 ACCEPT all lo * ::/0 ::/0 
+	0 0 DROP all * * ::1 ::/0 
+
+# ip6tables -L OUTPUT -v -n
+Chain OUTPUT (policy DROP 0 packets, 0 bytes)
+	pkts bytes target prot opt in out source destination
+	0 0 ACCEPT all * lo ::/0 ::/0
+```
+
+**OR** verify IPv6 is disabled:  
+Run the following script. Output will confirm if IPv6 is disabled on the system.
+
+``` bash
+#!/usr/bin/bash
+output=""
+grubfile="$(find -L /boot -name 'grub.cfg' -type f)"
+[ -f "$grubfile" ] && ! grep "^\s*linux" "$grubfile" | grep -vq ipv6.disable=1 && output="ipv6 disabled in grub config"
+grep -Eqs "^\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1\b" /etc/sysctl.conf /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf \
+/run/sysctl.d/*.conf && grep -Eqs 
+"^\s*net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1\b" /etc/sysctl.conf /etc/sysctl.d/*.conf \
+/usr/lib/sysctl.d/*.conf /run/sysctl.d/*.conf && sysctl 
+net.ipv6.conf.all.disable_ipv6 | grep -Eq \
+"^\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1\b" && sysctl 
+net.ipv6.conf.default.disable_ipv6 | \
+grep -Eq "^\s*net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1\b" && 
+output="ipv6 disabled in sysctl config"
+[ -n "$output" ] && echo -e "\n$output" || echo -e "\n*** IPv6 is enabled on the system ***"
+```
+
+Run the following commands to implement the loopback rules:
+
+```
+# ip6tables -A INPUT -i lo -j ACCEPT
+# ip6tables -A OUTPUT -o lo -j ACCEPT
+# ip6tables -A INPUT -s ::1 -j DROP
+```
 
 3. Ensure ip6tables outbound and established connections are configured (Manual)
 
+Run the following command and verify all rules for new outbound, and established connections match site policy:
 
+`# ip6tables -L -v -n`
+
+**OR** verify IPv6 is disabled:  
+Run the following script. Output will confirm if IPv6 is disabled on the system.
+
+``` bash
+#!/usr/bin/bash
+output=""
+grubfile="$(find -L /boot -name 'grub.cfg' -type f)"
+[ -f "$grubfile" ] && ! grep "^\s*linux" "$grubfile" | grep -vq ipv6.disable=1 && output="ipv6 disabled in grub config"
+grep -Eqs "^\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1\b" /etc/sysctl.conf /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf \
+/run/sysctl.d/*.conf && grep -Eqs 
+"^\s*net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1\b" /etc/sysctl.conf /etc/sysctl.d/*.conf \
+/usr/lib/sysctl.d/*.conf /run/sysctl.d/*.conf && sysctl 
+net.ipv6.conf.all.disable_ipv6 | grep -Eq \
+"^\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1\b" && sysctl 
+net.ipv6.conf.default.disable_ipv6 | \
+grep -Eq "^\s*net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1\b" && 
+output="ipv6 disabled in sysctl config"
+[ -n "$output" ] && echo -e "\n$output" || echo -e "\n*** IPv6 is enabled on the system ***"
+```
+
+Configure iptables in accordance with site policy. The following commands will implement a policy to allow all outbound connections and all established connections:
+
+```
+# ip6tables -A OUTPUT -p tcp -m state --state NEW,ESTABLISHED -j ACCEPT
+# ip6tables -A OUTPUT -p udp -m state --state NEW,ESTABLISHED -j ACCEPT
+# ip6tables -A OUTPUT -p icmp -m state --state NEW,ESTABLISHED -j ACCEPT
+# ip6tables -A INPUT -p tcp -m state --state ESTABLISHED -j ACCEPT
+# ip6tables -A INPUT -p udp -m state --state ESTABLISHED -j ACCEPT
+# ip6tables -A INPUT -p icmp -m state --state ESTABLISHED -j ACCEPT
+```
 
 4. Ensure ip6tables firewall rules exist for all open ports (Automated)
 
+Run the following command to determine open ports:
 
+```
+# ss -6tuln
+Netid State Recv-Q Send-Q Local Address:Port Peer 
+Address:Port 
+udp UNCONN 0 0 ::1:123 
+:::*
+udp UNCONN 0 0 :::123 
+:::*
+tcp LISTEN 0 128 :::22 
+:::*
+tcp LISTEN 0 20 ::1:25 
+:::*
+```
+
+Run the following command to determine firewall rules:
+
+```
+# ip6tables -L INPUT -v -n
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+	pkts bytes target prot opt in out source destination 
+	0 0 ACCEPT all lo * ::/0 ::/0 
+	0 0 DROP all * * ::1 ::/0 
+	0 0 ACCEPT tcp * * ::/0 ::/0 
+tcp dpt:22 state NEW
+```
+
+Verify all open ports listening on non-localhost addresses have at least one firewall rule.
+The last line identified by the "tcp dpt:22 state NEW" identifies it as a firewall rule for 
+new connections on tcp port 22
+
+**OR** verify IPv6 is disabled:  
+Run the following script. Output will confirm if IPv6 is disabled on the system.
+
+``` bash
+#!/usr/bin/bash
+output=""
+grubfile="$(find -L /boot -name 'grub.cfg' -type f)"
+[ -f "$grubfile" ] && ! grep "^\s*linux" "$grubfile" | grep -vq ipv6.disable=1 && output="ipv6 disabled in grub config"
+grep -Eqs "^\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1\b" /etc/sysctl.conf /etc/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf \
+/run/sysctl.d/*.conf && grep -Eqs 
+"^\s*net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1\b" /etc/sysctl.conf /etc/sysctl.d/*.conf \
+/usr/lib/sysctl.d/*.conf /run/sysctl.d/*.conf && sysctl 
+net.ipv6.conf.all.disable_ipv6 | grep -Eq \
+"^\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1\b" && sysctl 
+net.ipv6.conf.default.disable_ipv6 | \
+grep -Eq "^\s*net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1\b" && 
+output="ipv6 disabled in sysctl config"
+[ -n "$output" ] && echo -e "\n$output" || echo -e "\n*** IPv6 is enabled on the system ***"
+```
+
+For each port identified in the audit which does not have a firewall rule establish a proper rule for accepting inbound connections:
+
+`# ip6tables -A INPUT -p <protocol> --dport <port> -m state --state NEW -j ACCEPT`
 
 ---
 
